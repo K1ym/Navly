@@ -1,0 +1,12 @@
+{
+  "object_name": "host_dispatch_result",
+  "object_scope": "bridge_local",
+  "request_id": "placeholder-request-id",
+  "host_trace_ref": "host:trace:placeholder",
+  "host_session_ref": "host:session:placeholder",
+  "dispatch_status": "not_executed",
+  "dispatch_mode": "thread_reply",
+  "delivery_receipt_ref": null,
+  "dispatched_at": null,
+  "trace_refs": []
+}
