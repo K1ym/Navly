@@ -12,6 +12,8 @@
   - `navly-v1/openclaw-host-bridge/`：Navly_v1 OpenClaw 宿主桥接层专项方案包
   - `navly-v1/runtime/`：Navly_v1 thin runtime shell 专项方案包
   - `navly-v1/verification/`：Navly_v1 verification / regression baseline 方案包
+  - `navly-v1/2026-04-06-navly-v1-upstream-integration-policy.md`：各 upstream 的统一采用方式
+  - `navly-v1/2026-04-06-navly-v1-implementation-kickoff.md`：implementation 启动与首批 PR 基线
 
 当前目录：
 

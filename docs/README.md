@@ -17,18 +17,21 @@ Navly 的文档按 **用途优先** 组织，按 **业务域** 细分。
 2. `specs/navly-v1/2026-04-06-navly-v1-modular-development-and-vibe-coding.md`
 3. `specs/navly-v1/2026-04-06-navly-v1-naming-conventions.md`
 4. `specs/navly-v1/2026-04-06-navly-v1-shared-contracts-layer.md`
-5. `specs/navly-v1/data-platform/README.md`
-6. `specs/navly-v1/auth-kernel/README.md`
-7. `specs/navly-v1/openclaw-host-bridge/README.md`
-8. `specs/navly-v1/runtime/README.md`
-9. `specs/navly-v1/verification/README.md`
-10. `architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
-11. `api/qinqin/README.md`
-12. `api/qinqin/endpoint-manifest.md`
-13. `api/qinqin/auth-and-signing.md`
-14. `specs/navly-v1/README.md`
-15. `architecture/navly-v1/README.md`
-16. `audits/qinqin/README.md`
+5. `specs/navly-v1/2026-04-06-navly-v1-upstream-integration-policy.md`
+6. `specs/navly-v1/2026-04-06-navly-v1-implementation-kickoff.md`
+7. `specs/navly-v1/data-platform/README.md`
+8. `specs/navly-v1/auth-kernel/README.md`
+9. `specs/navly-v1/openclaw-host-bridge/README.md`
+10. `specs/navly-v1/runtime/README.md`
+11. `specs/navly-v1/verification/README.md`
+12. `architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
+13. `api/qinqin/README.md`
+14. `api/qinqin/endpoint-manifest.md`
+15. `api/qinqin/auth-and-signing.md`
+16. `specs/navly-v1/README.md`
+17. `architecture/navly-v1/README.md`
+18. `reference/navly-v1/2026-04-06-navly-v1-canonical-ids-and-glossary.md`
+19. `audits/qinqin/README.md`
 
 ## 当前文档域
 

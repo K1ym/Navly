@@ -41,6 +41,10 @@
   - `runtime` 第一阶段必须闭合的最小 vertical slice、能力优先级、验收标准与延期项
 - `2026-04-06-navly-v1-thin-runtime-external-interfaces.md`
   - `runtime` 与 `openclaw-host-bridge`、`auth-kernel`、`data-platform` 的正式接口、request lifecycle、错误归属与禁止耦合点
+- `2026-04-06-navly-v1-thin-runtime-target-repo-structure.md`
+  - `runtimes/navly-runtime/` 的目标目录骨架、职责与默认读取边界
+- `2026-04-06-navly-v1-thin-runtime-implementation-plan.md`
+  - `thin runtime shell` phase-1 的可执行 implementation plan、里程碑与 gate
 
 ---
 
@@ -50,13 +54,15 @@
 2. `2026-04-06-navly-v1-thin-runtime-internal-layers.md`
 3. `2026-04-06-navly-v1-thin-runtime-phase-1.md`
 4. `2026-04-06-navly-v1-thin-runtime-external-interfaces.md`
-5. `../2026-04-06-navly-v1-design.md`
-6. `../2026-04-06-navly-v1-modular-development-and-vibe-coding.md`
-7. `../2026-04-06-navly-v1-naming-conventions.md`
-8. `../2026-04-06-navly-v1-shared-contracts-layer.md`
-9. `../auth-kernel/README.md`
-10. `../data-platform/README.md`
-11. `../../../architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
+5. `2026-04-06-navly-v1-thin-runtime-target-repo-structure.md`
+6. `2026-04-06-navly-v1-thin-runtime-implementation-plan.md`
+7. `../2026-04-06-navly-v1-design.md`
+8. `../2026-04-06-navly-v1-modular-development-and-vibe-coding.md`
+9. `../2026-04-06-navly-v1-naming-conventions.md`
+10. `../2026-04-06-navly-v1-shared-contracts-layer.md`
+11. `../auth-kernel/README.md`
+12. `../data-platform/README.md`
+13. `../../../architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
 
 ---
 

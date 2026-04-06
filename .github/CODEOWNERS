@@ -1,0 +1,13 @@
+# Default total-control owner
+* @K1ym
+
+# Specs and architecture
+/docs/specs/ @K1ym
+/docs/architecture/ @K1ym
+/docs/reference/ @K1ym
+/docs/api/ @K1ym
+/docs/audits/ @K1ym
+
+# Collaboration policy files
+/.github/ @K1ym
+/AGENTS.md @K1ym

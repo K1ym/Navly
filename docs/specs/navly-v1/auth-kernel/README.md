@@ -39,6 +39,10 @@
   - `Navly_v1` 权限与会话绑定内核第一阶段的闭环范围、交付顺序、验收标准与非目标
 - `2026-04-06-navly-v1-auth-kernel-external-interfaces.md`
   - `auth-kernel` 与 `data-platform`、`openclaw-host-bridge`、`runtime` 的正式接口边界、输入输出契约与责任矩阵
+- `2026-04-06-navly-v1-auth-kernel-target-repo-structure.md`
+  - `platforms/auth-kernel/` 的目标目录骨架、写入边界与默认消费边界
+- `2026-04-06-navly-v1-auth-kernel-implementation-plan.md`
+  - `auth-kernel` phase-1 的可执行 implementation plan、里程碑与 gate
 
 ---
 
@@ -48,10 +52,12 @@
 2. `2026-04-06-navly-v1-auth-kernel-internal-layers.md`
 3. `2026-04-06-navly-v1-auth-kernel-phase-1.md`
 4. `2026-04-06-navly-v1-auth-kernel-external-interfaces.md`
-5. `../2026-04-06-navly-v1-design.md`
-6. `../2026-04-06-navly-v1-modular-development-and-vibe-coding.md`
-7. `../../../architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
-8. `../../../reference/navly-v1/open-source-stack/openclaw-local-source.md`
+5. `2026-04-06-navly-v1-auth-kernel-target-repo-structure.md`
+6. `2026-04-06-navly-v1-auth-kernel-implementation-plan.md`
+7. `../2026-04-06-navly-v1-design.md`
+8. `../2026-04-06-navly-v1-modular-development-and-vibe-coding.md`
+9. `../../../architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
+10. `../../../reference/navly-v1/open-source-stack/openclaw-local-source.md`
 
 ---
 
