@@ -4,6 +4,20 @@
   "source_system_id": "qinqin.v1_1",
   "entries": [
     {
+      "endpoint_contract_id": "qinqin.v1_1.shared",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "shared",
+      "version": "v1.1",
+      "display_name": "Qinqin v1.1 Shared Virtual Contract",
+      "method": null,
+      "path": null,
+      "increment_strategy": null,
+      "structured_targets": [],
+      "truth_source_doc": "docs/api/qinqin/auth-and-signing.md",
+      "status": "seeded_virtual_shared_contract",
+      "notes": "Virtual shared contract for cross-endpoint parameter/path variance governance only; not an actual source endpoint."
+    },
+    {
       "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
       "source_system_id": "qinqin.v1_1",
       "domain": "member",

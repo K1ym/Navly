@@ -6,33 +6,39 @@
     {
       "service_object_id": "navly.service.store.member_insight",
       "document_short_name": "store_member_insight",
-      "bound_capability_id": "navly.store.member_insight",
-      "status": "seeded_not_implemented"
+      "status": "seeded_not_implemented",
+      "capability_id": "navly.store.member_insight",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
     },
     {
       "service_object_id": "navly.service.store.daily_overview",
       "document_short_name": "store_daily_overview",
-      "bound_capability_id": "navly.store.daily_overview",
-      "status": "seeded_not_implemented"
+      "status": "seeded_not_implemented",
+      "capability_id": "navly.store.daily_overview",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
     },
     {
       "service_object_id": "navly.service.store.staff_board",
       "document_short_name": "store_staff_board",
-      "bound_capability_id": "navly.store.staff_board",
-      "status": "seeded_not_implemented"
+      "status": "seeded_not_implemented",
+      "capability_id": "navly.store.staff_board",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
     },
     {
       "service_object_id": "navly.service.store.finance_summary",
       "document_short_name": "store_finance_summary",
-      "bound_capability_id": "navly.store.finance_summary",
-      "status": "seeded_not_implemented"
-    },
-    {
-      "service_object_id": "navly.service.system.capability_explanation",
-      "document_short_name": "capability_explanation",
-      "bound_capability_id": null,
       "status": "seeded_not_implemented",
-      "notes": "Companion explanation object; not a primary capability seed."
+      "capability_id": "navly.store.finance_summary",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
     }
-  ]
+  ],
+  "notes": "Milestone A seed for canonical capability -> service bindings only. Companion explanation objects are intentionally kept out until a dedicated owner-scope registry is introduced."
 }
