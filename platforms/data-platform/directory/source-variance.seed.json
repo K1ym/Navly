@@ -71,7 +71,6 @@
       "variance_kind": "path_resolution_constraint",
       "source_system_id": "qinqin.v1_1",
       "endpoint_contract_id": "qinqin.v1_1.shared",
-      "canonical_form": "use_manifest_paths_as_frozen_for_v1_1",
       "observed_variants": [
         "GetConsumptionList",
         "GetRechargeList",
@@ -85,7 +84,8 @@
         "docs/api/qinqin/endpoint-manifest.md"
       ],
       "resolution_status": "seeded_frozen_for_phase_1",
-      "notes": "Manifest paths are authoritative for phase-1."
+      "notes": "Manifest paths are authoritative for phase-1.",
+      "resolution_rule": "use_manifest_paths_as_frozen_for_v1_1"
     }
   ]
 }

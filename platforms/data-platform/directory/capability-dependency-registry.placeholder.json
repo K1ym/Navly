@@ -22,5 +22,6 @@
       "dependency_status": "not_yet_expanded",
       "notes": "Dependency matrix is deferred beyond skeleton creation."
     }
-  ]
+  ],
+  "shared_contract_owner_path": "shared/contracts"
 }
