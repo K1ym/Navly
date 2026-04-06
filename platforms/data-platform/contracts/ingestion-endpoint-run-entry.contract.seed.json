@@ -1,0 +1,19 @@
+{
+  "contract_name": "ingestion_endpoint_run_entry",
+  "owner": "data-platform",
+  "status": "milestone_b_seed",
+  "fields": [
+    "endpoint_run_id",
+    "endpoint_run_trace_ref",
+    "ingestion_run_id",
+    "endpoint_contract_id",
+    "org_id",
+    "endpoint_status",
+    "page_count",
+    "record_count",
+    "started_at",
+    "completed_at",
+    "error_code",
+    "error_message"
+  ]
+}

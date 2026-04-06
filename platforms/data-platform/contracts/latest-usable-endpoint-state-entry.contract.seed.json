@@ -1,0 +1,18 @@
+{
+  "contract_name": "latest_usable_endpoint_state_entry",
+  "owner": "data-platform",
+  "status": "milestone_b_seed",
+  "fields": [
+    "state_id",
+    "state_trace_ref",
+    "source_system_id",
+    "endpoint_contract_id",
+    "org_id",
+    "latest_usable_business_date",
+    "availability_status",
+    "latest_run_trace_ref",
+    "latest_endpoint_run_id",
+    "latest_endpoint_status",
+    "updated_at"
+  ]
+}

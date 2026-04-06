@@ -24,7 +24,11 @@
     "endpoint_parameter_registry_entry",
     "endpoint_field_catalog_entry",
     "field_landing_policy_entry",
-    "source_variance_entry"
+    "source_variance_entry",
+    "ingestion_run_entry",
+    "ingestion_endpoint_run_entry",
+    "raw_response_page_entry",
+    "latest_usable_endpoint_state_entry"
   ],
   "canonical_id_rules": {
     "capability_id": "navly.<domain>.<capability_name>",
