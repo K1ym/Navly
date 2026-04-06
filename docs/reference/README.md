@@ -5,4 +5,4 @@
 当前建议优先阅读：
 
 - `data-platform/secrets-and-config.md`
-- `navly-v1/`：Navly_v1 开源依赖与本地源码参考
+- `navly-v1/`：Navly_v1 开源依赖、本地源码参考、canonical IDs 与 glossary

@@ -14,6 +14,10 @@
   - 主枚举、reason code、trace / audit 规则
 - `2026-04-06-navly-v1-shared-contracts-interaction.md`
   - bridge <-> runtime 需要冻结的 interaction contracts
+- `2026-04-06-navly-v1-shared-contracts-target-repo-structure.md`
+  - `shared/contracts/` 的目标目录骨架、对象分组与 schema 落位原则
+- `2026-04-06-navly-v1-shared-contracts-implementation-plan.md`
+  - shared-contracts 的 schema seed / enum seed / interaction seed 实施顺序
 
 ## 目录定位
 

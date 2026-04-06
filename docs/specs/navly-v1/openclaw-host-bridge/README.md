@@ -42,6 +42,10 @@
   - `Navly_v1` 第一阶段必须闭合的宿主桥接链路、交付顺序、验收标准、后续增强与非目标
 - `2026-04-06-navly-v1-openclaw-host-bridge-external-interfaces.md`
   - `openclaw-host-bridge` 与 `OpenClaw host`、`auth-kernel`、`runtime`、`data-platform` 的正式接口边界与对象约定
+- `2026-04-06-navly-v1-openclaw-host-bridge-target-repo-structure.md`
+  - `bridges/openclaw-host-bridge/` 的目标目录骨架与 bridge local / shared interaction 边界
+- `2026-04-06-navly-v1-openclaw-host-bridge-implementation-plan.md`
+  - `openclaw-host-bridge` phase-1 的可执行 implementation plan、里程碑与 gate
 
 ---
 
@@ -51,17 +55,19 @@
 2. `2026-04-06-navly-v1-openclaw-host-bridge-internal-layers.md`
 3. `2026-04-06-navly-v1-openclaw-host-bridge-phase-1.md`
 4. `2026-04-06-navly-v1-openclaw-host-bridge-external-interfaces.md`
-5. `../2026-04-06-navly-v1-design.md`
-6. `../2026-04-06-navly-v1-modular-development-and-vibe-coding.md`
-7. `../2026-04-06-navly-v1-naming-conventions.md`
-8. `../2026-04-06-navly-v1-shared-contracts-layer.md`
-9. `../auth-kernel/README.md`
-10. `../data-platform/README.md`
-11. `../../../architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
-12. `../../../reference/navly-v1/open-source-stack/openclaw-local-source.md`
-13. `../../../../upstreams/openclaw/docs/concepts/architecture.md`
-14. `../../../../upstreams/openclaw/docs/concepts/session.md`
-15. `../../../../upstreams/openclaw/docs/gateway/protocol.md`
+5. `2026-04-06-navly-v1-openclaw-host-bridge-target-repo-structure.md`
+6. `2026-04-06-navly-v1-openclaw-host-bridge-implementation-plan.md`
+7. `../2026-04-06-navly-v1-design.md`
+8. `../2026-04-06-navly-v1-modular-development-and-vibe-coding.md`
+9. `../2026-04-06-navly-v1-naming-conventions.md`
+10. `../2026-04-06-navly-v1-shared-contracts-layer.md`
+11. `../auth-kernel/README.md`
+12. `../data-platform/README.md`
+13. `../../../architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
+14. `../../../reference/navly-v1/open-source-stack/openclaw-local-source.md`
+15. `../../../../upstreams/openclaw/docs/concepts/architecture.md`
+16. `../../../../upstreams/openclaw/docs/concepts/session.md`
+17. `../../../../upstreams/openclaw/docs/gateway/protocol.md`
 
 ---
 
