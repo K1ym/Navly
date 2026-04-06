@@ -1,0 +1,116 @@
+{
+  "registry_name": "field_landing_policy_registry",
+  "status": "milestone_a_seed",
+  "entries": [
+    {
+      "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
+      "field_selector": "structured_targets.*",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "customer",
+        "customer_card",
+        "customer_ticket",
+        "customer_coupon"
+      ],
+      "policy_status": "seeded",
+      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "field_selector": "structured_targets.*",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "consume_bill",
+        "consume_bill_payment",
+        "consume_bill_info"
+      ],
+      "policy_status": "seeded",
+      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "field_selector": "structured_targets.*",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "recharge_bill",
+        "recharge_bill_payment",
+        "recharge_bill_ticket",
+        "recharge_bill_sales"
+      ],
+      "policy_status": "seeded",
+      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_user_trade_list.v1_4",
+      "field_selector": "structured_targets.*",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "account_trade"
+      ],
+      "policy_status": "seeded",
+      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
+      "field_selector": "structured_targets.*",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "staff",
+        "staff_item"
+      ],
+      "policy_status": "seeded",
+      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_up_clock_list.v1_6",
+      "field_selector": "structured_targets.*",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "tech_shift_item",
+        "tech_shift_summary"
+      ],
+      "policy_status": "seeded",
+      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_market_list.v1_7",
+      "field_selector": "structured_targets.*",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "sales_commission"
+      ],
+      "policy_status": "seeded",
+      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "field_selector": "structured_targets.*",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "commission_setting",
+        "commission_setting_detail"
+      ],
+      "policy_status": "seeded",
+      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
+    },
+    {
+      "endpoint_contract_id": "qinqin.v1_1.shared",
+      "field_selector": "all_non_structured_documented_fields",
+      "landing_tier": "tier_b_preserved",
+      "target_layer": "L0",
+      "target_dataset": [
+        "raw_response_page"
+      ],
+      "policy_status": "seeded",
+      "notes": "Documented but not yet structured fields must still be preserved in raw truth."
+    }
+  ]
+}

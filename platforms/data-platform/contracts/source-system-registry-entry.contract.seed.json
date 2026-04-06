@@ -1,0 +1,14 @@
+{
+  "contract_name": "source_system_registry_entry",
+  "owner": "data-platform",
+  "status": "milestone_a_seed",
+  "fields": [
+    "source_system_id",
+    "source_name",
+    "source_version",
+    "source_kind",
+    "truth_source_docs",
+    "status",
+    "notes"
+  ]
+}
