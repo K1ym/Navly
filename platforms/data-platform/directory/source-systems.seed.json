@@ -1,0 +1,22 @@
+{
+  "registry_name": "source_system_registry",
+  "status": "milestone_a_seed",
+  "entries": [
+    {
+      "source_system_id": "qinqin.v1_1",
+      "source_name": "Qinqin",
+      "source_version": "v1.1",
+      "source_kind": "thirdparty_http_api",
+      "truth_source_docs": [
+        "docs/api/qinqin/README.md",
+        "docs/api/qinqin/endpoint-manifest.md",
+        "docs/api/qinqin/auth-and-signing.md"
+      ],
+      "audit_docs": [
+        "docs/audits/qinqin/README.md"
+      ],
+      "status": "seeded_not_implemented",
+      "notes": "Milestone A only seeds source registration; no live adapter implementation yet."
+    }
+  ]
+}

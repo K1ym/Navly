@@ -1,0 +1,55 @@
+{
+  "registry_name": "endpoint_field_catalog",
+  "status": "milestone_a_placeholder",
+  "scope": "shape_only_no_full_field_extraction",
+  "entries": [
+    {
+      "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
+      "catalog_status": "placeholder_only",
+      "truth_source_doc": "docs/api/qinqin/member/1.1-user-base.md",
+      "notes": "Full field extraction is intentionally deferred. Milestone A only seeds the catalog boundary."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "catalog_status": "placeholder_only",
+      "truth_source_doc": "docs/api/qinqin/member/1.2-user-consume-details.md",
+      "notes": "Full field extraction is intentionally deferred. Milestone A only seeds the catalog boundary."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "catalog_status": "placeholder_only",
+      "truth_source_doc": "docs/api/qinqin/member/1.3-user-recharge-details.md",
+      "notes": "Full field extraction is intentionally deferred. Milestone A only seeds the catalog boundary."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_user_trade_list.v1_4",
+      "catalog_status": "placeholder_only",
+      "truth_source_doc": "docs/api/qinqin/member/1.4-user-account-trades.md",
+      "notes": "Full field extraction is intentionally deferred. Milestone A only seeds the catalog boundary."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
+      "catalog_status": "placeholder_only",
+      "truth_source_doc": "docs/api/qinqin/staff/1.5-staff-base.md",
+      "notes": "Full field extraction is intentionally deferred. Milestone A only seeds the catalog boundary."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_up_clock_list.v1_6",
+      "catalog_status": "placeholder_only",
+      "truth_source_doc": "docs/api/qinqin/staff/1.6-staff-clock-details.md",
+      "notes": "Full field extraction is intentionally deferred. Milestone A only seeds the catalog boundary."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_market_list.v1_7",
+      "catalog_status": "placeholder_only",
+      "truth_source_doc": "docs/api/qinqin/staff/1.7-staff-sales-commission.md",
+      "notes": "Full field extraction is intentionally deferred. Milestone A only seeds the catalog boundary."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "catalog_status": "placeholder_only",
+      "truth_source_doc": "docs/api/qinqin/staff/1.8-staff-base-commission.md",
+      "notes": "Full field extraction is intentionally deferred. Milestone A only seeds the catalog boundary."
+    }
+  ]
+}
