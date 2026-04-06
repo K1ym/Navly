@@ -1,0 +1,16 @@
+{
+  "contract_name": "raw_response_page_entry",
+  "owner": "data-platform",
+  "status": "milestone_b_seed",
+  "fields": [
+    "raw_page_id",
+    "run_trace_ref",
+    "endpoint_run_id",
+    "endpoint_contract_id",
+    "page_index",
+    "request_envelope",
+    "response_envelope",
+    "response_record_count",
+    "captured_at"
+  ]
+}

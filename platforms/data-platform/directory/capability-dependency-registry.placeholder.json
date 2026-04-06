@@ -4,8 +4,19 @@
   "entries": [
     {
       "capability_id": "navly.store.member_insight",
-      "dependency_status": "not_yet_expanded",
-      "notes": "Dependency matrix is deferred beyond skeleton creation."
+      "dependency_status": "vertical_slice_seeded",
+      "notes": "Milestone B first vertical slice dependency seed for member insight backbone.",
+      "default_service_object_id": "navly.service.store.member_insight",
+      "endpoint_contract_ids": [
+        "qinqin.member.get_customers_list.v1_1",
+        "qinqin.member.get_consume_bill_list.v1_2"
+      ],
+      "required_canonical_datasets": [
+        "customer",
+        "customer_card",
+        "consume_bill",
+        "consume_bill_payment"
+      ]
     },
     {
       "capability_id": "navly.store.daily_overview",
