@@ -1,0 +1,20 @@
+{
+  "seed_version": 1,
+  "status": "milestone-a-placeholder",
+  "owner_module": "auth-kernel",
+  "catalog_name": "restriction_taxonomy",
+  "restriction_codes": [
+    {
+      "restriction_code": "scope_limited",
+      "description": "Continue only within a narrowed scope set."
+    },
+    {
+      "restriction_code": "capability_limited",
+      "description": "Continue only with a reduced capability set."
+    },
+    {
+      "restriction_code": "conversation_confirmation_required",
+      "description": "Continue only after conversation-bound scope confirmation."
+    }
+  ]
+}

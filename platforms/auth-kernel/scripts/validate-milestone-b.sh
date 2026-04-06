@@ -12,6 +12,14 @@ legacy_token="escalation""_required"
 required_files=(
   "$ROOT/contracts/contract-ownership.seed.json"
   "$ROOT/contracts/shared-contract-alignment.mjs"
+  "$ROOT/policy-catalog/actor-type-vocabulary.seed.json"
+  "$ROOT/policy-catalog/role-catalog.seed.json"
+  "$ROOT/policy-catalog/scope-taxonomy.seed.json"
+  "$ROOT/policy-catalog/capability-vocabulary.seed.json"
+  "$ROOT/policy-catalog/access-decision-status.alignment.json"
+  "$ROOT/policy-catalog/decision-reason-taxonomy.seed.json"
+  "$ROOT/policy-catalog/restriction-taxonomy.seed.json"
+  "$ROOT/policy-catalog/obligation-taxonomy.seed.json"
   "$ROOT/policy-catalog/policy-catalog-loader.mjs"
   "$ROOT/policy-catalog/capability-grant-profile.seed.json"
   "$ROOT/actor-registry/actor-registry.seed.json"
@@ -40,7 +48,7 @@ for file in "${required_files[@]}"; do
   fi
 done
 
-"$ROOT/scripts/validate-milestone-a.sh"
+bash "$ROOT/scripts/validate-milestone-a.sh"
 
 if rg -n "$legacy_token" "$ROOT" >/dev/null 2>&1; then
   echo "retired legacy escalation alias is forbidden inside platforms/auth-kernel" >&2

@@ -15,14 +15,6 @@ function readJsonSeed(fileName) {
   return JSON.parse(fs.readFileSync(path.join(moduleDir, fileName), 'utf8'));
 }
 
-export function loadBindingBackbone() {
-  return {
-    roleBindings: readJsonSeed('role-binding.seed.json').bindings ?? [],
-    scopeBindings: readJsonSeed('scope-binding.seed.json').bindings ?? [],
-    conversationBindingProfile: readJsonSeed('conversation-binding.seed.json'),
-  };
-}
-
 function deriveConversationRef(ingressEvidence) {
   const rawConversationKey = ingressEvidence.host_conversation_ref || ingressEvidence.host_session_ref || ingressEvidence.request_id;
   return buildConversationRef(buildDeterministicId('conversation', ingressEvidence.channel_kind, rawConversationKey));
@@ -30,6 +22,29 @@ function deriveConversationRef(ingressEvidence) {
 
 function deriveSessionRef(actorRef, conversationRef) {
   return buildSessionRef(buildDeterministicId('session', actorRef, conversationRef));
+}
+
+export function computeBindingSnapshotRef(bindingSnapshot) {
+  return `navly:binding-snapshot:${buildDeterministicId(
+    'binding',
+    bindingSnapshot.actor_ref ?? 'none',
+    bindingSnapshot.tenant_ref ?? 'none',
+    bindingSnapshot.conversation_ref ?? 'none',
+    [...(bindingSnapshot.role_ids ?? [])].sort().join(','),
+    [...(bindingSnapshot.granted_scope_refs ?? [])].sort().join(','),
+    bindingSnapshot.primary_scope_ref ?? 'none',
+    bindingSnapshot.selected_scope_ref ?? 'none',
+    bindingSnapshot.conversation_binding_status ?? 'none',
+    [...(bindingSnapshot.reason_codes ?? [])].sort().join(','),
+  )}`;
+}
+
+export function loadBindingBackbone() {
+  return {
+    roleBindings: readJsonSeed('role-binding.seed.json').bindings ?? [],
+    scopeBindings: readJsonSeed('scope-binding.seed.json').bindings ?? [],
+    conversationBindingProfile: readJsonSeed('conversation-binding.seed.json'),
+  };
 }
 
 export function buildBindingSnapshot({
@@ -42,8 +57,7 @@ export function buildBindingSnapshot({
   const conversationRef = deriveConversationRef(ingressEvidence);
 
   if (actorResolutionResult.resolution_status !== 'resolved') {
-    return {
-      binding_snapshot_ref: `navly:binding-snapshot:${buildDeterministicId('binding', ingressEvidence.request_id, conversationRef)}`,
+    const unresolvedSnapshot = {
       actor_ref: actorResolutionResult.actor_ref ?? null,
       tenant_ref: actorResolutionResult.tenant_ref ?? null,
       role_ids: [],
@@ -56,25 +70,39 @@ export function buildBindingSnapshot({
       reason_codes: [...(actorResolutionResult.reason_codes ?? [])],
       generated_at: now,
     };
+
+    return {
+      ...unresolvedSnapshot,
+      binding_snapshot_ref: computeBindingSnapshotRef(unresolvedSnapshot),
+    };
   }
 
   const actorRef = actorResolutionResult.actor_ref;
+  const tenantRef = actorResolutionResult.tenant_ref;
   const roleIds = bindingBackbone.roleBindings
     .filter((binding) => binding.actor_ref === actorRef)
     .map((binding) => binding.role_id);
 
-  const scopeBindings = bindingBackbone.scopeBindings.filter((binding) => binding.actor_ref === actorRef);
-  const grantedScopeRefs = scopeBindings.map((binding) => {
+  const actorScopeBindings = bindingBackbone.scopeBindings.filter((binding) => binding.actor_ref === actorRef);
+  const tenantScopedBindings = actorScopeBindings.filter((binding) => binding.tenant_ref === tenantRef);
+  const hasTenantMismatch = tenantScopedBindings.length !== actorScopeBindings.length;
+
+  let grantedScopeRefs = tenantScopedBindings.map((binding) => {
     assertMatchesSharedPattern('scope_ref', binding.scope_ref, sharedPatterns.scopeRef);
     return binding.scope_ref;
   });
-  const primaryScopeRef = scopeBindings.find((binding) => binding.is_primary)?.scope_ref ?? grantedScopeRefs[0] ?? null;
+  let primaryScopeRef = tenantScopedBindings.find((binding) => binding.is_primary)?.scope_ref ?? grantedScopeRefs[0] ?? null;
 
   let conversationBindingStatus = 'bound';
   let selectedScopeRef = null;
   const reasonCodes = [];
 
-  if (selectedScopeHint) {
+  if (hasTenantMismatch) {
+    grantedScopeRefs = [];
+    primaryScopeRef = null;
+    conversationBindingStatus = 'suspended';
+    reasonCodes.push('tenant_mismatch');
+  } else if (selectedScopeHint) {
     if (grantedScopeRefs.includes(selectedScopeHint)) {
       selectedScopeRef = selectedScopeHint;
     } else {
@@ -91,23 +119,23 @@ export function buildBindingSnapshot({
     reasonCodes.push('binding_missing');
   }
 
-  const sessionRef = deriveSessionRef(actorRef, conversationRef);
-  const bindingSnapshotRef = `navly:binding-snapshot:${buildDeterministicId('binding', actorRef, conversationRef, selectedScopeRef ?? 'none')}`;
-  const effectivePrimaryScopeRef = conversationBindingStatus === 'bound' ? (selectedScopeRef ?? primaryScopeRef) : null;
-
-  return {
-    binding_snapshot_ref: bindingSnapshotRef,
+  const bindingSnapshot = {
     actor_ref: actorRef,
-    tenant_ref: actorResolutionResult.tenant_ref,
+    tenant_ref: tenantRef,
     role_ids: roleIds,
     granted_scope_refs: grantedScopeRefs,
-    primary_scope_ref: effectivePrimaryScopeRef,
+    primary_scope_ref: conversationBindingStatus === 'bound' ? (selectedScopeRef ?? primaryScopeRef) : null,
     selected_scope_ref: selectedScopeRef,
     conversation_ref: conversationRef,
-    session_ref: sessionRef,
+    session_ref: deriveSessionRef(actorRef, conversationRef),
     conversation_binding_status: conversationBindingStatus,
     reason_codes: reasonCodes,
     generated_at: now,
+  };
+
+  return {
+    ...bindingSnapshot,
+    binding_snapshot_ref: computeBindingSnapshotRef(bindingSnapshot),
   };
 }
 
@@ -118,23 +146,26 @@ export function applyScopeSelectionToBindingSnapshot({ bindingSnapshot, requeste
 
   assertMatchesSharedPattern('requested_scope_ref', requestedScopeRef, sharedPatterns.scopeRef);
 
-  if (!bindingSnapshot.granted_scope_refs.includes(requestedScopeRef)) {
-    return {
-      ...bindingSnapshot,
-      selected_scope_ref: null,
-      primary_scope_ref: null,
-      conversation_binding_status: 'suspended',
-      reason_codes: ['invalid_scope_selection'],
-      generated_at: now,
-    };
-  }
+  const nextSnapshot = !bindingSnapshot.granted_scope_refs.includes(requestedScopeRef)
+    ? {
+        ...bindingSnapshot,
+        selected_scope_ref: null,
+        primary_scope_ref: null,
+        conversation_binding_status: 'suspended',
+        reason_codes: ['invalid_scope_selection'],
+        generated_at: now,
+      }
+    : {
+        ...bindingSnapshot,
+        selected_scope_ref: requestedScopeRef,
+        primary_scope_ref: requestedScopeRef,
+        conversation_binding_status: 'bound',
+        reason_codes: [],
+        generated_at: now,
+      };
 
   return {
-    ...bindingSnapshot,
-    selected_scope_ref: requestedScopeRef,
-    primary_scope_ref: requestedScopeRef,
-    conversation_binding_status: 'bound',
-    reason_codes: [],
-    generated_at: now,
+    ...nextSnapshot,
+    binding_snapshot_ref: computeBindingSnapshotRef(nextSnapshot),
   };
 }
