@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runMilestoneBAccessChain } from '../serving/access-chain-backbone.mjs';
+import {
+  applyScopeSelectionToBindingSnapshot,
+  buildBindingSnapshot,
+  loadBindingBackbone,
+} from '../bindings/binding-backbone.mjs';
 import { evaluateCapabilityAccess } from '../decision/capability-access-decision-backbone.mjs';
 
 function sampleBaseIngress(peerAliasValue, extras = {}) {
@@ -140,4 +145,55 @@ test('store staff is denied when requesting capability outside grant profile', (
   assert.equal(result.access_decision.decision_status, 'deny');
   assert.deepEqual(result.access_decision.reason_codes, ['capability_not_granted']);
   assert.equal(result.access_context_envelope, null);
+});
+
+test('tenant mismatch bindings are excluded and fail closed before granted scopes are exposed', () => {
+  const bindingBackbone = loadBindingBackbone();
+  const result = buildBindingSnapshot({
+    ingressEvidence: sampleBaseIngress('sample_manager_single_scope'),
+    actorResolutionResult: {
+      resolution_status: 'resolved',
+      actor_ref: 'navly:actor:sample-store-manager-single',
+      tenant_ref: 'navly:tenant:sample-retail',
+      reason_codes: [],
+    },
+    bindingBackbone: {
+      ...bindingBackbone,
+      scopeBindings: [
+        ...bindingBackbone.scopeBindings,
+        {
+          actor_ref: 'navly:actor:sample-store-manager-single',
+          tenant_ref: 'navly:tenant:foreign-tenant',
+          scope_ref: 'navly:scope:store:foreign-store-999',
+          is_primary: false,
+        },
+      ],
+    },
+  });
+
+  assert.equal(result.conversation_binding_status, 'suspended');
+  assert.deepEqual(result.reason_codes, ['tenant_mismatch']);
+  assert.deepEqual(result.granted_scope_refs, []);
+  assert.equal(result.primary_scope_ref, null);
+});
+
+test('scope selection recalculates binding_snapshot_ref when effective content changes', () => {
+  const initialSnapshot = buildBindingSnapshot({
+    ingressEvidence: sampleBaseIngress('sample_manager_multi_scope'),
+    actorResolutionResult: {
+      resolution_status: 'resolved',
+      actor_ref: 'navly:actor:sample-store-manager-multi',
+      tenant_ref: 'navly:tenant:sample-retail',
+      reason_codes: [],
+    },
+  });
+
+  const reboundSnapshot = applyScopeSelectionToBindingSnapshot({
+    bindingSnapshot: initialSnapshot,
+    requestedScopeRef: 'navly:scope:store:sample-store-002',
+  });
+
+  assert.notEqual(reboundSnapshot.binding_snapshot_ref, initialSnapshot.binding_snapshot_ref);
+  assert.equal(reboundSnapshot.selected_scope_ref, 'navly:scope:store:sample-store-002');
+  assert.equal(reboundSnapshot.conversation_binding_status, 'bound');
 });

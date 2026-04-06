@@ -58,7 +58,7 @@ export function sanitizeRefSegment(value) {
 }
 
 export function stableHashId(...parts) {
-  return createHash('sha1').update(parts.join('|')).digest('hex').slice(0, 16);
+  return createHash('sha256').update(parts.join('|')).digest('hex').slice(0, 16);
 }
 
 export function assertMatchesSharedPattern(label, value, pattern) {

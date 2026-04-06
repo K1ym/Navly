@@ -5,70 +5,6 @@ import { assertCapabilityId, sharedEnums } from '../contracts/shared-contract-al
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 
-function parseScalar(rawValue) {
-  const value = rawValue.trim();
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  if (/^-?\d+$/.test(value)) return Number(value);
-  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-    return value.slice(1, -1);
-  }
-  return value;
-}
-
-export function parseSimpleSeedYaml(sourceText) {
-  const result = {};
-  let activeListKey = null;
-  let activeItem = null;
-
-  for (const rawLine of sourceText.split(/\r?\n/)) {
-    if (!rawLine.trim() || rawLine.trim().startsWith('#')) {
-      continue;
-    }
-
-    const indent = rawLine.match(/^ */)[0].length;
-    const line = rawLine.trim();
-
-    if (indent === 0) {
-      const [rawKey, ...rawRest] = line.split(':');
-      const key = rawKey.trim();
-      const rest = rawRest.join(':').trim();
-      if (!rest) {
-        result[key] = [];
-        activeListKey = key;
-        activeItem = null;
-      } else {
-        result[key] = parseScalar(rest);
-        activeListKey = null;
-        activeItem = null;
-      }
-      continue;
-    }
-
-    if (activeListKey && indent === 2 && line.startsWith('- ')) {
-      activeItem = {};
-      result[activeListKey].push(activeItem);
-      const inline = line.slice(2).trim();
-      if (inline) {
-        const [rawKey, ...rawRest] = inline.split(':');
-        activeItem[rawKey.trim()] = parseScalar(rawRest.join(':').trim());
-      }
-      continue;
-    }
-
-    if (activeListKey && activeItem && indent >= 4) {
-      const [rawKey, ...rawRest] = line.split(':');
-      activeItem[rawKey.trim()] = parseScalar(rawRest.join(':').trim());
-    }
-  }
-
-  return result;
-}
-
-function readYamlSeed(fileName) {
-  return parseSimpleSeedYaml(fs.readFileSync(path.join(moduleDir, fileName), 'utf8'));
-}
-
 function readJsonSeed(fileName) {
   return JSON.parse(fs.readFileSync(path.join(moduleDir, fileName), 'utf8'));
 }
@@ -84,13 +20,13 @@ export function assertCatalogCodes(label, codes, allowedCodes) {
 }
 
 export function loadPolicyCatalog() {
-  const actorTypes = readYamlSeed('actor-type-vocabulary.seed.yaml');
-  const roles = readYamlSeed('role-catalog.seed.yaml');
-  const scopeTaxonomy = readYamlSeed('scope-taxonomy.seed.yaml');
-  const capabilityVocabulary = readYamlSeed('capability-vocabulary.seed.yaml');
-  const decisionReasons = readYamlSeed('decision-reason-taxonomy.seed.yaml');
-  const restrictions = readYamlSeed('restriction-taxonomy.seed.yaml');
-  const obligations = readYamlSeed('obligation-taxonomy.seed.yaml');
+  const actorTypes = readJsonSeed('actor-type-vocabulary.seed.json');
+  const roles = readJsonSeed('role-catalog.seed.json');
+  const scopeTaxonomy = readJsonSeed('scope-taxonomy.seed.json');
+  const capabilityVocabulary = readJsonSeed('capability-vocabulary.seed.json');
+  const decisionReasons = readJsonSeed('decision-reason-taxonomy.seed.json');
+  const restrictions = readJsonSeed('restriction-taxonomy.seed.json');
+  const obligations = readJsonSeed('obligation-taxonomy.seed.json');
   const capabilityGrantProfile = readJsonSeed('capability-grant-profile.seed.json');
 
   const capabilityById = new Map();

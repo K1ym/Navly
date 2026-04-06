@@ -9,6 +9,10 @@ function readJsonSeed(fileName) {
   return JSON.parse(fs.readFileSync(path.join(moduleDir, fileName), 'utf8'));
 }
 
+function aliasLookupKey(aliasNamespace, aliasValue) {
+  return `${aliasNamespace}:${aliasValue}`;
+}
+
 export function loadActorRegistryBackbone() {
   const actorRegistrySeed = readJsonSeed('actor-registry.seed.json');
   const identityAliasRegistrySeed = readJsonSeed('identity-alias-registry.seed.json');
@@ -20,9 +24,18 @@ export function loadActorRegistryBackbone() {
     actorsByRef.set(actor.actor_ref, actor);
   }
 
+  const aliasLookup = new Map();
+  for (const alias of identityAliasRegistrySeed.aliases ?? []) {
+    const key = aliasLookupKey(alias.alias_namespace, alias.alias_value);
+    const existing = aliasLookup.get(key) ?? [];
+    existing.push(alias);
+    aliasLookup.set(key, existing);
+  }
+
   return {
     actorsByRef,
     aliases: identityAliasRegistrySeed.aliases ?? [],
+    aliasLookup,
   };
 }
 
@@ -30,14 +43,8 @@ export function resolveActorFromIngress({ ingressEvidence, actorRegistryBackbone
   const aliasMatches = [];
 
   for (const evidence of ingressEvidence.peer_identity_evidence ?? []) {
-    for (const alias of actorRegistryBackbone.aliases) {
-      if (
-        alias.alias_namespace === evidence.alias_namespace &&
-        alias.alias_value === evidence.alias_value
-      ) {
-        aliasMatches.push(alias);
-      }
-    }
+    const lookupKey = aliasLookupKey(evidence.alias_namespace, evidence.alias_value);
+    aliasMatches.push(...(actorRegistryBackbone.aliasLookup.get(lookupKey) ?? []));
   }
 
   const uniqueActorRefs = [...new Set(aliasMatches.map((match) => match.actor_ref))];
