@@ -1,0 +1,15 @@
+{
+  "contract_name": "runtime_execution_plan",
+  "status": "milestone_a_placeholder",
+  "owner_scope": "runtime",
+  "fields": [
+    "request_id",
+    "runtime_trace_ref",
+    "selected_capability_id",
+    "selected_service_object_id",
+    "target_scope_ref",
+    "target_business_date",
+    "freshness_mode"
+  ],
+  "notes": "Milestone A only defines shape placeholder; execution closure belongs to milestone B/C."
+}

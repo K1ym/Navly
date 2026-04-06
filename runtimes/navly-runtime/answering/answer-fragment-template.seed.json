@@ -1,0 +1,11 @@
+{
+  "template_name": "runtime_answer_fragment_template",
+  "status": "milestone_a_seed",
+  "fragments": [
+    {
+      "fragment_type": "text",
+      "status": "placeholder"
+    }
+  ],
+  "notes": "Concrete business answer composition belongs to milestone D."
+}
