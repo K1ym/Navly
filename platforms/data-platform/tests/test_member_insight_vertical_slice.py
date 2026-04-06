@@ -8,13 +8,11 @@ import unittest
 from pathlib import Path
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
-if str(DATA_PLATFORM_ROOT / 'ingestion') not in sys.path:
-    sys.path.insert(0, str(DATA_PLATFORM_ROOT / 'ingestion'))
-if str(DATA_PLATFORM_ROOT / 'connectors' / 'qinqin') not in sys.path:
-    sys.path.insert(0, str(DATA_PLATFORM_ROOT / 'connectors' / 'qinqin'))
+if str(DATA_PLATFORM_ROOT) not in sys.path:
+    sys.path.insert(0, str(DATA_PLATFORM_ROOT))
 
-from member_insight_vertical_slice import run_member_insight_vertical_slice  # type: ignore  # noqa: E402
-from qinqin_substrate import FixtureQinqinTransport, build_signed_request  # type: ignore  # noqa: E402
+from backbone_support.qinqin_substrate import FixtureQinqinTransport, build_signed_request
+from ingestion.member_insight_vertical_slice import _run_status, run_member_insight_vertical_slice
 
 
 class MemberInsightVerticalSliceTest(unittest.TestCase):
@@ -64,10 +62,60 @@ class MemberInsightVerticalSliceTest(unittest.TestCase):
             self.assertTrue(Path(tmpdir, 'latest-state', 'latest-usable-endpoint-state.json').exists())
             self.assertTrue(Path(tmpdir, 'canonical', 'customer.json').exists())
 
+    def test_empty_trailing_page_finishes_completed_not_source_empty(self) -> None:
+        fixture_bundle = self._fixture_bundle()
+        fixture_bundle['qinqin.member.get_customers_list.v1_1'] = [
+            {
+                'Code': 200,
+                'Msg': '操作成功',
+                'RetData': {
+                    'Total': 2,
+                    'Data': [
+                        {
+                            'Id': 'cust_001',
+                            'OrgId': '627149864218629',
+                            'Phone': '18670475200',
+                            'Name': '张三',
+                            'Storeds': []
+                        }
+                    ]
+                }
+            },
+            {
+                'Code': 200,
+                'Msg': '操作成功',
+                'RetData': {
+                    'Total': 2,
+                    'Data': []
+                }
+            }
+        ]
+        transport = FixtureQinqinTransport(fixture_bundle)
+        result = run_member_insight_vertical_slice(
+            org_id='627149864218629',
+            start_time='2026-03-20 09:00:00',
+            end_time='2026-03-24 09:00:00',
+            requested_business_date='2026-03-23',
+            app_secret='test-secret',
+            transport=transport,
+            page_size=1,
+        )
+        customer_endpoint = [
+            item for item in result['historical_run_truth']['endpoint_runs']
+            if item['endpoint_contract_id'] == 'qinqin.member.get_customers_list.v1_1'
+        ][0]
+        self.assertEqual(customer_endpoint['endpoint_status'], 'completed')
+        self.assertEqual(customer_endpoint['record_count'], 1)
+
+    def test_zero_endpoint_runs_are_failed(self) -> None:
+        self.assertEqual(_run_status([]), 'failed')
+
     def test_cli_runner_writes_artifact_tree(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             script_path = DATA_PLATFORM_ROOT / 'scripts' / 'run_member_insight_vertical_slice.py'
             fixture_path = DATA_PLATFORM_ROOT / 'tests' / 'fixtures' / 'member_insight' / 'qinqin_fixture_pages.bundle.json'
+            env = dict(**__import__('os').environ)
+            env['PYTHONPATH'] = str(DATA_PLATFORM_ROOT)
             completed = subprocess.run(
                 [
                     sys.executable,
@@ -83,6 +131,7 @@ class MemberInsightVerticalSliceTest(unittest.TestCase):
                 check=True,
                 capture_output=True,
                 text=True,
+                env=env,
             )
             payload = json.loads(completed.stdout)
             self.assertEqual(payload['capability_id'], 'navly.store.member_insight')
