@@ -1,0 +1,80 @@
+{
+  "qinqin.member.get_customers_list.v1_1": [
+    {
+      "Code": 200,
+      "Msg": "操作成功",
+      "RetData": {
+        "Total": 1,
+        "Data": [
+          {
+            "Id": "cust_001",
+            "OrgId": "627149864218629",
+            "Phone": "18670475200",
+            "Name": "张三",
+            "StoredAmount": 1000.0,
+            "ConsumeAmount": 88.0,
+            "CTime": "2026-03-01",
+            "LastConsumeTime": "2026-03-23",
+            "MarketerId": "mk_001",
+            "MarketerName": "军座",
+            "Storeds": [
+              {
+                "Id": "card_001",
+                "OrgId": "627149864218629",
+                "CardTypeId": "ct_001",
+                "CardTypeName": "储值卡A",
+                "CardNo": "4274303521",
+                "Balance": 912.0,
+                "Total": 1000.0,
+                "Consume": 88.0,
+                "OpenTime": "2026-03-01 09:00:00",
+                "ExpireTime": "2126-03-01 00:00:00",
+                "State": 1
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "qinqin.member.get_consume_bill_list.v1_2": [
+    {
+      "Code": 200,
+      "Msg": "操作成功",
+      "RetData": {
+        "Total": 1,
+        "Data": [
+          {
+            "SettleId": "settle_001",
+            "SettleNo": "XF2603230005",
+            "Consume": 88.0,
+            "Pay": 88.0,
+            "HandCardCode": "1028",
+            "RoomCode": "604",
+            "CTime": "2026-03-23 16:08:17",
+            "OptTime": "2026-03-23 17:24:29",
+            "OptCode": "admin",
+            "OptName": "军座",
+            "DiscountAmount": 0.0,
+            "DeductionAmount": 0.0,
+            "TicketAmount": 0.0,
+            "Payments": [
+              {
+                "Name": "现金",
+                "Amount": 88.0,
+                "PaymentType": 1,
+                "PyamentSource": ""
+              }
+            ],
+            "Infos": [
+              {
+                "ItemName": "足疗",
+                "Amount": 88.0
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -11,6 +11,7 @@
     "observed_variants",
     "evidence_docs",
     "resolution_status",
-    "notes"
+    "notes",
+    "resolution_rule"
   ]
 }
