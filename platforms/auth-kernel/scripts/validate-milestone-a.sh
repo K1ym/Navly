@@ -11,6 +11,7 @@ legacy_token="escalation""_required"
 capability_seed="$ROOT/policy-catalog/capability-vocabulary.seed.yaml"
 
 required_dirs=(
+  docs
   contracts
   policy-catalog
   ingress-evidence
@@ -59,9 +60,9 @@ if ! rg -n "capability_id:" "$capability_seed" >/dev/null 2>&1; then
   exit 1
 fi
 
-if rg -n "capability_id:" "$capability_seed" | rg -v "capability_id: navly\." >/dev/null 2>&1; then
+if rg -n "capability_id:" "$capability_seed" | rg -v "capability_id:\s+navly\." >/dev/null 2>&1; then
   echo "all capability_id entries must use namespaced navly.* format" >&2
-  rg -n "capability_id:" "$capability_seed" | rg -v "capability_id: navly\." >&2
+  rg -n "capability_id:" "$capability_seed" | rg -v "capability_id:\s+navly\." >&2
   exit 1
 fi
 
