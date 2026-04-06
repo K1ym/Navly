@@ -1,0 +1,15 @@
+seed_version: 1
+status: milestone-a-placeholder
+owner_module: auth-kernel
+catalog_name: decision_reason_taxonomy
+reason_codes:
+  - reason_code: actor_unresolved
+    description: Canonical actor could not be resolved from ingress evidence.
+  - reason_code: actor_inactive
+    description: Canonical actor exists but is not in an active lifecycle state.
+  - reason_code: scope_unbound
+    description: Required scope binding is missing or still pending confirmation.
+  - reason_code: capability_not_granted
+    description: Requested capability is not granted to the current binding snapshot.
+  - reason_code: manual_review_needed
+    description: Request must move to explicit escalation or review flow.

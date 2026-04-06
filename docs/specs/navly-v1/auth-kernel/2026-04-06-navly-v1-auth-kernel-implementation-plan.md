@@ -89,7 +89,7 @@ phase-1 先闭合：
 - [ ] actor / binding object skeleton 就位
 - [ ] decision object skeleton 就位
 - [ ] access_context_envelope mapping 明确
-- [ ] 不再存在 `escalation_required`
+- [ ] 不再保留旧的 legacy escalation 状态别名
 
 ---
 
