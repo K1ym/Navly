@@ -139,7 +139,7 @@ Phase-1 必须具备：
 1. 入口级 `Gate 0`
 2. capability 级 `access decision`
 3. `access_decision_status` canonical：`allow / deny / restricted / escalation`
-4. 不再使用 `escalation_required`
+4. 不再使用旧的 legacy escalation 状态别名
 5. `reason_code` / `restriction_code` / `obligation_code`
 6. `session_grant_snapshot` 与 `expires_at`
 
