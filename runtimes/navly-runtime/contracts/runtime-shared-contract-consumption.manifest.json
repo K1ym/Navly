@@ -1,0 +1,59 @@
+{
+  "manifest_name": "runtime_shared_contract_consumption",
+  "status": "milestone_a_freeze",
+  "consumes": [
+    {
+      "name": "access_context_envelope",
+      "path": "shared/contracts/access/access_context_envelope.schema.json",
+      "direction": "input"
+    },
+    {
+      "name": "access_decision",
+      "path": "shared/contracts/access/access_decision.schema.json",
+      "direction": "input"
+    },
+    {
+      "name": "capability_readiness_query",
+      "path": "shared/contracts/readiness/capability_readiness_query.schema.json",
+      "direction": "output"
+    },
+    {
+      "name": "capability_readiness_response",
+      "path": "shared/contracts/readiness/capability_readiness_response.schema.json",
+      "direction": "input"
+    },
+    {
+      "name": "theme_service_query",
+      "path": "shared/contracts/service/theme_service_query.schema.json",
+      "direction": "output"
+    },
+    {
+      "name": "theme_service_response",
+      "path": "shared/contracts/service/theme_service_response.schema.json",
+      "direction": "input"
+    },
+    {
+      "name": "runtime_request_envelope",
+      "path": "shared/contracts/interaction/runtime_request_envelope.schema.json",
+      "direction": "input"
+    },
+    {
+      "name": "runtime_result_envelope",
+      "path": "shared/contracts/interaction/runtime_result_envelope.schema.json",
+      "direction": "output"
+    },
+    {
+      "name": "runtime_outcome_event",
+      "path": "shared/contracts/interaction/runtime_outcome_event.schema.json",
+      "direction": "output"
+    }
+  ],
+  "enum_dependencies": [
+    {
+      "name": "runtime_result_status",
+      "path": "shared/contracts/enums/runtime_result_status.schema.json",
+      "ownership": "shared_only"
+    }
+  ],
+  "notes": "Runtime milestone A consumes shared contracts only; no local contract fork is allowed."
+}
