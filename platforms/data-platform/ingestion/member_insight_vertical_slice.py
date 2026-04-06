@@ -1,24 +1,19 @@
 from __future__ import annotations
 
 import json
-import sys
 import uuid
 from pathlib import Path
 from typing import Any
 
+from backbone_support.latest_usable_state_backbone import build_latest_usable_endpoint_states, build_vertical_slice_backbone_state
+from backbone_support.member_insight_canonical_backbone import build_member_insight_canonical_artifacts
+from backbone_support.qinqin_substrate import build_signed_request, load_seed_backed_qinqin_registry
+from backbone_support.raw_replay_backbone import VerticalSliceArtifactStore
+
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
-for relative in ['connectors/qinqin', 'raw-store', 'warehouse', 'sync-state']:
-    candidate = str(DATA_PLATFORM_ROOT / relative)
-    if candidate not in sys.path:
-        sys.path.insert(0, candidate)
-
-from qinqin_substrate import build_signed_request, load_seed_backed_qinqin_registry  # type: ignore  # noqa: E402
-from raw_replay_backbone import VerticalSliceArtifactStore  # type: ignore  # noqa: E402
-from member_insight_canonical_backbone import build_member_insight_canonical_artifacts  # type: ignore  # noqa: E402
-from latest_usable_state_backbone import build_latest_usable_endpoint_states, build_vertical_slice_backbone_state  # type: ignore  # noqa: E402
-
 VERTICAL_SLICE_CAPABILITY_ID = 'navly.store.member_insight'
 SOURCE_SYSTEM_ID = 'qinqin.v1_1'
+DEFAULT_PAGE_SIZE = 200
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -38,6 +33,8 @@ def _new_trace_ref() -> str:
 
 
 def _run_status(endpoint_runs: list[dict[str, Any]]) -> str:
+    if not endpoint_runs:
+        return 'failed'
     statuses = {entry['endpoint_status'] for entry in endpoint_runs}
     if statuses.issubset({'completed', 'source_empty'}):
         return 'completed'
@@ -54,6 +51,7 @@ def run_member_insight_vertical_slice(
     requested_business_date: str,
     app_secret: str,
     transport: Any,
+    page_size: int = DEFAULT_PAGE_SIZE,
     output_root: str | Path | None = None,
     data_platform_root: Path = DATA_PLATFORM_ROOT,
 ) -> dict[str, Any]:
@@ -74,7 +72,7 @@ def run_member_insight_vertical_slice(
     raw_pages_by_endpoint: dict[str, list[dict[str, Any]]] = {}
     completed_endpoint_runs: list[dict[str, Any]] = []
 
-    for endpoint_contract_id in dependency_entry['endpoint_contract_ids']:
+    for endpoint_contract_id in dependency_entry.get('endpoint_contract_ids', []):
         endpoint_run = artifact_store.start_endpoint_run(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,
@@ -91,7 +89,7 @@ def run_member_insight_vertical_slice(
                 start_time=start_time,
                 end_time=end_time,
                 page_index=page_index,
-                page_size=200,
+                page_size=page_size,
                 app_secret=app_secret,
                 data_platform_root=data_platform_root,
             )
@@ -125,10 +123,11 @@ def run_member_insight_vertical_slice(
 
             total = int(response_envelope.get('RetData', {}).get('Total', response_record_count) or 0)
             if response_record_count == 0:
+                endpoint_status = 'source_empty' if accumulated_records == 0 else 'completed'
                 completed_endpoint_runs.append(
                     artifact_store.finalize_endpoint_run(
                         endpoint_run_id=endpoint_run['endpoint_run_id'],
-                        endpoint_status='source_empty',
+                        endpoint_status=endpoint_status,
                         page_count=page_index,
                         record_count=accumulated_records,
                     )
@@ -172,13 +171,18 @@ def run_member_insight_vertical_slice(
         requested_business_date=requested_business_date,
         latest_usable_endpoint_states=latest_usable_endpoint_states,
     )
-    artifact_store.write_json_artifacts(
-        canonical_artifacts=canonical_artifacts,
-        latest_state_artifacts={
-            'latest_usable_endpoint_states': latest_usable_endpoint_states,
-            'vertical_slice_backbone_state': vertical_slice_backbone_state,
-        },
-    )
+    artifact_store.write_payload_map({
+        'historical-run-truth/ingestion-runs.json': artifact_store.ingestion_runs,
+        'historical-run-truth/endpoint-runs.json': artifact_store.endpoint_runs,
+        'raw-replay/raw-response-pages.json': artifact_store.raw_response_pages,
+        'canonical/customer.json': canonical_artifacts.get('customer', []),
+        'canonical/customer_card.json': canonical_artifacts.get('customer_card', []),
+        'canonical/consume_bill.json': canonical_artifacts.get('consume_bill', []),
+        'canonical/consume_bill_payment.json': canonical_artifacts.get('consume_bill_payment', []),
+        'canonical/consume_bill_info.json': canonical_artifacts.get('consume_bill_info', []),
+        'latest-state/latest-usable-endpoint-state.json': latest_usable_endpoint_states,
+        'latest-state/vertical-slice-backbone-state.json': vertical_slice_backbone_state,
+    })
     return {
         'request_id': uuid.uuid4().hex,
         'trace_ref': _new_trace_ref(),

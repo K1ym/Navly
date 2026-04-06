@@ -6,13 +6,11 @@ import sys
 from pathlib import Path
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
-if str(DATA_PLATFORM_ROOT / 'ingestion') not in sys.path:
-    sys.path.insert(0, str(DATA_PLATFORM_ROOT / 'ingestion'))
-if str(DATA_PLATFORM_ROOT / 'connectors' / 'qinqin') not in sys.path:
-    sys.path.insert(0, str(DATA_PLATFORM_ROOT / 'connectors' / 'qinqin'))
+if str(DATA_PLATFORM_ROOT) not in sys.path:
+    sys.path.insert(0, str(DATA_PLATFORM_ROOT))
 
-from member_insight_vertical_slice import run_member_insight_vertical_slice  # type: ignore  # noqa: E402
-from qinqin_substrate import FixtureQinqinTransport  # type: ignore  # noqa: E402
+from backbone_support.qinqin_substrate import FixtureQinqinTransport
+from ingestion.member_insight_vertical_slice import DEFAULT_PAGE_SIZE, run_member_insight_vertical_slice
 
 
 def main() -> int:
@@ -22,6 +20,7 @@ def main() -> int:
     parser.add_argument('--end-time', required=True)
     parser.add_argument('--requested-business-date', required=True)
     parser.add_argument('--app-secret', required=True)
+    parser.add_argument('--page-size', type=int, default=DEFAULT_PAGE_SIZE)
     parser.add_argument('--fixtures', default=str(DATA_PLATFORM_ROOT / 'tests' / 'fixtures' / 'member_insight' / 'qinqin_fixture_pages.bundle.json'))
     parser.add_argument('--output-dir', required=True)
     args = parser.parse_args()
@@ -34,6 +33,7 @@ def main() -> int:
         end_time=args.end_time,
         requested_business_date=args.requested_business_date,
         app_secret=args.app_secret,
+        page_size=args.page_size,
         transport=transport,
         output_root=args.output_dir,
     )
