@@ -155,7 +155,7 @@
 | 对象 | 必须冻结字段 | 可扩展但不能进入核心契约 | 明确不进入 shared-contracts 核心 |
 | --- | --- | --- | --- |
 | `capability_readiness_query` | `request_id`、`trace_ref`、`capability_id`、`access_context`、`target_scope_ref`、`target_business_date`、`freshness_mode` | `extensions.*` | runtime prompt、自然语言问题文本 |
-| `capability_readiness_response` | `request_id`、`trace_ref`、`capability_id`、`readiness_status`、`evaluated_scope_ref`、`requested_business_date`、`latest_usable_business_date`、`reason_codes`、`blocking_dependencies`、`state_trace_refs`、`evaluated_at` | `run_trace_refs`、`extensions.*` | 内部 SQL、调度器临时状态、自由文本说明 |
+| `capability_readiness_response` | `request_id`、`trace_ref`、`capability_id`、`readiness_status`、`evaluated_scope_ref`、`requested_business_date`、`latest_usable_business_date`、`reason_codes`、`blocking_dependencies`、`state_trace_refs`、`run_trace_refs`、`evaluated_at` | `extensions.*` | 内部 SQL、调度器临时状态、自由文本说明 |
 | `blocking_dependency_ref` | `dependency_kind`、`dependency_ref`、`blocking_reason_code` | `state_trace_refs`、`run_trace_refs` | 物理表名、文件路径、脚本名 |
 
 ### 4.4 service / trace family
@@ -172,7 +172,7 @@
 | 对象 | 必须冻结字段 | 可扩展但不能进入核心契约 | 明确不进入 shared-contracts 核心 |
 | --- | --- | --- | --- |
 | `runtime_request_envelope` | `request_id`、`ingress_ref`、`trace_ref`、`channel_kind`、`message_mode`、`user_input_text`、`response_channel_capabilities`、`access_context_envelope`、`decision_ref` | `structured_input_slots`、`requested_capability_id`、`requested_service_object_id`、`target_scope_hint`、`target_business_date_hint`、`delivery_hint` | host 私有 session 结构、workspace 内部对象、prompt 原文 |
-| `runtime_result_envelope` | `request_id`、`runtime_trace_ref`、`result_status`、`selected_capability_id`、`answer_fragments`、`reason_codes`、`trace_refs` | `selected_service_object_id`、`explanation_fragments`、`escalation_action`、`delivery_hints` | 渠道渲染细节、宿主 SDK 参数 |
+| `runtime_result_envelope` | `request_id`、`runtime_trace_ref`、`result_status`、`selected_capability_id`、`answer_fragments`、`reason_codes`、`trace_refs` | `selected_service_object_id`、`explanation_fragments`、`escalation_action`、`delivery_hints` | 渠道渲染细节、宿主 SDK 参数；`answer_fragments` / `explanation_fragments` 元素至少是结构化对象 |
 | `runtime_outcome_event` | `event_id`、`request_id`、`trace_ref`、`runtime_trace_ref`、`decision_ref`、`selected_capability_id`、`result_status`、`occurred_at` | `selected_service_object_id`、`reason_codes`、`extensions.*` | 宿主 token、未治理调试文本 |
 
 ---

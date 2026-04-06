@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "conversation_ref",
+  "description": "Canonical conversation binding reference owned by auth-kernel.",
+  "type": "string",
+  "pattern": "^navly:conversation:[A-Za-z0-9._:-]+$"
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "capability_id",
+  "description": "Namespaced canonical capability identifier for Navly shared contracts.",
+  "type": "string",
+  "pattern": "^navly\\.[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+  "examples": [
+    "navly.store.daily_summary",
+    "navly.member.consume_overview"
+  ]
+}

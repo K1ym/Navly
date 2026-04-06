@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "actor_ref",
+  "description": "Canonical actor reference owned by auth-kernel.",
+  "type": "string",
+  "pattern": "^navly:actor:[A-Za-z0-9._:-]+$"
+}

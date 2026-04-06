@@ -83,8 +83,8 @@
 | `result_status` | `runtime_result_status` | freeze | 运行时结果主状态 |
 | `selected_capability_id` | `string` | freeze | 实际执行的 capability |
 | `selected_service_object_id` | `string` | extend | 实际读取的服务对象 |
-| `answer_fragments` | `array` | freeze | 渠道无关回答片段 |
-| `explanation_fragments` | `array` | extend | fallback / explanation 片段 |
+| `answer_fragments` | `object[]` | freeze | 渠道无关回答片段；每个 fragment 至少是结构化对象 |
+| `explanation_fragments` | `object[]` | extend | fallback / explanation 片段；每个 fragment 至少是结构化对象 |
 | `escalation_action` | `object` | extend | 升级动作建议 |
 | `reason_codes` | `string[]` | freeze | 结构化原因代码 |
 | `trace_refs` | `string[]` | freeze | access / readiness / service / run 追踪引用 |

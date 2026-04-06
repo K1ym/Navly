@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "session_ref",
+  "description": "Canonical authorized session reference owned by auth-kernel.",
+  "type": "string",
+  "pattern": "^navly:session:[A-Za-z0-9._:-]+$"
+}
