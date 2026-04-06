@@ -23,11 +23,15 @@
     },
     "answer_fragments": {
       "type": "array",
-      "items": {}
+      "items": {
+        "type": "object"
+      }
     },
     "explanation_fragments": {
       "type": "array",
-      "items": {}
+      "items": {
+        "type": "object"
+      }
     },
     "escalation_action": {
       "type": "object",

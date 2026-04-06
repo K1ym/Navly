@@ -73,6 +73,7 @@
     "reason_codes",
     "blocking_dependencies",
     "state_trace_refs",
+    "run_trace_refs",
     "evaluated_at"
   ]
 }

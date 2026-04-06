@@ -40,6 +40,7 @@
     "request_id",
     "trace_ref",
     "capability_id",
+    "service_object_id",
     "access_context",
     "target_scope_ref",
     "target_business_date",
