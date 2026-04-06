@@ -11,7 +11,8 @@
       ],
       "applies_to": "all_qinqin_endpoints",
       "status": "seeded_pending_wire_freeze",
-      "notes": "Canonical semantic key only; final wire usage per endpoint is deferred."
+      "notes": "Canonical semantic key only; final wire usage per endpoint is deferred.",
+      "preferred_wire_name": "OrgId"
     },
     {
       "parameter_key": "sign",
@@ -21,7 +22,8 @@
       ],
       "applies_to": "all_qinqin_endpoints",
       "status": "seeded_pending_wire_freeze",
-      "notes": "Signature parameter required by shared auth/signing rule."
+      "notes": "Signature parameter required by shared auth/signing rule.",
+      "preferred_wire_name": "Sign"
     },
     {
       "parameter_key": "start_time",
@@ -32,7 +34,8 @@
       ],
       "applies_to": "windowed_qinqin_endpoints",
       "status": "seeded_pending_wire_freeze",
-      "notes": "Known naming drift captured from docs and audits."
+      "notes": "Known naming drift captured from docs and audits.",
+      "preferred_wire_name": "Stime"
     },
     {
       "parameter_key": "end_time",
@@ -43,7 +46,8 @@
       ],
       "applies_to": "windowed_qinqin_endpoints",
       "status": "seeded_pending_wire_freeze",
-      "notes": "Known naming drift captured from docs and audits."
+      "notes": "Known naming drift captured from docs and audits.",
+      "preferred_wire_name": "Etime"
     },
     {
       "parameter_key": "page_index",
@@ -54,7 +58,8 @@
       ],
       "applies_to": "paged_qinqin_endpoints",
       "status": "seeded_pending_wire_freeze",
-      "notes": "Known naming drift captured from docs and audits."
+      "notes": "Known naming drift captured from docs and audits.",
+      "preferred_wire_name": "PageIndex"
     },
     {
       "parameter_key": "page_size",
@@ -64,7 +69,8 @@
       ],
       "applies_to": "paged_qinqin_endpoints",
       "status": "seeded_pending_wire_freeze",
-      "notes": "Shared pagination size parameter."
+      "notes": "Shared pagination size parameter.",
+      "preferred_wire_name": "PageSize"
     }
   ]
 }

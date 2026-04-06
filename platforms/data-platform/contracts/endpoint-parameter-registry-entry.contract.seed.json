@@ -5,6 +5,7 @@
   "fields": [
     "parameter_key",
     "semantic_name",
+    "preferred_wire_name",
     "known_wire_variants",
     "applies_to",
     "status",
