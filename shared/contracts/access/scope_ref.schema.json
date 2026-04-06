@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "scope_ref",
+  "description": "Canonical scope reference. Uses namespaced canonical ref format with explicit scope kind segment.",
+  "type": "string",
+  "pattern": "^navly:scope:(tenant|org|store|hq):[A-Za-z0-9._:-]+$"
+}

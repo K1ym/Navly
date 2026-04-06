@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "service_object_id",
+  "description": "Namespaced canonical service object identifier for Navly shared contracts.",
+  "type": "string",
+  "pattern": "^navly\\.service\\.[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+  "examples": [
+    "navly.service.store.daily_summary",
+    "navly.service.member.consume_overview"
+  ]
+}

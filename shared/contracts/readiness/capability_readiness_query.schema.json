@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "capability_readiness_query",
+  "description": "Phase-1 P0 schema seed for capability_readiness_query.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_ref": {
+      "$ref": "../trace/trace_ref.schema.json"
+    },
+    "capability_id": {
+      "$ref": "../capability/capability_id.schema.json"
+    },
+    "access_context": {
+      "$ref": "../access/access_context_envelope.schema.json"
+    },
+    "target_scope_ref": {
+      "$ref": "../access/scope_ref.schema.json"
+    },
+    "target_business_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "freshness_mode": {
+      "$ref": "../enums/freshness_mode.schema.json"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "request_id",
+    "trace_ref",
+    "capability_id",
+    "access_context",
+    "target_scope_ref",
+    "target_business_date",
+    "freshness_mode"
+  ]
+}

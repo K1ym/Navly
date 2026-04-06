@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "scope_kind",
+  "description": "Frozen shared enum for canonical scope kinds.",
+  "type": "string",
+  "enum": [
+    "tenant",
+    "org",
+    "store",
+    "hq"
+  ]
+}

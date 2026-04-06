@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "state_trace_ref",
+  "description": "State-truth trace reference owned by data-platform.",
+  "type": "string",
+  "pattern": "^navly:state-trace:[A-Za-z0-9._:-]+:[A-Za-z0-9._:-]+$"
+}

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "capability_readiness_response",
+  "description": "Phase-1 P0 schema seed for capability_readiness_response.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_ref": {
+      "$ref": "../trace/trace_ref.schema.json"
+    },
+    "capability_id": {
+      "$ref": "../capability/capability_id.schema.json"
+    },
+    "readiness_status": {
+      "$ref": "../enums/readiness_status.schema.json"
+    },
+    "evaluated_scope_ref": {
+      "$ref": "../access/scope_ref.schema.json"
+    },
+    "requested_business_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "latest_usable_business_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "$ref": "../enums/readiness_reason_code.schema.json"
+      }
+    },
+    "blocking_dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "./blocking_dependency_ref.schema.json"
+      }
+    },
+    "state_trace_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../trace/state_trace_ref.schema.json"
+      }
+    },
+    "run_trace_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../trace/run_trace_ref.schema.json"
+      }
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "request_id",
+    "trace_ref",
+    "capability_id",
+    "readiness_status",
+    "evaluated_scope_ref",
+    "requested_business_date",
+    "latest_usable_business_date",
+    "reason_codes",
+    "blocking_dependencies",
+    "state_trace_refs",
+    "evaluated_at"
+  ]
+}

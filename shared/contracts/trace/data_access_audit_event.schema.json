@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "data_access_audit_event",
+  "description": "Phase-1 placeholder for data_access_audit_event. Detailed shared audit field freeze belongs to milestone D.",
+  "$comment": "This placeholder intentionally keeps only the top-level event skeleton for milestone A/B.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_ref": {
+      "$ref": "./trace_ref.schema.json"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "event_id",
+    "request_id",
+    "trace_ref",
+    "occurred_at"
+  ]
+}

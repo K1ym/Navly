@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "capability_explanation_object",
+  "description": "Phase-1 schema seed for capability_explanation_object. Explanation payload remains structured, not natural-language final output.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "capability_id": {
+      "$ref": "../capability/capability_id.schema.json"
+    },
+    "explanation_scope": {
+      "type": "string",
+      "enum": [
+        "readiness",
+        "service"
+      ]
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "$ref": "../enums/readiness_reason_code.schema.json"
+      }
+    },
+    "summary_tokens": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "state_trace_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../trace/state_trace_ref.schema.json"
+      }
+    },
+    "run_trace_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../trace/run_trace_ref.schema.json"
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "capability_id",
+    "explanation_scope",
+    "reason_codes",
+    "state_trace_refs",
+    "run_trace_refs"
+  ]
+}
