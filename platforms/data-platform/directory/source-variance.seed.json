@@ -1,0 +1,91 @@
+{
+  "registry_name": "source_variance_registry",
+  "status": "milestone_a_seed",
+  "entries": [
+    {
+      "variance_id": "qinqin.param.page-name-drift",
+      "variance_kind": "parameter_name_drift",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.v1_1.shared",
+      "canonical_form": "page_index",
+      "observed_variants": [
+        "PageIndex",
+        "Page"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/auth-and-signing.md"
+      ],
+      "resolution_status": "seeded_pending_validation",
+      "notes": "Must not be silently hardcoded per endpoint."
+    },
+    {
+      "variance_id": "qinqin.param.start-time-name-drift",
+      "variance_kind": "parameter_name_drift",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.v1_1.shared",
+      "canonical_form": "start_time",
+      "observed_variants": [
+        "Stime",
+        "STime"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/auth-and-signing.md"
+      ],
+      "resolution_status": "seeded_pending_validation",
+      "notes": "Captured from docs; final wire freeze deferred."
+    },
+    {
+      "variance_id": "qinqin.param.end-time-name-drift",
+      "variance_kind": "parameter_name_drift",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.v1_1.shared",
+      "canonical_form": "end_time",
+      "observed_variants": [
+        "Etime",
+        "ETime"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/auth-and-signing.md"
+      ],
+      "resolution_status": "seeded_pending_validation",
+      "notes": "Captured from docs; final wire freeze deferred."
+    },
+    {
+      "variance_id": "qinqin.param.org-id-name-drift",
+      "variance_kind": "parameter_name_drift",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.v1_1.shared",
+      "canonical_form": "org_id",
+      "observed_variants": [
+        "OrgId",
+        "OrgID"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/auth-and-signing.md"
+      ],
+      "resolution_status": "seeded_pending_validation",
+      "notes": "Must remain governed as variance, not hidden in ad-hoc code."
+    },
+    {
+      "variance_id": "qinqin.path.legacy-path-required",
+      "variance_kind": "path_resolution_constraint",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.v1_1.shared",
+      "observed_variants": [
+        "GetConsumptionList",
+        "GetRechargeList",
+        "GetAccountList",
+        "GetStaffList",
+        "GetTechClockList",
+        "GetSalesCommissionList",
+        "GetStaffBaseCommissionList"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/endpoint-manifest.md"
+      ],
+      "resolution_status": "seeded_frozen_for_phase_1",
+      "notes": "Manifest paths are authoritative for phase-1.",
+      "resolution_rule": "use_manifest_paths_as_frozen_for_v1_1"
+    }
+  ]
+}

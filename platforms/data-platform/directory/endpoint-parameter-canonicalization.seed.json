@@ -1,0 +1,70 @@
+{
+  "registry_name": "endpoint_parameter_registry",
+  "status": "milestone_a_seed",
+  "entries": [
+    {
+      "parameter_key": "org_id",
+      "semantic_name": "org_id",
+      "known_wire_variants": [
+        "OrgId",
+        "OrgID"
+      ],
+      "applies_to": "all_qinqin_endpoints",
+      "status": "seeded_pending_wire_freeze",
+      "notes": "Canonical semantic key only; final wire usage per endpoint is deferred."
+    },
+    {
+      "parameter_key": "sign",
+      "semantic_name": "sign",
+      "known_wire_variants": [
+        "Sign"
+      ],
+      "applies_to": "all_qinqin_endpoints",
+      "status": "seeded_pending_wire_freeze",
+      "notes": "Signature parameter required by shared auth/signing rule."
+    },
+    {
+      "parameter_key": "start_time",
+      "semantic_name": "start_time",
+      "known_wire_variants": [
+        "Stime",
+        "STime"
+      ],
+      "applies_to": "windowed_qinqin_endpoints",
+      "status": "seeded_pending_wire_freeze",
+      "notes": "Known naming drift captured from docs and audits."
+    },
+    {
+      "parameter_key": "end_time",
+      "semantic_name": "end_time",
+      "known_wire_variants": [
+        "Etime",
+        "ETime"
+      ],
+      "applies_to": "windowed_qinqin_endpoints",
+      "status": "seeded_pending_wire_freeze",
+      "notes": "Known naming drift captured from docs and audits."
+    },
+    {
+      "parameter_key": "page_index",
+      "semantic_name": "page_index",
+      "known_wire_variants": [
+        "PageIndex",
+        "Page"
+      ],
+      "applies_to": "paged_qinqin_endpoints",
+      "status": "seeded_pending_wire_freeze",
+      "notes": "Known naming drift captured from docs and audits."
+    },
+    {
+      "parameter_key": "page_size",
+      "semantic_name": "page_size",
+      "known_wire_variants": [
+        "PageSize"
+      ],
+      "applies_to": "paged_qinqin_endpoints",
+      "status": "seeded_pending_wire_freeze",
+      "notes": "Shared pagination size parameter."
+    }
+  ]
+}

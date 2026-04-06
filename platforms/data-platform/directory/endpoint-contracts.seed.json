@@ -1,0 +1,152 @@
+{
+  "registry_name": "endpoint_contract_registry",
+  "status": "milestone_a_seed",
+  "source_system_id": "qinqin.v1_1",
+  "entries": [
+    {
+      "endpoint_contract_id": "qinqin.v1_1.shared",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "shared",
+      "version": "v1.1",
+      "display_name": "Qinqin v1.1 Shared Virtual Contract",
+      "method": null,
+      "path": null,
+      "increment_strategy": null,
+      "structured_targets": [],
+      "truth_source_doc": "docs/api/qinqin/auth-and-signing.md",
+      "status": "seeded_virtual_shared_contract",
+      "notes": "Virtual shared contract for cross-endpoint parameter/path variance governance only; not an actual source endpoint."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "member",
+      "version": "1.1",
+      "display_name": "用户（会员）基础信息",
+      "method": "POST",
+      "path": "/api/thirdparty/GetCustomersList",
+      "increment_strategy": "profile_refresh_windowed",
+      "structured_targets": [
+        "customer",
+        "customer_card",
+        "customer_ticket",
+        "customer_coupon"
+      ],
+      "truth_source_doc": "docs/api/qinqin/member/1.1-user-base.md",
+      "status": "seeded_not_implemented"
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "member",
+      "version": "1.2",
+      "display_name": "用户消费明细数据",
+      "method": "POST",
+      "path": "/api/thirdparty/GetConsumeBillList",
+      "increment_strategy": "business_window_incremental",
+      "structured_targets": [
+        "consume_bill",
+        "consume_bill_payment",
+        "consume_bill_info"
+      ],
+      "truth_source_doc": "docs/api/qinqin/member/1.2-user-consume-details.md",
+      "status": "seeded_not_implemented"
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "member",
+      "version": "1.3",
+      "display_name": "用户充值明细数据",
+      "method": "POST",
+      "path": "/api/thirdparty/GetRechargeBillList",
+      "increment_strategy": "business_window_incremental",
+      "structured_targets": [
+        "recharge_bill",
+        "recharge_bill_payment",
+        "recharge_bill_ticket",
+        "recharge_bill_sales"
+      ],
+      "truth_source_doc": "docs/api/qinqin/member/1.3-user-recharge-details.md",
+      "status": "seeded_not_implemented"
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_user_trade_list.v1_4",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "member",
+      "version": "1.4",
+      "display_name": "用户账户流水数据",
+      "method": "POST",
+      "path": "/api/thirdparty/GetUserTradeList",
+      "increment_strategy": "business_window_incremental",
+      "structured_targets": [
+        "account_trade"
+      ],
+      "truth_source_doc": "docs/api/qinqin/member/1.4-user-account-trades.md",
+      "status": "seeded_not_implemented"
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "staff",
+      "version": "1.5",
+      "display_name": "技师基础信息数据",
+      "method": "POST",
+      "path": "/api/thirdparty/GetPersonList",
+      "increment_strategy": "profile_refresh_windowed",
+      "structured_targets": [
+        "staff",
+        "staff_item"
+      ],
+      "truth_source_doc": "docs/api/qinqin/staff/1.5-staff-base.md",
+      "status": "seeded_not_implemented"
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_up_clock_list.v1_6",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "staff",
+      "version": "1.6",
+      "display_name": "技师上钟明细数据",
+      "method": "POST",
+      "path": "/api/thirdparty/GetTechUpClockList",
+      "increment_strategy": "business_window_incremental",
+      "structured_targets": [
+        "tech_shift_item",
+        "tech_shift_summary"
+      ],
+      "truth_source_doc": "docs/api/qinqin/staff/1.6-staff-clock-details.md",
+      "status": "seeded_not_implemented"
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_market_list.v1_7",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "staff",
+      "version": "1.7",
+      "display_name": "技师推销提成数据",
+      "method": "POST",
+      "path": "/api/thirdparty/GetTechMarketList",
+      "increment_strategy": "business_window_incremental",
+      "structured_targets": [
+        "sales_commission"
+      ],
+      "truth_source_doc": "docs/api/qinqin/staff/1.7-staff-sales-commission.md",
+      "status": "seeded_not_implemented"
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "source_system_id": "qinqin.v1_1",
+      "domain": "staff",
+      "version": "1.8",
+      "display_name": "技师基本提成设置数据",
+      "method": "POST",
+      "path": "/api/thirdparty/GetTechCommissionSetList",
+      "increment_strategy": "daily_full_replace",
+      "structured_targets": [
+        "commission_setting",
+        "commission_setting_detail"
+      ],
+      "truth_source_doc": "docs/api/qinqin/staff/1.8-staff-base-commission.md",
+      "status": "seeded_not_implemented"
+    }
+  ]
+}

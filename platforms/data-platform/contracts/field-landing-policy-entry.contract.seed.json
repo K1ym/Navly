@@ -1,0 +1,19 @@
+{
+  "contract_name": "field_landing_policy_entry",
+  "owner": "data-platform",
+  "status": "milestone_a_seed",
+  "fields": [
+    "endpoint_contract_id",
+    "field_selector",
+    "landing_tier",
+    "target_layer",
+    "target_dataset",
+    "policy_status",
+    "notes"
+  ],
+  "landing_tiers": [
+    "tier_a_structured",
+    "tier_b_preserved",
+    "tier_c_documented_only"
+  ]
+}

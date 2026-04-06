@@ -1,0 +1,41 @@
+{
+  "schema_version": "navly.data_platform.contract_ownership.seed.v1",
+  "status": "milestone_a_seed",
+  "module": "data-platform",
+  "ownership_scope": "data-platform-only",
+  "shared_contract_owner_path": "shared/contracts",
+  "shared_contract_dependencies": [
+    "capability_definition",
+    "capability_id",
+    "capability_scope_requirement",
+    "capability_service_binding",
+    "access_context_envelope",
+    "access_decision",
+    "capability_readiness_query",
+    "capability_readiness_response",
+    "theme_service_query",
+    "theme_service_response",
+    "trace_ref",
+    "data_access_audit_event"
+  ],
+  "data_platform_owned_contracts": [
+    "source_system_registry_entry",
+    "endpoint_contract_registry_entry",
+    "endpoint_parameter_registry_entry",
+    "endpoint_field_catalog_entry",
+    "field_landing_policy_entry",
+    "source_variance_entry"
+  ],
+  "canonical_id_rules": {
+    "capability_id": "navly.<domain>.<capability_name>",
+    "service_object_id": "navly.service.<domain>.<object_name>",
+    "document_short_names_only": [
+      "store_member_insight",
+      "store_daily_overview",
+      "store_staff_board",
+      "store_finance_summary",
+      "capability_explanation"
+    ]
+  },
+  "note": "Milestone A seed only. No shared contract definitions are duplicated here."
+}
