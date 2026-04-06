@@ -1,0 +1,9 @@
+seed_version: 1
+status: milestone-a-placeholder
+owner_module: auth-kernel
+catalog_name: actor_type_vocabulary
+actor_types:
+  - actor_type: human_user
+    description: Human actor placeholder for store manager/store staff style access subjects.
+  - actor_type: system_service
+    description: Service actor placeholder for controlled backend automation.

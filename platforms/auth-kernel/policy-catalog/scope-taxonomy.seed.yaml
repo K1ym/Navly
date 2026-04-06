@@ -1,0 +1,14 @@
+seed_version: 1
+status: milestone-a-placeholder
+owner_module: auth-kernel
+catalog_name: scope_taxonomy
+scope_kinds:
+  - scope_kind: store
+    scope_ref_field: store_ref
+    description: Store-scoped access binding placeholder.
+  - scope_kind: org
+    scope_ref_field: org_ref
+    description: Organization-scoped access binding placeholder.
+  - scope_kind: hq
+    scope_ref_field: hq_ref
+    description: HQ-scoped access binding placeholder.

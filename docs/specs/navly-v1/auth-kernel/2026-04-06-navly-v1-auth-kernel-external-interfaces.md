@@ -372,7 +372,7 @@ runtime 与 `auth-kernel` 之间禁止：
 
 明确约束：
 
-- 不再使用 `escalation_required`
+- 不再使用旧的 legacy escalation 状态别名
 - 如需表达需要升级，统一使用 `access_decision_status = escalation`
 
 推荐所有外部消费者统一理解如下语义：
