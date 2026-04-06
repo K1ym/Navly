@@ -1,0 +1,11 @@
+{
+  "object_name": "host_trace_event",
+  "object_scope": "bridge_local",
+  "event_id": "placeholder-event-id",
+  "request_id": "placeholder-request-id",
+  "host_trace_ref": "host:trace:placeholder",
+  "stage": "host_ingress_received",
+  "status": "recorded",
+  "linked_trace_refs": [],
+  "occurred_at": "2026-04-06T00:00:00Z"
+}
