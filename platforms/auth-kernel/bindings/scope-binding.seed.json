@@ -1,0 +1,37 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "bindings": [
+    {
+      "actor_ref": "navly:actor:sample-store-manager-single",
+      "tenant_ref": "navly:tenant:sample-retail",
+      "scope_ref": "navly:scope:store:sample-store-001",
+      "is_primary": true
+    },
+    {
+      "actor_ref": "navly:actor:sample-store-manager-multi",
+      "tenant_ref": "navly:tenant:sample-retail",
+      "scope_ref": "navly:scope:store:sample-store-001",
+      "is_primary": true
+    },
+    {
+      "actor_ref": "navly:actor:sample-store-manager-multi",
+      "tenant_ref": "navly:tenant:sample-retail",
+      "scope_ref": "navly:scope:store:sample-store-002",
+      "is_primary": false
+    },
+    {
+      "actor_ref": "navly:actor:sample-store-staff",
+      "tenant_ref": "navly:tenant:sample-retail",
+      "scope_ref": "navly:scope:store:sample-store-001",
+      "is_primary": true
+    },
+    {
+      "actor_ref": "navly:actor:sample-inactive-staff",
+      "tenant_ref": "navly:tenant:sample-retail",
+      "scope_ref": "navly:scope:store:sample-store-001",
+      "is_primary": true
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # policy-catalog
 
-分层：C0  
+分层：C0
 用途：承载 auth-kernel 在 milestone A 需要冻结的 vocabulary / taxonomy seed。
 
 ## 当前 seed 范围

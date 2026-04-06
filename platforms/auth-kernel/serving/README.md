@@ -1,10 +1,15 @@
 # serving
 
-分层：L3  
-用途：承载 access serving boundary 与下游消费适配。
+分层：L3
+用途：承载 auth-kernel 对下游的 owner-side access serving boundary。
+
+## 当前 Milestone B 内容
+
+- `access-context-envelope-backbone.mjs`
+- `access-chain-backbone.mjs`
 
 ## 当前约束
 
-- 下游默认只应通过本目录未来暴露的受控 boundary 消费 auth-kernel
-- milestone A 不在这里定义 public access contract owner schema
-- 与 `access_context_envelope` 相关的公共契约主定义权仍属于 `shared-contracts`
+- 这里不拥有 public `access_context_envelope` schema 主定义权
+- 当前只负责基于 shared contract 构造 owner-side envelope 输出
+- 只有在 Gate 0 / capability access 成立且 scope 已绑定时才会签发 envelope

@@ -1,0 +1,14 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "auto_bind_single_scope": true,
+  "multi_scope_without_selection_status": "pending_scope",
+  "invalid_scope_selection_status": "suspended",
+  "allow_in_scope_rebinding": true,
+  "conversation_binding_status_values": [
+    "bound",
+    "pending_scope",
+    "suspended"
+  ]
+}

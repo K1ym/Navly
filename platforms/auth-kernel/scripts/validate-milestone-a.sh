@@ -6,9 +6,14 @@ if ! command -v rg >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! command -v node >/dev/null 2>&1; then
+  echo "node is required to validate milestone A JSON seeds" >&2
+  exit 1
+fi
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 legacy_token="escalation""_required"
-capability_seed="$ROOT/policy-catalog/capability-vocabulary.seed.yaml"
+capability_seed="$ROOT/policy-catalog/capability-vocabulary.seed.json"
 
 required_dirs=(
   docs
@@ -33,14 +38,14 @@ for dir in "${required_dirs[@]}"; do
 done
 
 required_files=(
-  "$ROOT/policy-catalog/actor-type-vocabulary.seed.yaml"
-  "$ROOT/policy-catalog/role-catalog.seed.yaml"
-  "$ROOT/policy-catalog/scope-taxonomy.seed.yaml"
-  "$ROOT/policy-catalog/capability-vocabulary.seed.yaml"
-  "$ROOT/policy-catalog/access-decision-status.alignment.yaml"
-  "$ROOT/policy-catalog/decision-reason-taxonomy.seed.yaml"
-  "$ROOT/policy-catalog/restriction-taxonomy.seed.yaml"
-  "$ROOT/policy-catalog/obligation-taxonomy.seed.yaml"
+  "$ROOT/policy-catalog/actor-type-vocabulary.seed.json"
+  "$ROOT/policy-catalog/role-catalog.seed.json"
+  "$ROOT/policy-catalog/scope-taxonomy.seed.json"
+  "$ROOT/policy-catalog/capability-vocabulary.seed.json"
+  "$ROOT/policy-catalog/access-decision-status.alignment.json"
+  "$ROOT/policy-catalog/decision-reason-taxonomy.seed.json"
+  "$ROOT/policy-catalog/restriction-taxonomy.seed.json"
+  "$ROOT/policy-catalog/obligation-taxonomy.seed.json"
 )
 
 for file in "${required_files[@]}"; do
@@ -55,15 +60,25 @@ if rg -n "$legacy_token" "$ROOT" >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! rg -n "capability_id:" "$capability_seed" >/dev/null 2>&1; then
-  echo "capability vocabulary seed must declare at least one capability_id" >&2
-  exit 1
-fi
+node --input-type=module - "$capability_seed" <<'EOF'
+import fs from 'node:fs';
 
-if rg -n "capability_id:" "$capability_seed" | rg -v "capability_id:\s+navly\." >/dev/null 2>&1; then
-  echo "all capability_id entries must use namespaced navly.* format" >&2
-  rg -n "capability_id:" "$capability_seed" | rg -v "capability_id:\s+navly\." >&2
-  exit 1
-fi
+const capabilitySeedPath = process.argv[2];
+const capabilitySeed = JSON.parse(fs.readFileSync(capabilitySeedPath, 'utf8'));
+const capabilities = capabilitySeed.capabilities;
+
+if (!Array.isArray(capabilities) || capabilities.length === 0) {
+  console.error('capability vocabulary seed must declare at least one capability_id');
+  process.exit(1);
+}
+
+for (const capability of capabilities) {
+  if (typeof capability.capability_id !== 'string' || !capability.capability_id.startsWith('navly.')) {
+    console.error('all capability_id entries must use namespaced navly.* format');
+    console.error(JSON.stringify(capability, null, 2));
+    process.exit(1);
+  }
+}
+EOF
 
 echo "auth-kernel milestone A validation passed"
