@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "capability_service_binding",
+  "description": "Phase-1 schema seed for capability_service_binding. Payload internals remain outside shared-contracts.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "capability_id": {
+      "$ref": "./capability_id.schema.json"
+    },
+    "service_object_id": {
+      "$ref": "../service/service_object_id.schema.json"
+    },
+    "service_kind": {
+      "type": "string",
+      "const": "theme_service"
+    },
+    "is_default_binding": {
+      "type": "boolean"
+    },
+    "include_explanation_supported": {
+      "type": "boolean"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "capability_id",
+    "service_object_id",
+    "service_kind",
+    "is_default_binding",
+    "include_explanation_supported"
+  ]
+}

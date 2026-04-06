@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "runtime_result_envelope",
+  "description": "Phase-1 P0 schema seed for runtime -> bridge canonical result.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime_trace_ref": {
+      "$ref": "./runtime_trace_ref.schema.json"
+    },
+    "result_status": {
+      "$ref": "../enums/runtime_result_status.schema.json"
+    },
+    "selected_capability_id": {
+      "$ref": "../capability/capability_id.schema.json"
+    },
+    "selected_service_object_id": {
+      "$ref": "../service/service_object_id.schema.json"
+    },
+    "answer_fragments": {
+      "type": "array",
+      "items": {}
+    },
+    "explanation_fragments": {
+      "type": "array",
+      "items": {}
+    },
+    "escalation_action": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "trace_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "delivery_hints": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "request_id",
+    "runtime_trace_ref",
+    "result_status",
+    "selected_capability_id",
+    "answer_fragments",
+    "reason_codes",
+    "trace_refs"
+  ]
+}

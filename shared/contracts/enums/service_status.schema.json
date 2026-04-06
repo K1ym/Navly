@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "service_status",
+  "description": "Frozen shared enum for theme service result status.",
+  "type": "string",
+  "enum": [
+    "served",
+    "not_ready",
+    "scope_mismatch",
+    "error"
+  ]
+}

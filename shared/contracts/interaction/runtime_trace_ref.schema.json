@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "runtime_trace_ref",
+  "description": "Runtime-owned execution trace reference. Canonical namespaced format remains intentionally lightweight in milestone A.",
+  "type": "string",
+  "minLength": 1
+}

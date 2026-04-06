@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "runtime_result_status",
+  "description": "Frozen shared enum for runtime result status.",
+  "type": "string",
+  "enum": [
+    "answered",
+    "fallback",
+    "escalated",
+    "rejected",
+    "runtime_error"
+  ]
+}

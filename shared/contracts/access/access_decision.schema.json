@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "access_decision",
+  "description": "Phase-1 P0 schema seed for access_decision.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "decision_ref": {
+      "$ref": "./decision_ref.schema.json"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_ref": {
+      "$ref": "../trace/trace_ref.schema.json"
+    },
+    "decision_status": {
+      "$ref": "../enums/access_decision_status.schema.json"
+    },
+    "actor_ref": {
+      "$ref": "./actor_ref.schema.json"
+    },
+    "session_ref": {
+      "$ref": "./session_ref.schema.json"
+    },
+    "target_capability_id": {
+      "$ref": "../capability/capability_id.schema.json"
+    },
+    "target_scope_ref": {
+      "$ref": "./scope_ref.schema.json"
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "restriction_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "obligation_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "decision_ref",
+    "request_id",
+    "trace_ref",
+    "decision_status",
+    "actor_ref",
+    "session_ref",
+    "target_capability_id",
+    "target_scope_ref",
+    "decided_at",
+    "expires_at"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "access_decision_status",
+  "description": "Frozen shared enum for access decision status.",
+  "type": "string",
+  "enum": [
+    "allow",
+    "deny",
+    "restricted",
+    "escalation"
+  ]
+}

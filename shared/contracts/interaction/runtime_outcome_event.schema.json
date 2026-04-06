@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "runtime_outcome_event",
+  "description": "Phase-1 P0 schema seed for runtime outcome event.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_ref": {
+      "$ref": "../trace/trace_ref.schema.json"
+    },
+    "runtime_trace_ref": {
+      "$ref": "./runtime_trace_ref.schema.json"
+    },
+    "decision_ref": {
+      "$ref": "../access/decision_ref.schema.json"
+    },
+    "selected_capability_id": {
+      "$ref": "../capability/capability_id.schema.json"
+    },
+    "selected_service_object_id": {
+      "$ref": "../service/service_object_id.schema.json"
+    },
+    "result_status": {
+      "$ref": "../enums/runtime_result_status.schema.json"
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "event_id",
+    "request_id",
+    "trace_ref",
+    "runtime_trace_ref",
+    "decision_ref",
+    "selected_capability_id",
+    "result_status",
+    "occurred_at"
+  ]
+}
