@@ -1,14 +1,15 @@
-# Dispatch Skeleton
+# Host Dispatch Backbone
 
-本目录预留给 runtime result -> host dispatch。
+本目录承载 host dispatch handoff backbone。
 
-当前 milestone A 只建立：
+当前 milestone B 已实现：
 
-- `host_dispatch_result` local placeholder
-- dispatch 边界说明
+- Gate 0 blocked path 的 host dispatch preparation
+- runtime result path 的 host dispatch preparation
+- `host_dispatch_result` closer-to-executable handoff object
 
 当前**不**实现：
 
-- real reply dispatch
-- host delivery retry
-- delivery receipt reconciliation
+- live outbound delivery
+- host receipt reconciliation
+- retry / resend orchestration

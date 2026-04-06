@@ -2,24 +2,39 @@
   "object_name": "host_ingress_envelope",
   "object_scope": "bridge_local",
   "request_id": "placeholder-request-id",
-  "ingress_ref": "placeholder-ingress-ref",
+  "ingress_ref": "navly:ingress:placeholder",
+  "trace_ref": "navly:trace:placeholder",
+  "host_trace_ref": "openclaw-host-bridge:host-trace:placeholder",
   "host_event_kind": "chat_message",
   "channel_kind": "wecom",
-  "channel_account_ref": "host:channel-account:placeholder",
+  "message_mode": "direct_message",
+  "channel_account_ref": "openclaw-host-bridge:channel-account:placeholder",
   "host_session_ref": "host:session:placeholder",
   "host_workspace_ref": "host:workspace:placeholder",
   "host_conversation_ref": "host:conversation:placeholder",
   "host_message_ref": "host:message:placeholder",
-  "peer_identity_evidence": {
-    "source": "host",
-    "peer_ref": "host:peer:placeholder"
-  },
+  "peer_identity_evidence": [
+    {
+      "alias_namespace": "wecom_user_id",
+      "alias_value": "sample_manager_single_scope",
+      "evidence_source": "host"
+    }
+  ],
   "message_text": "placeholder user input",
   "attachment_refs": [],
-  "host_delivery_context": {
-    "reply_mode": "thread_reply",
-    "target_ref": "host:delivery-target:placeholder"
+  "structured_input_slots": {},
+  "requested_capability_id": "navly.store.daily_overview",
+  "requested_service_object_id": null,
+  "target_scope_hint": null,
+  "target_business_date_hint": "2026-04-06",
+  "response_channel_capabilities": {
+    "supports_text_reply": true,
+    "supports_thread_reply": false,
+    "supports_private_reply": true
   },
-  "received_at": "2026-04-06T00:00:00Z",
-  "host_trace_ref": "host:trace:placeholder"
+  "host_delivery_context": {
+    "dispatch_mode": "direct_reply",
+    "target_ref": "host:session:placeholder"
+  },
+  "received_at": "2026-04-06T00:00:00Z"
 }

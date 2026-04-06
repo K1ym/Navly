@@ -1,12 +1,31 @@
 {
   "object_name": "host_dispatch_result",
   "object_scope": "bridge_local",
+  "dispatch_ref": "openclaw-host-bridge:dispatch:placeholder",
   "request_id": "placeholder-request-id",
-  "host_trace_ref": "host:trace:placeholder",
+  "trace_ref": "navly:trace:placeholder",
+  "host_trace_ref": "openclaw-host-bridge:host-trace:placeholder",
   "host_session_ref": "host:session:placeholder",
-  "dispatch_status": "not_executed",
-  "dispatch_mode": "thread_reply",
-  "delivery_receipt_ref": null,
-  "dispatched_at": null,
-  "trace_refs": []
+  "host_workspace_ref": "host:workspace:placeholder",
+  "host_conversation_ref": "host:conversation:placeholder",
+  "decision_ref": "navly:decision:placeholder",
+  "session_ref": "navly:session:placeholder",
+  "conversation_ref": "navly:conversation:placeholder",
+  "runtime_trace_ref": null,
+  "dispatch_status": "ready_for_runtime_dispatch",
+  "dispatch_mode": "direct_reply",
+  "reply_blocks": [
+    {
+      "kind": "text",
+      "text": "placeholder answer"
+    }
+  ],
+  "delivery_target": {
+    "dispatch_mode": "direct_reply",
+    "target_ref": "host:session:placeholder"
+  },
+  "trace_refs": [
+    "navly:trace:placeholder"
+  ],
+  "prepared_at": "2026-04-06T00:00:00Z"
 }

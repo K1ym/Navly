@@ -1,15 +1,15 @@
-# Host Ingress Skeleton
+# Host Ingress Backbone
 
-本目录预留给 host ingress normalization。
+本目录承载 host ingress normalization backbone。
 
-当前 milestone A 只建立：
+当前 milestone B 已实现：
 
-- `host_ingress_envelope` local placeholder
-- host evidence capture 的目录边界
-- host trace skeleton 的输入主语
+- `host_ingress_envelope` 归一化 backbone
+- peer identity evidence 归一化
+- host delivery context / response channel capability 默认值
 
 当前**不**实现：
 
 - live gateway message ingestion
-- host event parser
-- auth-kernel Gate 0 调用
+- live OpenClaw session restore
+- auth-kernel 调用
