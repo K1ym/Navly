@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if ! command -v rg >/dev/null 2>&1; then
+  echo "ripgrep (rg) is required to run validate-milestone-a.sh" >&2
+  exit 1
+fi
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 legacy_token="escalation""_required"
+capability_seed="$ROOT/policy-catalog/capability-vocabulary.seed.yaml"
 
 required_dirs=(
   contracts
@@ -48,8 +54,14 @@ if rg -n "$legacy_token" "$ROOT" >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! rg -n "capability_id: navly\." "$ROOT/policy-catalog/capability-vocabulary.seed.yaml" >/dev/null 2>&1; then
-  echo "capability vocabulary seed must use namespaced capability_id" >&2
+if ! rg -n "capability_id:" "$capability_seed" >/dev/null 2>&1; then
+  echo "capability vocabulary seed must declare at least one capability_id" >&2
+  exit 1
+fi
+
+if rg -n "capability_id:" "$capability_seed" | rg -v "capability_id: navly\." >/dev/null 2>&1; then
+  echo "all capability_id entries must use namespaced navly.* format" >&2
+  rg -n "capability_id:" "$capability_seed" | rg -v "capability_id: navly\." >&2
   exit 1
 fi
 
