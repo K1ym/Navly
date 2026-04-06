@@ -1,9 +1,9 @@
-seed_version: 1
-status: milestone-a-placeholder
+seed_version: 2
+status: milestone-b-backbone
 owner_module: auth-kernel
 catalog_name: actor_type_vocabulary
 actor_types:
   - actor_type: human_user
-    description: Human actor placeholder for store manager/store staff style access subjects.
+    description: Human actor for store manager/store staff access subjects.
   - actor_type: system_service
-    description: Service actor placeholder for controlled backend automation.
+    description: Service actor for controlled backend automation.

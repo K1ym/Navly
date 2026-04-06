@@ -1,14 +1,14 @@
-seed_version: 1
-status: milestone-a-placeholder
+seed_version: 2
+status: milestone-b-backbone
 owner_module: auth-kernel
 catalog_name: role_catalog
 roles:
   - role_id: navly.role.store_manager
     actor_type: human_user
-    description: Placeholder role vocabulary for manager-style store access.
+    description: Manager-style store access role.
   - role_id: navly.role.store_staff
     actor_type: human_user
-    description: Placeholder role vocabulary for staff-style store access.
+    description: Staff-style store access role.
   - role_id: navly.role.system_service
     actor_type: system_service
-    description: Placeholder role vocabulary for controlled service-side access.
+    description: Controlled service-side access role.

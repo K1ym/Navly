@@ -1,14 +1,17 @@
-seed_version: 1
-status: milestone-a-placeholder
+seed_version: 2
+status: milestone-b-backbone
 owner_module: auth-kernel
 catalog_name: scope_taxonomy
 scope_kinds:
+  - scope_kind: tenant
+    scope_ref_field: tenant_ref
+    description: Tenant-scoped canonical access container.
   - scope_kind: store
     scope_ref_field: store_ref
-    description: Store-scoped access binding placeholder.
+    description: Store-scoped access binding.
   - scope_kind: org
     scope_ref_field: org_ref
-    description: Organization-scoped access binding placeholder.
+    description: Organization-scoped access binding.
   - scope_kind: hq
     scope_ref_field: hq_ref
-    description: HQ-scoped access binding placeholder.
+    description: HQ-scoped access binding.

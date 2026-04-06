@@ -1,0 +1,35 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "actors": [
+    {
+      "actor_ref": "navly:actor:sample-store-manager-single",
+      "actor_type": "human_user",
+      "lifecycle_state": "active",
+      "tenant_ref": "navly:tenant:sample-retail",
+      "display_name": "Sample Store Manager Single Scope"
+    },
+    {
+      "actor_ref": "navly:actor:sample-store-manager-multi",
+      "actor_type": "human_user",
+      "lifecycle_state": "active",
+      "tenant_ref": "navly:tenant:sample-retail",
+      "display_name": "Sample Store Manager Multi Scope"
+    },
+    {
+      "actor_ref": "navly:actor:sample-store-staff",
+      "actor_type": "human_user",
+      "lifecycle_state": "active",
+      "tenant_ref": "navly:tenant:sample-retail",
+      "display_name": "Sample Store Staff"
+    },
+    {
+      "actor_ref": "navly:actor:sample-inactive-staff",
+      "actor_type": "human_user",
+      "lifecycle_state": "inactive",
+      "tenant_ref": "navly:tenant:sample-retail",
+      "display_name": "Sample Inactive Staff"
+    }
+  ]
+}

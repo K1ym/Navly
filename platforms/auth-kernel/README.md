@@ -1,78 +1,82 @@
 # Navly_v1 auth-kernel
 
-状态：milestone-a-skeleton  
-用途：建立 `platforms/auth-kernel/` 的 phase-1 / milestone A 目录骨架与 C0 seed
+状态：milestone-b-backbone
+用途：在 `platforms/auth-kernel/` 下推进 phase-1 Milestone B：actor resolution backbone、binding backbone、Gate 0 closure 与 capability access skeleton。
 
 ## 当前范围
 
-本目录当前只实现 milestone A：
+本目录当前实现到 Milestone B：
 
-- 目录骨架
-- C0 vocabulary / taxonomy seed
-- 最小校验脚本
+- milestone A 目录骨架与 C0 seed
+- actor resolution backbone
+- role / scope / conversation binding backbone
+- binding_snapshot generation
+- Gate 0 closure
+- capability access decision skeleton
+- access_context_envelope owner-side consumption mapping
+- milestone A / B 自检脚本与最小测试
 
 本轮**不**实现：
 
-- policy engine
-- actor resolution logic
-- binding persistence logic
-- Gate 0 runtime logic
-- data-platform logic
-- 任何 public shared contract owner implementation
+- rich policy engine
+- admin UI
+- external governance surface
+- bridge/runtime/data-platform 模块逻辑
+- 任何 public shared contract owner rewrite
 
 ## owning boundary
 
-- `auth-kernel` 是 access truth 的 owner module
-- 但 **shared contracts 的 public access contract 主定义权不在这里**
-- `platforms/auth-kernel/contracts/` 当前只保留 owner-scope 说明，不在 milestone A 内私自定义 `access_context_envelope` / `access_decision` 公共契约
-- OpenClaw 的 `host_session_ref` / `host_workspace_ref` 只能作为 ingress evidence，不能直接当 canonical truth
+- `auth-kernel` 是 access truth owner module
+- `shared/contracts` 仍然拥有 public access / capability / trace 契约主定义权
+- `auth-kernel` 在本目录中只做 owner-side backbone、shared contract alignment 与受控输出构造
+- OpenClaw 的 `host_session_ref` / `host_workspace_ref` / `host_conversation_ref` 只作为 host evidence 进入解析链，不能直接升级为 canonical access truth
 
-## 当前骨架
+## 当前链路闭合范围
+
+当前已能闭合的最小 access 链路：
 
 ```text
-platforms/auth-kernel/
-  README.md
-  docs/
-  contracts/
-  policy-catalog/
-  ingress-evidence/
-  actor-registry/
-  bindings/
-  decision/
-  governance/
-  serving/
-  migration/
-  scripts/
-  tests/
+host evidence
+  -> actor resolution
+  -> role / scope / conversation binding
+  -> binding_snapshot
+  -> Gate 0
+  -> capability access decision
+  -> access_context_envelope
 ```
 
-## 当前 C0 seed
+## 当前 backbone 文件
 
-当前已建立：
+- `contracts/shared-contract-alignment.mjs`
+- `policy-catalog/policy-catalog-loader.mjs`
+- `actor-registry/actor-resolution-backbone.mjs`
+- `bindings/binding-backbone.mjs`
+- `decision/gate0-backbone.mjs`
+- `decision/capability-access-decision-backbone.mjs`
+- `serving/access-context-envelope-backbone.mjs`
+- `serving/access-chain-backbone.mjs`
 
-- actor type vocabulary placeholder
-- role catalog placeholder
-- scope taxonomy placeholder
-- namespaced capability vocabulary placeholder
-- access decision status alignment
-- reason taxonomy placeholder
-- restriction taxonomy placeholder
-- obligation taxonomy placeholder
+## 自检
+
+- `platforms/auth-kernel/scripts/validate-milestone-a.sh`
+- `platforms/auth-kernel/scripts/validate-milestone-b.sh`
 
 ## canonical freeze
 
-当前冻结以下 canonical：
+当前继续冻结以下 canonical：
 
-- `capability_id` 统一采用 namespaced canonical 风格
-- `access_decision_status` 统一为：
+- `access_decision_status` 只能是：
   - `allow`
   - `deny`
   - `restricted`
   - `escalation`
-- 不再使用旧的 legacy escalation 状态别名
+- `capability_id` 必须保持 namespaced canonical 风格
+- 没有 `decision_ref` 就必须 fail closed
+- conversation binding 只能锚定/收窄/挂起，不能扩权
 
 ## 参考文档
 
 - `docs/specs/navly-v1/auth-kernel/2026-04-06-navly-v1-auth-kernel-phase-1.md`
-- `docs/specs/navly-v1/auth-kernel/2026-04-06-navly-v1-auth-kernel-target-repo-structure.md`
-- `docs/specs/navly-v1/2026-04-06-navly-v1-shared-contracts-layer.md`
+- `docs/specs/navly-v1/auth-kernel/2026-04-06-navly-v1-auth-kernel-external-interfaces.md`
+- `docs/specs/navly-v1/auth-kernel/2026-04-06-navly-v1-auth-kernel-implementation-plan.md`
+- `docs/specs/navly-v1/shared-contracts/2026-04-06-navly-v1-shared-contracts-core-objects.md`
