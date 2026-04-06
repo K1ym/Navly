@@ -1,7 +1,7 @@
 # Runtime outcome
 
-milestone A 范围：
+milestone B 范围：
 
-- `runtime_result_envelope` / `runtime_outcome_event` 对齐占位
-- `runtime_result_status` 仅引用 shared enum
-- 不实现完整投递与治理闭环
+- `runtime_result_envelope` 输出闭合
+- `runtime_outcome_event` 输出闭合
+- `runtime_result_status` 仅消费 shared enum

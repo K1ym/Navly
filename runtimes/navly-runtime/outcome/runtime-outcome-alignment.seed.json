@@ -1,6 +1,6 @@
 {
   "alignment_name": "runtime_outcome_alignment",
-  "status": "milestone_a_seed",
+  "status": "milestone_b_backbone",
   "output_contracts": [
     "runtime_result_envelope",
     "runtime_outcome_event"
@@ -12,5 +12,6 @@
     "escalated",
     "rejected",
     "runtime_error"
-  ]
+  ],
+  "notes": "Milestone B closes runtime_result_envelope main path with shared runtime_result_status enum only."
 }

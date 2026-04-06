@@ -5,5 +5,6 @@
 当前包含：
 
 - runtime shared contract 消费清单
+- runtime 对 shared schemas 的对齐校验工具
 - route entry owner-scope seed
-- execution plan owner-scope placeholder
+- execution plan owner-scope contract 占位

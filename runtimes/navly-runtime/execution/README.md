@@ -1,7 +1,8 @@
 # Runtime execution
 
-milestone A 范围：
+milestone B 范围：
 
-- guarded execution 顺序占位
-- access/readiness/service 调用对象名冻结
-- 不实现 milestone C 真实调用闭环
+- capability access decision call wiring
+- readiness query wiring
+- theme service query wiring
+- guarded execution fail-closed ordering

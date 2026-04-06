@@ -1,12 +1,17 @@
 {
   "plan_name": "runtime_route_fallback_plan",
-  "status": "milestone_a_seed",
+  "status": "milestone_b_backbone",
   "fallback_steps": [
     "emit_runtime_result_envelope_with_fallback_status",
-    "emit_runtime_outcome_event",
-    "preserve_trace_ref_and_decision_ref"
+    "preserve_decision_ref_traceability",
+    "suggest_capability_clarification"
   ],
   "reason_codes": [
-    "runtime.route.unresolved"
-  ]
+    "runtime.route.unresolved",
+    "runtime.route.capability_not_registered",
+    "runtime.route.service_not_registered",
+    "runtime.route.scope_unavailable"
+  ],
+  "fallback_capability_id": "navly.system.capability_explanation",
+  "fallback_service_object_id": "navly.service.system.capability_explanation"
 }

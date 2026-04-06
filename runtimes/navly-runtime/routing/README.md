@@ -1,7 +1,7 @@
 # Runtime routing
 
-milestone A 范围：
+milestone B 范围：
 
-- capability route registry seed
-- route fallback seed
-- 不实现 richer route planner
+- capability route resolution closure
+- default service binding selection closure
+- unresolved route fallback plan
