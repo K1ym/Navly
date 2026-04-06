@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Local/private materials
+docs/reference/data-platform/private/
+*.local
+*.local.*
+
+# Large local upstream archives (not part of the initial spec baseline)
+upstreams/
+
+# Common env/secrets
+.env
+.env.*
