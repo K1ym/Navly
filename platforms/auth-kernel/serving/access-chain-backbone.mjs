@@ -5,7 +5,7 @@ import { evaluateGate0 } from '../decision/gate0-backbone.mjs';
 import { evaluateCapabilityAccess } from '../decision/capability-access-decision-backbone.mjs';
 import { buildAccessContextEnvelope } from './access-context-envelope-backbone.mjs';
 
-export function runMilestoneBAccessChain({ rawIngressEvidence, requestedCapabilityId, requestedScopeRef = null, now = new Date().toISOString() }) {
+export function runMilestoneBAccessChain({ rawIngressEvidence, requestedCapabilityId, requestedScopeRef = null, bindingBackbone = undefined, now = new Date().toISOString() }) {
   const ingressEvidence = normalizeHostEvidence({
     ...rawIngressEvidence,
     requested_capability_id: requestedCapabilityId ?? rawIngressEvidence.requested_capability_id,
@@ -15,6 +15,7 @@ export function runMilestoneBAccessChain({ rawIngressEvidence, requestedCapabili
   const bindingSnapshot = buildBindingSnapshot({
     ingressEvidence,
     actorResolutionResult,
+    bindingBackbone: bindingBackbone ?? undefined,
     selectedScopeHint: rawIngressEvidence.target_scope_hint ?? requestedScopeRef,
     now,
   });
