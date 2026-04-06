@@ -2,7 +2,7 @@
   "plan_name": "runtime_route_fallback_plan",
   "status": "milestone_a_seed",
   "fallback_steps": [
-    "emit_runtime_result_envelope_with_rejected_status",
+    "emit_runtime_result_envelope_with_fallback_status",
     "emit_runtime_outcome_event",
     "preserve_trace_ref_and_decision_ref"
   ],

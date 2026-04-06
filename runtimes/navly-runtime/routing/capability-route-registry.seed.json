@@ -1,7 +1,7 @@
 {
   "registry_name": "capability_route_registry",
   "status": "milestone_a_seed",
-  "route_strategy": "capability_first_service_object_first",
+  "route_strategy": "capability_first_then_service_object",
   "entries": [
     {
       "route_id": "explicit.navly.store.daily_overview",
@@ -27,7 +27,7 @@
     }
   ],
   "default_fallback": {
-    "result_status": "rejected",
+    "result_status": "fallback",
     "reason_code": "runtime.route.unresolved",
     "next_action": "request_capability_clarification"
   },

@@ -6,7 +6,7 @@
 ## 本轮交付
 
 - runtime 目录骨架完成
-- route registry seed 完成（capability-first / service-object-first）
+- route registry seed 完成（`route_strategy = capability_first_then_service_object`）
 - shared interaction contract 消费清单完成
 - 最小 validate 脚本完成
 

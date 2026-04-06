@@ -12,7 +12,6 @@
   "constraints": {
     "capability_id_format": "navly.<domain>.<capability_name>",
     "service_object_id_format": "navly.service.<domain>.<object_name>",
-    "route_is_capability_first": true,
-    "route_is_service_object_first": true
+    "route_strategy": "capability_first_then_service_object"
   }
 }
