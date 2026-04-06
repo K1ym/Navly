@@ -1,0 +1,23 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "contract_name": "gate0_result",
+  "required_fields": [
+    "decision_ref",
+    "request_id",
+    "trace_ref",
+    "decision_status",
+    "conversation_ref",
+    "issued_at",
+    "expires_at"
+  ],
+  "optional_fields": [
+    "actor_ref",
+    "session_ref",
+    "binding_snapshot_ref",
+    "reason_codes",
+    "restriction_codes",
+    "obligation_codes"
+  ]
+}

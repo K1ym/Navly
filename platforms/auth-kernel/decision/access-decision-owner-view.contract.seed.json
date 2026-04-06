@@ -1,0 +1,16 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "contract_name": "access_decision_owner_view",
+  "shared_mapping": "shared/contracts/access/access_decision.schema.json",
+  "owner_extension_fields": [
+    "binding_snapshot_ref",
+    "gate0_decision_ref",
+    "decision_chain_status"
+  ],
+  "notes": [
+    "this owner view must stay mappable to the shared access_decision contract",
+    "no decision_ref means fail closed"
+  ]
+}

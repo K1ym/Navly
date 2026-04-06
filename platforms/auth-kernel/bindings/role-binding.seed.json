@@ -1,0 +1,23 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "bindings": [
+    {
+      "actor_ref": "navly:actor:sample-store-manager-single",
+      "role_id": "navly.role.store_manager"
+    },
+    {
+      "actor_ref": "navly:actor:sample-store-manager-multi",
+      "role_id": "navly.role.store_manager"
+    },
+    {
+      "actor_ref": "navly:actor:sample-store-staff",
+      "role_id": "navly.role.store_staff"
+    },
+    {
+      "actor_ref": "navly:actor:sample-inactive-staff",
+      "role_id": "navly.role.store_staff"
+    }
+  ]
+}
