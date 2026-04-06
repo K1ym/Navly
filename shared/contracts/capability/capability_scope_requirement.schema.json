@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "capability_scope_requirement",
+  "description": "Phase-1 schema seed for capability_scope_requirement. Kept intentionally lean in milestone A/B.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "capability_id": {
+      "$ref": "./capability_id.schema.json"
+    },
+    "scope_kind": {
+      "$ref": "../enums/scope_kind.schema.json"
+    },
+    "requirement_level": {
+      "type": "string",
+      "enum": [
+        "required",
+        "optional"
+      ]
+    },
+    "selection_mode": {
+      "type": "string",
+      "enum": [
+        "single",
+        "multiple",
+        "tenant_wide"
+      ]
+    },
+    "is_default_scope_kind": {
+      "type": "boolean"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "capability_id",
+    "scope_kind",
+    "requirement_level",
+    "selection_mode",
+    "is_default_scope_kind"
+  ]
+}

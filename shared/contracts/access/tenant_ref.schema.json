@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tenant_ref",
+  "description": "Canonical tenant reference used in shared contracts.",
+  "type": "string",
+  "pattern": "^navly:tenant:[A-Za-z0-9._:-]+$"
+}

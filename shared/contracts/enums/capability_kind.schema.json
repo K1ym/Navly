@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "capability_kind",
+  "description": "Phase-1 seed for capability kind. Exists to support capability_definition seed without expanding beyond current milestone.",
+  "type": "string",
+  "enum": [
+    "data_read",
+    "runtime_action"
+  ]
+}

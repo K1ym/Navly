@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trace_ref",
+  "description": "Top-level cross-module interaction trace reference.",
+  "type": "string",
+  "pattern": "^navly:trace:[A-Za-z0-9._:-]+$"
+}

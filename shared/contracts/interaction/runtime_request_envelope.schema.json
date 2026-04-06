@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "runtime_request_envelope",
+  "description": "Phase-1 P0 schema seed for bridge -> runtime canonical handoff.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ingress_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_ref": {
+      "$ref": "../trace/trace_ref.schema.json"
+    },
+    "channel_kind": {
+      "type": "string",
+      "minLength": 1
+    },
+    "message_mode": {
+      "type": "string",
+      "minLength": 1
+    },
+    "user_input_text": {
+      "type": "string"
+    },
+    "structured_input_slots": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "requested_capability_id": {
+      "$ref": "../capability/capability_id.schema.json"
+    },
+    "requested_service_object_id": {
+      "$ref": "../service/service_object_id.schema.json"
+    },
+    "target_scope_hint": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_business_date_hint": {
+      "type": "string",
+      "format": "date"
+    },
+    "response_channel_capabilities": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "access_context_envelope": {
+      "$ref": "../access/access_context_envelope.schema.json"
+    },
+    "decision_ref": {
+      "$ref": "../access/decision_ref.schema.json"
+    },
+    "delivery_hint": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "request_id",
+    "ingress_ref",
+    "trace_ref",
+    "channel_kind",
+    "message_mode",
+    "user_input_text",
+    "response_channel_capabilities",
+    "access_context_envelope",
+    "decision_ref"
+  ]
+}

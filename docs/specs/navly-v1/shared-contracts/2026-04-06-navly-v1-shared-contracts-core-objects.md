@@ -236,13 +236,14 @@
 | `reason_codes` | `readiness_reason_code[]` | freeze | readiness 原因主集合 |
 | `blocking_dependencies` | `blocking_dependency_ref[]` | freeze | 阻塞依赖引用方式 |
 | `state_trace_refs` | `string[]` | freeze | 命中的状态追踪引用 |
-| `run_trace_refs` | `string[]` | extend | 相关历史 run 追踪引用 |
+| `run_trace_refs` | `string[]` | freeze | 相关历史 run 追踪引用；若当前无 run trace 也应返回空数组 |
 | `evaluated_at` | `datetime` | freeze | 评估时间 |
 
 说明：
 
 - `readiness_status` 只表达“当前能力在该 scope/date 是否可答”。
 - 它不表达 access allow / deny，不表达最终用户话术。
+- `run_trace_refs` 在 phase-1 进入必填主骨架；若当前无历史执行引用，也应显式返回空数组。
 - `reason_codes` 与 `blocking_dependencies` 必须可审计，不能退化成自由文本解释。
 
 ---
@@ -256,7 +257,7 @@
 | `request_id` | `string` | freeze | 请求标识 |
 | `trace_ref` | `string` | freeze | 当前交互追踪引用 |
 | `capability_id` | `string` | freeze | 所属 capability |
-| `service_object_id` | `string` | freeze | 目标服务对象；不填时使用默认 binding |
+| `service_object_id` | `string` | freeze | 目标服务对象；默认 binding 应在 runtime route 阶段完成，进入 `theme_service_query` 时必须已带出 canonical `service_object_id` |
 | `access_context` | `access_context_envelope` | freeze | 标准访问上下文 |
 | `target_scope_ref` | `string` | freeze | 目标范围 |
 | `target_business_date` | `date` | freeze | 目标业务日期 |

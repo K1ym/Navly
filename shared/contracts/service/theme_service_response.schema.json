@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "theme_service_response",
+  "description": "Phase-1 P0 schema seed for theme_service_response. The envelope is frozen; service payload internals remain owner-governed.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_ref": {
+      "$ref": "../trace/trace_ref.schema.json"
+    },
+    "capability_id": {
+      "$ref": "../capability/capability_id.schema.json"
+    },
+    "service_object_id": {
+      "$ref": "./service_object_id.schema.json"
+    },
+    "service_status": {
+      "$ref": "../enums/service_status.schema.json"
+    },
+    "service_object": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "data_window": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "explanation_object": {
+      "$ref": "./capability_explanation_object.schema.json"
+    },
+    "state_trace_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../trace/state_trace_ref.schema.json"
+      }
+    },
+    "run_trace_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../trace/run_trace_ref.schema.json"
+      }
+    },
+    "served_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "request_id",
+    "trace_ref",
+    "capability_id",
+    "service_object_id",
+    "service_status",
+    "service_object",
+    "data_window",
+    "state_trace_refs",
+    "run_trace_refs",
+    "served_at"
+  ]
+}

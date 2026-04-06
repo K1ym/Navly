@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "readiness_reason_code",
+  "description": "Phase-1 placeholder for readiness reason code master set. Detailed reason taxonomy remains implementation-deferred.",
+  "type": "string",
+  "minLength": 1
+}

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "access_context_envelope",
+  "description": "Phase-1 P0 schema seed for access_context_envelope.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_ref": {
+      "$ref": "../trace/trace_ref.schema.json"
+    },
+    "decision_ref": {
+      "$ref": "./decision_ref.schema.json"
+    },
+    "actor_ref": {
+      "$ref": "./actor_ref.schema.json"
+    },
+    "session_ref": {
+      "$ref": "./session_ref.schema.json"
+    },
+    "conversation_ref": {
+      "$ref": "./conversation_ref.schema.json"
+    },
+    "tenant_ref": {
+      "$ref": "./tenant_ref.schema.json"
+    },
+    "primary_scope_ref": {
+      "$ref": "./scope_ref.schema.json"
+    },
+    "granted_scope_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "./scope_ref.schema.json"
+      }
+    },
+    "granted_capability_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "../capability/capability_id.schema.json"
+      }
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "request_id",
+    "trace_ref",
+    "decision_ref",
+    "actor_ref",
+    "session_ref",
+    "conversation_ref",
+    "tenant_ref",
+    "primary_scope_ref",
+    "granted_scope_refs",
+    "granted_capability_ids",
+    "issued_at",
+    "expires_at"
+  ]
+}

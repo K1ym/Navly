@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "blocking_dependency_ref",
+  "description": "Phase-1 schema seed for blocking_dependency_ref. Reference style is frozen; dependency taxonomy remains implementation-light.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "dependency_kind": {
+      "type": "string",
+      "enum": [
+        "input_data",
+        "state_gate",
+        "projection"
+      ]
+    },
+    "dependency_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "blocking_reason_code": {
+      "$ref": "../enums/readiness_reason_code.schema.json"
+    },
+    "state_trace_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../trace/state_trace_ref.schema.json"
+      }
+    },
+    "run_trace_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../trace/run_trace_ref.schema.json"
+      }
+    }
+  },
+  "required": [
+    "dependency_kind",
+    "dependency_ref",
+    "blocking_reason_code"
+  ]
+}
