@@ -105,6 +105,13 @@ entries = registry.get("entries", [])
 if not entries:
     raise SystemExit("capability route registry must contain at least one seed entry")
 
+expected_route_strategy = "capability_first_then_service_object"
+if registry.get("route_strategy") != expected_route_strategy:
+    raise SystemExit(
+        "capability route registry must freeze explicit route_strategy; expected "
+        f"{expected_route_strategy}, got {registry.get('route_strategy')}"
+    )
+
 for idx, entry in enumerate(entries):
     capability_id = entry.get("capability_id", "")
     service_object_id = entry.get("default_service_object_id", "")
@@ -114,15 +121,17 @@ for idx, entry in enumerate(entries):
         )
     if not service_pattern.match(service_object_id):
         raise SystemExit(
-            "route entry #{} default_service_object_id is not namespaced canonical: {}".format(
-                idx, service_object_id
-            )
+            f"route entry #{idx} default_service_object_id is not namespaced canonical: {service_object_id}"
         )
 
 fallback = registry.get("default_fallback", {})
 if fallback.get("result_status") not in expected_enum:
     raise SystemExit(
         "default_fallback.result_status must use frozen shared runtime_result_status enum"
+    )
+if fallback.get("result_status") != "fallback":
+    raise SystemExit(
+        "default_fallback.result_status must be fallback for unresolved route clarification flow"
     )
 PY
 
@@ -139,14 +148,14 @@ scan_paths=(
 )
 
 forbidden_subject_pattern='endpoint|physical[ _-]?table|raw[ _-]?truth|raw-store|warehouse[ _-]?table|sql[ _-]?query'
-if rg -n -i "$forbidden_subject_pattern" "${scan_paths[@]}" >/dev/null 2>&1; then
+if rg -q -i "$forbidden_subject_pattern" "${scan_paths[@]}"; then
   echo "runtime milestone A forbids endpoint/table/raw-truth-centric wording in runtime module artifacts" >&2
   rg -n -i "$forbidden_subject_pattern" "${scan_paths[@]}" >&2
   exit 1
 fi
 
 legacy_glue_pattern='query_glue|prompt_glue|legacy_glue|legacy_query|legacy_route|legacy_routing'
-if rg -n -i "$legacy_glue_pattern" "${scan_paths[@]}" >/dev/null 2>&1; then
+if rg -q -i "$legacy_glue_pattern" "${scan_paths[@]}"; then
   echo "legacy glue naming is forbidden in runtime milestone A artifacts" >&2
   rg -n -i "$legacy_glue_pattern" "${scan_paths[@]}" >&2
   exit 1
