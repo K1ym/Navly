@@ -135,14 +135,16 @@ python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'
 
 下面这个示例会用 fixture transport 跑一个 Qinqin member insight 垂直切片，并把产物写到临时目录：
 
+> 该示例使用仓库内 fixture transport，不需要 live 凭证，也不应在 README 中填写真实门店标识或真实密钥。
+
 ```bash
 OUTPUT_DIR="$(mktemp -d)"
 python3 platforms/data-platform/scripts/run_member_insight_vertical_slice.py \
-  --org-id demo-org-001 \
+  --org-id <sample-org-id> \
   --start-time '2026-03-20 09:00:00' \
   --end-time '2026-03-24 09:00:00' \
   --requested-business-date 2026-03-23 \
-  --app-secret test-secret \
+  --app-secret <sample-app-secret> \
   --output-dir "$OUTPUT_DIR"
 ```
 

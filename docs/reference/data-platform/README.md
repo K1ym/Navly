@@ -5,4 +5,4 @@
 当前文件：
 
 - `secrets-and-config.md`：Qinqin API 运行时 secrets 与配置规范
-- `private/qinqin-live-secrets.local.md`：本地私有、AI 可直接读取的 Qinqin live 配置（当前唯一保留真实值的位置）
+- `private/`：本地私有目录约定；真实值只允许存在于**本地未跟踪文件**，不得进入 git history
