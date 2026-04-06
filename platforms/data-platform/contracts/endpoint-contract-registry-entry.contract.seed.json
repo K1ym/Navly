@@ -1,0 +1,26 @@
+{
+  "contract_name": "endpoint_contract_registry_entry",
+  "owner": "data-platform",
+  "status": "milestone_a_seed",
+  "fields": [
+    "endpoint_contract_id",
+    "source_system_id",
+    "domain",
+    "version",
+    "display_name",
+    "method",
+    "path",
+    "increment_strategy",
+    "structured_targets",
+    "truth_source_doc",
+    "status"
+  ],
+  "allowed_values": {
+    "increment_strategy": [
+      "profile_refresh_windowed",
+      "business_window_incremental",
+      "daily_full_replace"
+    ]
+  },
+  "notes": "Phase-1 seed. Virtual shared contracts may set increment_strategy to null because they are governance-only entries, not actual source endpoints."
+}

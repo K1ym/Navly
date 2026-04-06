@@ -1,0 +1,13 @@
+{
+  "contract_name": "endpoint_parameter_registry_entry",
+  "owner": "data-platform",
+  "status": "milestone_a_seed",
+  "fields": [
+    "parameter_key",
+    "semantic_name",
+    "known_wire_variants",
+    "applies_to",
+    "status",
+    "notes"
+  ]
+}

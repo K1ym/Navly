@@ -1,0 +1,27 @@
+{
+  "registry_name": "capability_dependency_registry",
+  "status": "milestone_a_placeholder",
+  "entries": [
+    {
+      "capability_id": "navly.store.member_insight",
+      "dependency_status": "not_yet_expanded",
+      "notes": "Dependency matrix is deferred beyond skeleton creation."
+    },
+    {
+      "capability_id": "navly.store.daily_overview",
+      "dependency_status": "not_yet_expanded",
+      "notes": "Dependency matrix is deferred beyond skeleton creation."
+    },
+    {
+      "capability_id": "navly.store.staff_board",
+      "dependency_status": "not_yet_expanded",
+      "notes": "Dependency matrix is deferred beyond skeleton creation."
+    },
+    {
+      "capability_id": "navly.store.finance_summary",
+      "dependency_status": "not_yet_expanded",
+      "notes": "Dependency matrix is deferred beyond skeleton creation."
+    }
+  ],
+  "shared_contract_owner_path": "shared/contracts"
+}

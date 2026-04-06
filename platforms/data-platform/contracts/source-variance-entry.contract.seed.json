@@ -1,0 +1,16 @@
+{
+  "contract_name": "source_variance_entry",
+  "owner": "data-platform",
+  "status": "milestone_a_seed",
+  "fields": [
+    "variance_id",
+    "variance_kind",
+    "source_system_id",
+    "endpoint_contract_id",
+    "canonical_form",
+    "observed_variants",
+    "evidence_docs",
+    "resolution_status",
+    "notes"
+  ]
+}

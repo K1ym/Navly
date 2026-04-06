@@ -1,0 +1,13 @@
+{
+  "contract_name": "endpoint_field_catalog_entry",
+  "owner": "data-platform",
+  "status": "milestone_a_seed",
+  "fields": [
+    "endpoint_contract_id",
+    "field_path",
+    "data_type",
+    "catalog_status",
+    "truth_source_doc",
+    "notes"
+  ]
+}

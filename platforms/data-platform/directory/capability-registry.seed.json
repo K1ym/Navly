@@ -1,0 +1,39 @@
+{
+  "registry_name": "capability_registry",
+  "status": "milestone_a_seed",
+  "shared_contract_owner_path": "shared/contracts",
+  "entries": [
+    {
+      "capability_id": "navly.store.member_insight",
+      "document_short_name": "store_member_insight",
+      "domain": "store",
+      "default_service_object_id": "navly.service.store.member_insight",
+      "status": "seeded_not_implemented",
+      "notes": "Phase-1 vertical slice anchor capability."
+    },
+    {
+      "capability_id": "navly.store.daily_overview",
+      "document_short_name": "store_daily_overview",
+      "domain": "store",
+      "default_service_object_id": "navly.service.store.daily_overview",
+      "status": "seeded_not_implemented",
+      "notes": "Document short name only; canonical cross-module ID is namespaced."
+    },
+    {
+      "capability_id": "navly.store.staff_board",
+      "document_short_name": "store_staff_board",
+      "domain": "store",
+      "default_service_object_id": "navly.service.store.staff_board",
+      "status": "seeded_not_implemented",
+      "notes": "Seed only; no readiness logic yet."
+    },
+    {
+      "capability_id": "navly.store.finance_summary",
+      "document_short_name": "store_finance_summary",
+      "domain": "store",
+      "default_service_object_id": "navly.service.store.finance_summary",
+      "status": "seeded_not_implemented",
+      "notes": "Seed only; no serving logic yet."
+    }
+  ]
+}
