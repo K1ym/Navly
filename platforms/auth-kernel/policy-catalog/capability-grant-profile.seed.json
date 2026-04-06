@@ -1,0 +1,37 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "catalog_name": "capability_grant_profile",
+  "grant_profiles": [
+    {
+      "role_id": "navly.role.store_manager",
+      "capability_ids": [
+        "navly.store.daily_overview",
+        "navly.store.member_insight",
+        "navly.store.staff_board",
+        "navly.store.finance_summary",
+        "navly.system.capability_explanation"
+      ]
+    },
+    {
+      "role_id": "navly.role.store_staff",
+      "capability_ids": [
+        "navly.store.daily_overview",
+        "navly.store.member_insight",
+        "navly.store.staff_board",
+        "navly.system.capability_explanation"
+      ]
+    },
+    {
+      "role_id": "navly.role.system_service",
+      "capability_ids": [
+        "navly.store.daily_overview",
+        "navly.store.member_insight",
+        "navly.store.staff_board",
+        "navly.store.finance_summary",
+        "navly.system.capability_explanation"
+      ]
+    }
+  ]
+}

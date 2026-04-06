@@ -1,0 +1,23 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "contract_name": "identity_resolution_result",
+  "resolution_status_values": [
+    "resolved",
+    "unknown",
+    "ambiguous",
+    "inactive"
+  ],
+  "required_fields": [
+    "resolution_status",
+    "reason_codes",
+    "matched_aliases"
+  ],
+  "optional_fields": [
+    "actor_ref",
+    "tenant_ref",
+    "actor_type",
+    "lifecycle_state"
+  ]
+}

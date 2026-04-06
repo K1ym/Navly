@@ -1,0 +1,32 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "aliases": [
+    {
+      "alias_namespace": "wecom_user_id",
+      "alias_value": "sample_manager_single_scope",
+      "actor_ref": "navly:actor:sample-store-manager-single"
+    },
+    {
+      "alias_namespace": "wecom_user_id",
+      "alias_value": "sample_manager_multi_scope",
+      "actor_ref": "navly:actor:sample-store-manager-multi"
+    },
+    {
+      "alias_namespace": "wecom_user_id",
+      "alias_value": "sample_store_staff",
+      "actor_ref": "navly:actor:sample-store-staff"
+    },
+    {
+      "alias_namespace": "wecom_user_id",
+      "alias_value": "sample_inactive_staff",
+      "actor_ref": "navly:actor:sample-inactive-staff"
+    },
+    {
+      "alias_namespace": "openclaw_host_account",
+      "alias_value": "sample.host.manager.single",
+      "actor_ref": "navly:actor:sample-store-manager-single"
+    }
+  ]
+}

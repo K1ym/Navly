@@ -1,0 +1,34 @@
+{
+  "seed_version": 2,
+  "status": "milestone-b-backbone",
+  "owner_module": "auth-kernel",
+  "owned_objects": [
+    "actor_registry_record",
+    "identity_alias_registry_entry",
+    "identity_resolution_result",
+    "role_binding",
+    "scope_binding",
+    "conversation_binding",
+    "binding_snapshot",
+    "gate0_result",
+    "access_decision_owner_view"
+  ],
+  "shared_contract_dependencies": [
+    "shared/contracts/access/actor_ref.schema.json",
+    "shared/contracts/access/session_ref.schema.json",
+    "shared/contracts/access/decision_ref.schema.json",
+    "shared/contracts/access/scope_ref.schema.json",
+    "shared/contracts/access/conversation_ref.schema.json",
+    "shared/contracts/access/tenant_ref.schema.json",
+    "shared/contracts/access/access_decision.schema.json",
+    "shared/contracts/access/access_context_envelope.schema.json",
+    "shared/contracts/capability/capability_id.schema.json",
+    "shared/contracts/enums/access_decision_status.schema.json",
+    "shared/contracts/enums/scope_kind.schema.json",
+    "shared/contracts/trace/trace_ref.schema.json"
+  ],
+  "notes": [
+    "auth-kernel may consume shared public contracts but must not redefine them locally",
+    "host_session_ref and host_workspace_ref remain ingress evidence only, not canonical access truth"
+  ]
+}
