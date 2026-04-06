@@ -177,6 +177,29 @@ test('tenant mismatch bindings are excluded and fail closed before granted scope
   assert.equal(result.primary_scope_ref, null);
 });
 
+test('Gate 0 preserves tenant_mismatch instead of collapsing it into binding_missing', () => {
+  const bindingBackbone = loadBindingBackbone();
+  const result = runMilestoneBAccessChain({
+    rawIngressEvidence: sampleBaseIngress('sample_manager_single_scope'),
+    requestedCapabilityId: 'navly.store.daily_overview',
+    bindingBackbone: {
+      ...bindingBackbone,
+      scopeBindings: [
+        ...bindingBackbone.scopeBindings,
+        {
+          actor_ref: 'navly:actor:sample-store-manager-single',
+          tenant_ref: 'navly:tenant:foreign-tenant',
+          scope_ref: 'navly:scope:store:foreign-store-999',
+          is_primary: false,
+        },
+      ],
+    },
+  });
+
+  assert.equal(result.gate0_result.decision_status, 'deny');
+  assert.deepEqual(result.gate0_result.reason_codes, ['tenant_mismatch']);
+});
+
 test('scope selection recalculates binding_snapshot_ref when effective content changes', () => {
   const initialSnapshot = buildBindingSnapshot({
     ingressEvidence: sampleBaseIngress('sample_manager_multi_scope'),

@@ -79,17 +79,6 @@ export function evaluateGate0({
     );
   }
 
-  if (!bindingSnapshot.role_ids.length || !bindingSnapshot.granted_scope_refs.length) {
-    return finalizeGate0Result(
-      {
-        ...baseResult,
-        decision_status: 'deny',
-        reason_codes: ['binding_missing'],
-      },
-      policyCatalog,
-    );
-  }
-
   if (bindingSnapshot.conversation_binding_status === 'pending_scope') {
     return finalizeGate0Result(
       {
@@ -109,6 +98,17 @@ export function evaluateGate0({
         ...baseResult,
         decision_status: 'deny',
         reason_codes: [...(bindingSnapshot.reason_codes ?? ['invalid_scope_selection'])],
+      },
+      policyCatalog,
+    );
+  }
+
+  if (!bindingSnapshot.role_ids.length || !bindingSnapshot.granted_scope_refs.length) {
+    return finalizeGate0Result(
+      {
+        ...baseResult,
+        decision_status: 'deny',
+        reason_codes: ['binding_missing'],
       },
       policyCatalog,
     );
