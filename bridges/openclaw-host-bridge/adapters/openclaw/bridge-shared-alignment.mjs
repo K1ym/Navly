@@ -19,6 +19,14 @@ function loadPattern(relativePath) {
   return new RegExp(schema.pattern);
 }
 
+function loadPatternOrFallback(relativePath, fallbackPattern) {
+  const schema = loadSchema(relativePath);
+  if (schema.pattern) {
+    return new RegExp(schema.pattern);
+  }
+  return fallbackPattern;
+}
+
 function loadEnum(relativePath) {
   const schema = loadSchema(relativePath);
   if (!Array.isArray(schema.enum)) {
@@ -37,6 +45,12 @@ export const sharedPatterns = {
   capabilityId: loadPattern('capability/capability_id.schema.json'),
   serviceObjectId: loadPattern('service/service_object_id.schema.json'),
   traceRef: loadPattern('trace/trace_ref.schema.json'),
+  stateTraceRef: loadPattern('trace/state_trace_ref.schema.json'),
+  runTraceRef: loadPattern('trace/run_trace_ref.schema.json'),
+  runtimeTraceRef: loadPatternOrFallback(
+    'interaction/runtime_trace_ref.schema.json',
+    /^navly:runtime-trace:[A-Za-z0-9._:-]+$/,
+  ),
 };
 
 export const sharedEnums = {
@@ -184,11 +198,31 @@ export function validateRuntimeRequestEnvelopeShape(runtimeRequestEnvelope) {
   return runtimeRequestEnvelope;
 }
 
+export function validateLinkedTraceRef(label, value) {
+  if (typeof value !== 'string') {
+    throw new Error(`${label} must be a string trace ref`);
+  }
+
+  const allowedPatterns = [
+    sharedPatterns.traceRef,
+    sharedPatterns.stateTraceRef,
+    sharedPatterns.runTraceRef,
+    sharedPatterns.runtimeTraceRef,
+  ];
+
+  if (!allowedPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(`${label} must match an allowed trace family pattern: ${value}`);
+  }
+
+  return value;
+}
+
 export function validateRuntimeResultEnvelopeShape(runtimeResultEnvelope) {
   ensureObject('runtime_result_envelope', runtimeResultEnvelope);
   if (!runtimeResultEnvelope.request_id || !runtimeResultEnvelope.runtime_trace_ref) {
     throw new Error('runtime_result_envelope must include request_id and runtime_trace_ref');
   }
+  assertMatchesSharedPattern('runtime_trace_ref', runtimeResultEnvelope.runtime_trace_ref, sharedPatterns.runtimeTraceRef);
 
   assertSharedEnumValue('runtime_result_envelope.result_status', runtimeResultEnvelope.result_status, sharedEnums.runtimeResultStatus);
   assertCapabilityId(runtimeResultEnvelope.selected_capability_id);
@@ -202,6 +236,9 @@ export function validateRuntimeResultEnvelopeShape(runtimeResultEnvelope) {
   if (!Array.isArray(runtimeResultEnvelope.trace_refs)) {
     throw new Error('runtime_result_envelope.trace_refs must be an array');
   }
+  runtimeResultEnvelope.trace_refs.forEach((traceRef, index) => {
+    validateLinkedTraceRef(`runtime_result_envelope.trace_refs[${index}]`, traceRef);
+  });
 
   return runtimeResultEnvelope;
 }
