@@ -1,0 +1,16 @@
+{
+  "alignment_name": "runtime_outcome_alignment",
+  "status": "milestone_a_seed",
+  "output_contracts": [
+    "runtime_result_envelope",
+    "runtime_outcome_event"
+  ],
+  "runtime_result_status_source": "shared/contracts/enums/runtime_result_status.schema.json",
+  "allowed_result_status_values": [
+    "answered",
+    "fallback",
+    "escalated",
+    "rejected",
+    "runtime_error"
+  ]
+}
