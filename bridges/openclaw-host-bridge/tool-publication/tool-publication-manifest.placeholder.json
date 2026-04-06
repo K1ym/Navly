@@ -1,0 +1,15 @@
+{
+  "object_name": "tool_publication_manifest",
+  "object_scope": "bridge_local",
+  "publication_version": "milestone-a-placeholder",
+  "tools": [
+    {
+      "tool_name": "navly_capability_placeholder",
+      "capability_id": "navly.placeholder.capability",
+      "service_object_id": "navly.service.placeholder.object",
+      "visibility_scope": "host_visible",
+      "owner_module": "runtime",
+      "input_schema_ref": "shared/contracts/interaction/runtime_request_envelope.schema.json"
+    }
+  ]
+}
