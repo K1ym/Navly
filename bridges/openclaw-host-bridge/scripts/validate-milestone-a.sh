@@ -6,7 +6,7 @@ if ! command -v rg >/dev/null 2>&1; then
   exit 1
 fi
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 README_FILE="$ROOT/README.md"
 FORBIDDEN_TOKEN="authorized_runtime""_handoff_envelope"
 
