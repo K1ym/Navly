@@ -1,0 +1,18 @@
+{
+  "contract_name": "endpoint_contract_registry_entry",
+  "owner": "data-platform",
+  "status": "milestone_a_seed",
+  "fields": [
+    "endpoint_contract_id",
+    "source_system_id",
+    "domain",
+    "version",
+    "display_name",
+    "method",
+    "path",
+    "increment_strategy",
+    "structured_targets",
+    "truth_source_doc",
+    "status"
+  ]
+}
