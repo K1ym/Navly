@@ -1,0 +1,13 @@
+{
+  "plan_name": "guarded_execution_order",
+  "status": "milestone_a_seed",
+  "steps": [
+    "consume_access_context_envelope",
+    "consume_access_decision",
+    "issue_capability_readiness_query",
+    "consume_capability_readiness_response",
+    "issue_theme_service_query",
+    "consume_theme_service_response"
+  ],
+  "notes": "Readiness and service execution closure are deferred to milestone C."
+}

@@ -1,0 +1,16 @@
+{
+  "contract_name": "runtime_interaction_context",
+  "status": "milestone_a_placeholder",
+  "fields": [
+    "request_id",
+    "runtime_trace_ref",
+    "channel_kind",
+    "message_mode",
+    "user_input_text",
+    "requested_capability_id",
+    "requested_service_object_id",
+    "target_scope_hint",
+    "target_business_date_hint",
+    "decision_ref"
+  ]
+}

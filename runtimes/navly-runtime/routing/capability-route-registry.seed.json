@@ -1,0 +1,35 @@
+{
+  "registry_name": "capability_route_registry",
+  "status": "milestone_a_seed",
+  "route_strategy": "capability_first_service_object_first",
+  "entries": [
+    {
+      "route_id": "explicit.navly.store.daily_overview",
+      "match_mode": "explicit_capability_id",
+      "match_tokens": [
+        "daily_overview",
+        "store_daily_overview"
+      ],
+      "capability_id": "navly.store.daily_overview",
+      "default_service_object_id": "navly.service.store.daily_overview",
+      "status": "seeded_not_implemented"
+    },
+    {
+      "route_id": "explicit.navly.store.member_insight",
+      "match_mode": "explicit_capability_id",
+      "match_tokens": [
+        "member_insight",
+        "store_member_insight"
+      ],
+      "capability_id": "navly.store.member_insight",
+      "default_service_object_id": "navly.service.store.member_insight",
+      "status": "seeded_not_implemented"
+    }
+  ],
+  "default_fallback": {
+    "result_status": "rejected",
+    "reason_code": "runtime.route.unresolved",
+    "next_action": "request_capability_clarification"
+  },
+  "notes": "Milestone A freeze only; route closure and guarded execution are out of scope."
+}
