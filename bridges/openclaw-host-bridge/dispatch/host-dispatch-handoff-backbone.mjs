@@ -52,7 +52,6 @@ function resolveRuntimeResultMismatchReason({
 
   if (
     runtimeRequestEnvelope.requested_service_object_id
-    && runtimeResultEnvelope.selected_service_object_id
     && runtimeResultEnvelope.selected_service_object_id !== runtimeRequestEnvelope.requested_service_object_id
   ) {
     return 'runtime_service_object_mismatch';

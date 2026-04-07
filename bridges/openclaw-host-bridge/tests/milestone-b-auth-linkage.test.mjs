@@ -295,3 +295,49 @@ test('milestone B backbone rejects runtime result capability mismatch', () => {
   assert.deepEqual(hostDispatchResult.reply_blocks[0].reason_codes, ['runtime_capability_mismatch']);
   assert.equal(hostDispatchResult.runtime_trace_ref, null);
 });
+
+test('milestone B backbone rejects runtime result missing selected service object when request pins one', () => {
+  const rawHostIngress = buildRawHostIngress({
+    request_id: 'asp24-request-service-object-missing',
+    requested_service_object_id: 'navly.service.store.member_insight',
+  });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  const hostDispatchResult = buildHostDispatchResult({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    runtimeRequestEnvelope,
+    runtimeResultEnvelope: {
+      ...buildRuntimeResultEnvelope(hostIngressEnvelope.request_id, hostIngressEnvelope.trace_ref),
+      selected_service_object_id: null,
+    },
+  });
+
+  assert.equal(hostDispatchResult.dispatch_status, 'blocked_runtime_result_mismatch');
+  assert.equal(hostDispatchResult.reply_blocks[0].kind, 'host_runtime_result_rejected');
+  assert.deepEqual(hostDispatchResult.reply_blocks[0].reason_codes, ['runtime_service_object_mismatch']);
+  assert.equal(hostDispatchResult.runtime_trace_ref, null);
+});
