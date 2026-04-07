@@ -1,6 +1,7 @@
 # Runtime adapters
 
-milestone A 范围：
+当前范围：
 
-- 渠道中立输出适配层占位
-- richer adapters 延后
+- owner-side auth adapter（capability access decision / access_context 调用面）
+- owner-side data adapter（readiness / theme service 调用面）
+- owner-side dependency client closure（runtime 默认可接入真实 owner surface）

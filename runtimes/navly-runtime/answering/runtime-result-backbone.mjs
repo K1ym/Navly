@@ -1,6 +1,6 @@
 import {
   ensureRuntimeResultStatus,
-  mergeTraceRefs,
+  filterTraceRefsByFamily,
   normalizeReasonCodes,
 } from '../contracts/shared-contract-alignment.mjs';
 
@@ -137,10 +137,12 @@ function collectDependencyTraceRefs(dependencyOutcome) {
     return [];
   }
 
-  return mergeTraceRefs(
-    [dependencyOutcome.capability_access_response?.access_decision?.decision_ref],
+  return filterTraceRefsByFamily(
+    [dependencyOutcome.capability_access_response?.access_decision?.trace_ref],
+    [dependencyOutcome.readiness_response?.trace_ref],
     dependencyOutcome.readiness_response?.state_trace_refs,
     dependencyOutcome.readiness_response?.run_trace_refs,
+    [dependencyOutcome.theme_service_response?.trace_ref],
     dependencyOutcome.theme_service_response?.state_trace_refs,
     dependencyOutcome.theme_service_response?.run_trace_refs,
   );
@@ -160,8 +162,8 @@ export function assembleRuntimeResultEnvelope({
 
   const reasonCodes = collectReasonCodes({ ingressError, routeResult, dependencyOutcome });
 
-  const traceRefs = mergeTraceRefs(
-    [runtimeIdentity.trace_ref, runtimeIdentity.runtime_trace_ref, runtimeIdentity.decision_ref],
+  const traceRefs = filterTraceRefsByFamily(
+    [runtimeIdentity.trace_ref, runtimeIdentity.runtime_trace_ref],
     collectDependencyTraceRefs(dependencyOutcome),
   );
 

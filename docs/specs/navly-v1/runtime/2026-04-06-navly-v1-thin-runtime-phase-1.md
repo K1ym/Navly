@@ -156,8 +156,10 @@ Phase-1 完成时，至少要成立以下 7 条：
 
 推荐至少先闭合一条 store 粒度能力，例如：
 
-- `capability_id`：`navly.store.daily_overview`
-- `service_object_id`：`navly.service.store.daily_overview`
+- `capability_id`：`navly.store.member_insight`
+- `service_object_id`：`navly.service.store.member_insight`
+
+`daily_overview` 可保留为 secondary entry，但不再作为当前最小闭环 canonical slice。
 
 注意：
 

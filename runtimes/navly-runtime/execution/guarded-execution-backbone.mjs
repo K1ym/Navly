@@ -23,17 +23,47 @@ function buildDependencyError(baseOutput, reasonCodes, errorMessage, extra = {})
   };
 }
 
+function pickString(value) {
+  return typeof value === 'string' && value.trim().length > 0 ? value : null;
+}
+
+function buildAuthAdapterContext(interactionContext) {
+  const slots = interactionContext.structured_input_slots ?? {};
+  return {
+    peer_identity_evidence: Array.isArray(slots.auth_peer_identity_evidence) ? slots.auth_peer_identity_evidence : null,
+    host_session_ref: pickString(slots.host_session_ref),
+    host_workspace_ref: pickString(slots.host_workspace_ref),
+    host_conversation_ref: pickString(slots.host_conversation_ref),
+  };
+}
+
+function buildDataAdapterContext(interactionContext) {
+  const slots = interactionContext.structured_input_slots ?? {};
+  return {
+    org_id: pickString(slots.data_org_id),
+    start_time: pickString(slots.data_window_start_time),
+    end_time: pickString(slots.data_window_end_time),
+    app_secret: pickString(slots.data_app_secret),
+    fixture_bundle_path: pickString(slots.data_fixture_bundle_path),
+  };
+}
+
 function buildCapabilityAccessRequest({ interactionContext, executionPlan }) {
   return {
     request_id: interactionContext.request_id,
+    trace_ref: interactionContext.trace_ref,
+    channel_kind: interactionContext.channel_kind,
+    message_mode: interactionContext.message_mode,
     session_ref: interactionContext.access_context_envelope.session_ref,
     conversation_ref: interactionContext.access_context_envelope.conversation_ref,
     prior_decision_ref: interactionContext.decision_ref,
     requested_capability_id: executionPlan.selected_capability_id,
     requested_scope_ref: executionPlan.target_scope_ref,
     requested_service_object_id: executionPlan.selected_service_object_id,
+    access_context_envelope: interactionContext.access_context_envelope,
     operation_kind: 'read',
     runtime_trace_ref: interactionContext.runtime_trace_ref,
+    extensions: buildAuthAdapterContext(interactionContext),
   };
 }
 
@@ -46,6 +76,8 @@ function resolveEffectiveAccessContext({ interactionContext, capabilityAccessRes
 }
 
 function buildReadinessQuery({ interactionContext, executionPlan, effectiveAccessContext, accessDecision }) {
+  const dataAdapterContext = buildDataAdapterContext(interactionContext);
+
   return {
     request_id: interactionContext.request_id,
     trace_ref: interactionContext.trace_ref,
@@ -57,6 +89,7 @@ function buildReadinessQuery({ interactionContext, executionPlan, effectiveAcces
     extensions: {
       runtime_trace_ref: interactionContext.runtime_trace_ref,
       selected_service_object_id: executionPlan.selected_service_object_id,
+      data_adapter_context: dataAdapterContext,
     },
   };
 }
@@ -76,6 +109,8 @@ function buildThemeServiceQuery({
   accessDecision,
   readinessResponse,
 }) {
+  const dataAdapterContext = buildDataAdapterContext(interactionContext);
+
   return {
     request_id: interactionContext.request_id,
     trace_ref: interactionContext.trace_ref,
@@ -88,6 +123,7 @@ function buildThemeServiceQuery({
     extensions: {
       runtime_trace_ref: interactionContext.runtime_trace_ref,
       readiness_latest_usable_business_date: readinessResponse.latest_usable_business_date,
+      data_adapter_context: dataAdapterContext,
     },
   };
 }

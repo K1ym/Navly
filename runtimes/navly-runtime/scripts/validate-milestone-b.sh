@@ -14,12 +14,16 @@ required_files=(
   "$ROOT/ingress/runtime-ingress-backbone.mjs"
   "$ROOT/routing/capability-route-backbone.mjs"
   "$ROOT/routing/capability-route-registry.seed.json"
+  "$ROOT/adapters/owner-side-auth-kernel-adapter.mjs"
+  "$ROOT/adapters/owner-side-data-platform-adapter.mjs"
+  "$ROOT/adapters/owner-side-dependency-clients.mjs"
   "$ROOT/execution/guarded-execution-backbone.mjs"
   "$ROOT/execution/runtime-chain-backbone.mjs"
   "$ROOT/answering/runtime-result-backbone.mjs"
   "$ROOT/outcome/runtime-outcome-event-backbone.mjs"
   "$ROOT/scripts/validate-milestone-a.sh"
   "$ROOT/tests/milestone-b-guarded-execution.test.mjs"
+  "$ROOT/tests/milestone-b-owner-adapter-closure.test.mjs"
 )
 
 for file in "${required_files[@]}"; do
@@ -43,8 +47,8 @@ if (routeRegistry.status !== 'milestone_b_backbone') {
   throw new Error(`route registry status must be milestone_b_backbone, got ${routeRegistry.status}`);
 }
 
-const expectedCapabilityId = 'navly.store.daily_overview';
-const expectedServiceObjectId = 'navly.service.store.daily_overview';
+const expectedCapabilityId = 'navly.store.member_insight';
+const expectedServiceObjectId = 'navly.service.store.member_insight';
 
 const entry = (routeRegistry.entries ?? []).find((item) => item.capability_id === expectedCapabilityId);
 if (!entry) {
@@ -52,6 +56,14 @@ if (!entry) {
 }
 if (entry.default_service_object_id !== expectedServiceObjectId) {
   throw new Error(`default_service_object_id must be ${expectedServiceObjectId}`);
+}
+if (entry.status !== 'implemented_milestone_b_primary') {
+  throw new Error(`canonical entry status must be implemented_milestone_b_primary, got ${entry.status}`);
+}
+
+const secondaryDaily = (routeRegistry.entries ?? []).find((item) => item.capability_id === 'navly.store.daily_overview');
+if (secondaryDaily && secondaryDaily.status === 'implemented_milestone_b_primary') {
+  throw new Error('daily_overview cannot remain the primary minimal slice');
 }
 
 const fallback = routeRegistry.default_fallback ?? {};
@@ -73,6 +85,8 @@ if (JSON.stringify(sharedRuntimeStatus) !== JSON.stringify(expectedStatus)) {
 }
 NODE
 
-node --test "$ROOT/tests/milestone-b-guarded-execution.test.mjs"
+node --test \
+  "$ROOT/tests/milestone-b-guarded-execution.test.mjs" \
+  "$ROOT/tests/milestone-b-owner-adapter-closure.test.mjs"
 
 echo "runtime milestone B validation passed"

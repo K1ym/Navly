@@ -8,6 +8,7 @@ import {
 } from '../routing/capability-route-backbone.mjs';
 import { runGuardedExecution } from './guarded-execution-backbone.mjs';
 import { buildRuntimeTraceRef } from '../contracts/shared-contract-alignment.mjs';
+import { createOwnerSideDependencyClients } from '../adapters/owner-side-dependency-clients.mjs';
 
 function buildFallbackRuntimeIdentity(runtimeRequestEnvelope, now) {
   const requestId = runtimeRequestEnvelope?.request_id ?? `runtime-missing-request-${now.slice(0, 10)}`;
@@ -40,12 +41,64 @@ function routeFallbackFromScopeError(routeRegistry, error) {
   };
 }
 
-export async function runMilestoneBGuardedExecutionChain({
-  runtimeRequestEnvelope,
+function buildDependencyAdapterError(interactionContext, error) {
+  return {
+    dependency_stage: 'dependency_error',
+    reason_codes: ['runtime.dependency.adapter_resolution_failed'],
+    error_message: error?.message ?? 'runtime dependency adapters are unavailable',
+    capability_access_request: null,
+    capability_access_response: null,
+    effective_access_context: interactionContext.access_context_envelope,
+    readiness_query: null,
+    readiness_response: null,
+    theme_service_query: null,
+    theme_service_response: null,
+  };
+}
+
+function resolveDependencyClients({
   authKernelClient,
   dataPlatformClient,
+  runtimeRequestEnvelope,
+  interactionContext,
+  now,
+  dependencyClientFactory,
+  dependencyClientFactoryOptions,
+}) {
+  if (authKernelClient && dataPlatformClient) {
+    return {
+      authKernelClient,
+      dataPlatformClient,
+    };
+  }
+
+  const dependencyClients = dependencyClientFactory({
+    runtimeRequestEnvelope,
+    interactionContext,
+    now,
+    ...dependencyClientFactoryOptions,
+  });
+
+  const resolvedAuthKernelClient = authKernelClient ?? dependencyClients?.authKernelClient ?? null;
+  const resolvedDataPlatformClient = dataPlatformClient ?? dependencyClients?.dataPlatformClient ?? null;
+  if (!resolvedAuthKernelClient || !resolvedDataPlatformClient) {
+    throw new Error('runtime dependency adapter closure must provide both authKernelClient and dataPlatformClient');
+  }
+
+  return {
+    authKernelClient: resolvedAuthKernelClient,
+    dataPlatformClient: resolvedDataPlatformClient,
+  };
+}
+
+export async function runMilestoneBGuardedExecutionChain({
+  runtimeRequestEnvelope,
+  authKernelClient = null,
+  dataPlatformClient = null,
   routeRegistry = loadCapabilityRouteRegistry(),
   now = new Date().toISOString(),
+  dependencyClientFactory = createOwnerSideDependencyClients,
+  dependencyClientFactoryOptions = {},
 }) {
   let runtimeIdentity = buildFallbackRuntimeIdentity(runtimeRequestEnvelope, now);
   let interactionContext = null;
@@ -91,26 +144,43 @@ export async function runMilestoneBGuardedExecutionChain({
     }
 
     if (routeResult.route_status === 'resolved' && executionPlan) {
+      let resolvedDependencyClients = null;
       try {
-        dependencyOutcome = await runGuardedExecution({
-          interactionContext,
-          executionPlan,
+        resolvedDependencyClients = resolveDependencyClients({
           authKernelClient,
           dataPlatformClient,
+          runtimeRequestEnvelope,
+          interactionContext,
+          now,
+          dependencyClientFactory,
+          dependencyClientFactoryOptions,
         });
       } catch (error) {
-        dependencyOutcome = {
-          dependency_stage: 'dependency_error',
-          reason_codes: ['runtime.dependency.unhandled_error'],
-          error_message: error?.message ?? 'unexpected guarded execution failure',
-          capability_access_request: null,
-          capability_access_response: null,
-          effective_access_context: interactionContext.access_context_envelope,
-          readiness_query: null,
-          readiness_response: null,
-          theme_service_query: null,
-          theme_service_response: null,
-        };
+        dependencyOutcome = buildDependencyAdapterError(interactionContext, error);
+      }
+
+      if (resolvedDependencyClients && !dependencyOutcome) {
+        try {
+          dependencyOutcome = await runGuardedExecution({
+            interactionContext,
+            executionPlan,
+            authKernelClient: resolvedDependencyClients.authKernelClient,
+            dataPlatformClient: resolvedDependencyClients.dataPlatformClient,
+          });
+        } catch (error) {
+          dependencyOutcome = {
+            dependency_stage: 'dependency_error',
+            reason_codes: ['runtime.dependency.unhandled_error'],
+            error_message: error?.message ?? 'unexpected guarded execution failure',
+            capability_access_request: null,
+            capability_access_response: null,
+            effective_access_context: interactionContext.access_context_envelope,
+            readiness_query: null,
+            readiness_response: null,
+            theme_service_query: null,
+            theme_service_response: null,
+          };
+        }
       }
     }
   }
