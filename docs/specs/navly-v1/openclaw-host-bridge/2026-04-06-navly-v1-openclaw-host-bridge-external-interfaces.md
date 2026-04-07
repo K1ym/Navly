@@ -297,9 +297,9 @@ bridge 与 `auth-kernel` 的边界是：
 
 ## 8. openclaw-host-bridge <-> runtime
 
-### 8.1 bridge -> runtime：Authorized Runtime Handoff Envelope
+### 8.1 bridge -> runtime：Runtime Request Envelope
 
-bridge 应向 runtime 提供 **Authorized Runtime Handoff Envelope**。
+bridge 应向 runtime 提供 **Runtime Request Envelope**。
 
 推荐字段：
 
@@ -307,16 +307,31 @@ bridge 应向 runtime 提供 **Authorized Runtime Handoff Envelope**。
 | --- | --- |
 | `request_id` | 本次运行时请求 ID |
 | `ingress_ref` | 宿主入口引用 |
-| `decision_ref` | Gate 0 决策引用 |
-| `actor_ref` | 当前 actor |
-| `session_ref` | 授权 session |
-| `conversation_ref` | 授权 conversation |
-| `access_context` | 标准访问上下文 |
-| `message_payload` | 用户消息与必要上下文 |
-| `attachment_refs` | 附件引用 |
-| `host_session_ref` | 宿主 session 引用 |
-| `host_delivery_context` | 默认返回路径 |
-| `host_trace_ref` | 宿主 trace 引用 |
+| `trace_ref` | 顶层交互追踪引用 |
+| `channel_kind` | 渠道类型，如 `wecom` |
+| `message_mode` | 私聊 / 群聊 / thread / command |
+| `user_input_text` | 规范化后的用户输入 |
+| `structured_input_slots` | 结构化输入槽位 |
+| `requested_capability_id` | 若入口显式指定 capability，则显式给出 |
+| `requested_service_object_id` | 若入口显式指定服务对象，则显式给出 |
+| `target_scope_hint` | 宿主侧 scope 提示，不代表授权结果 |
+| `target_business_date_hint` | 宿主侧业务日期提示 |
+| `response_channel_capabilities` | 当前渠道可投递的响应能力 |
+| `access_context_envelope` | `auth-kernel` 签发的标准访问上下文 |
+| `decision_ref` | runtime handoff 的 canonical 决策引用；必须与 `access_context_envelope.decision_ref` 一致 |
+| `delivery_hint` | 给 runtime/bridge return path 使用的宿主投递提示 |
+
+说明：
+
+- `runtime_request_envelope` 是 bridge -> runtime 的唯一 canonical handoff object
+- 顶层 `decision_ref` 不再默认等于 `Gate 0 Result.decision_ref`
+- 当前 canonical 规则是：
+  - `runtime_request_envelope.decision_ref = access_context_envelope.decision_ref`
+  - `gate0_decision_ref` 只保留在 bridge local metadata、`authorized_session_link`、`delivery_hint` 等宿主适配上下文中
+- 因此，bridge 需要同时保证：
+  - handoff 顶层 `decision_ref`
+  - nested `access_context_envelope.decision_ref`
+  两者一致；若不一致，bridge 必须 fail closed，不得继续 handoff
 
 ### 8.2 runtime -> bridge：Runtime Result Envelope
 
@@ -328,13 +343,20 @@ runtime 应向 bridge 返回 **Runtime Result Envelope**。
 | --- | --- |
 | `request_id` | 对应运行时请求 ID |
 | `runtime_trace_ref` | runtime 执行追踪引用 |
-| `result_kind` | `reply` / `fallback` / `escalation` / `tool_result` |
-| `reply_blocks` | 结构化回复块 |
-| `capability_refs` | 本次用到的 capability 列表 |
-| `reason_codes` | fallback / escalation / failure 原因 |
-| `state_trace_refs` | readiness / state 追踪引用 |
-| `run_trace_refs` | data run / audit 追踪引用 |
-| `dispatch_hints` | 宿主回复提示，如 thread reply / private reply |
+| `result_status` | `answered` / `fallback` / `escalated` / `rejected` / `runtime_error` |
+| `selected_capability_id` | 实际执行的 capability |
+| `selected_service_object_id` | 实际读取的服务对象 |
+| `answer_fragments` | 渠道无关的回答片段 |
+| `explanation_fragments` | fallback / explanation 片段 |
+| `escalation_action` | 升级动作建议 |
+| `reason_codes` | 结构化原因码 |
+| `trace_refs` | `trace_ref` / `state_trace_ref` / `run_trace_ref` / `runtime_trace_ref` family 的追踪引用 |
+| `delivery_hints` | 给 bridge 的投递提示 |
+
+说明：
+
+- bridge 必须消费 shared `runtime_result_envelope` 主语义，不再维护第二套 `result_kind / reply_blocks / dispatch_hints` 主 contract
+- `trace_refs` 应继续保持在 trace family 内；`decision_ref` 不属于 `trace_refs` family，应由 bridge 在本地 dispatch / audit 链中单独关联
 
 ### 8.3 runtime 与 bridge 的责任切分
 
@@ -350,7 +372,9 @@ bridge 负责：
 
 - host ingress normalize
 - Gate 0 结果 enforce
+- 组装 canonical `runtime_request_envelope`
 - host tool publication
+- 验证 runtime 返回结果与 request / capability / service_object 的对齐关系
 - host reply dispatch
 - host trace / audit link
 
