@@ -174,12 +174,43 @@ function buildScopeMismatchService(query, reasonCodes = ['scope_out_of_contract'
   };
 }
 
+function pruneExpiredRunCache(runCache, nowEpochMs, runCacheTtlMs) {
+  if (!Number.isFinite(runCacheTtlMs) || runCacheTtlMs <= 0) {
+    return;
+  }
+
+  for (const [cacheKey, cacheEntry] of runCache.entries()) {
+    if ((nowEpochMs - cacheEntry.created_at_epoch_ms) > runCacheTtlMs) {
+      runCache.delete(cacheKey);
+    }
+  }
+}
+
+function enforceRunCacheBound(runCache, runCacheMaxEntries) {
+  if (!Number.isFinite(runCacheMaxEntries) || runCacheMaxEntries <= 0) {
+    runCache.clear();
+    return;
+  }
+
+  while (runCache.size > runCacheMaxEntries) {
+    const oldestCacheKey = runCache.keys().next().value;
+    if (oldestCacheKey === undefined) {
+      break;
+    }
+    runCache.delete(oldestCacheKey);
+  }
+}
+
 export function createOwnerSideDataPlatformAdapter({
   pythonExecutable = 'python3',
   dataPlatformRoot = defaultDataPlatformRoot,
   defaultOrgId = null,
   defaultAppSecret = null,
   fixtureBundlePath = defaultFixtureBundlePath,
+  runCacheMaxEntries = 32,
+  runCacheTtlMs = 5 * 60 * 1000,
+  nowEpochMsFactory = () => Date.now(),
+  runMemberInsightBackboneImpl = runMemberInsightBackbone,
 } = {}) {
   const runCache = new Map();
 
@@ -197,15 +228,32 @@ export function createOwnerSideDataPlatformAdapter({
       context.end_time,
       context.fixture_bundle_path,
     ]);
-    if (!runCache.has(cacheKey)) {
-      runCache.set(cacheKey, runMemberInsightBackbone({
-        pythonExecutable,
-        dataPlatformRoot,
-        input: context,
-      }));
+
+    const nowEpochMsCandidate = Number(nowEpochMsFactory());
+    const nowEpochMs = Number.isFinite(nowEpochMsCandidate) ? nowEpochMsCandidate : Date.now();
+    pruneExpiredRunCache(runCache, nowEpochMs, runCacheTtlMs);
+
+    const cachedEntry = runCache.get(cacheKey);
+    if (cachedEntry?.promise) {
+      return cachedEntry.promise;
     }
 
-    return runCache.get(cacheKey);
+    const runPromise = runMemberInsightBackboneImpl({
+      pythonExecutable,
+      dataPlatformRoot,
+      input: context,
+    }).catch((error) => {
+      runCache.delete(cacheKey);
+      throw error;
+    });
+
+    runCache.set(cacheKey, {
+      promise: runPromise,
+      created_at_epoch_ms: nowEpochMs,
+    });
+    enforceRunCacheBound(runCache, runCacheMaxEntries);
+
+    return runPromise;
   }
 
   return {

@@ -8,7 +8,10 @@ import {
 } from '../routing/capability-route-backbone.mjs';
 import { runGuardedExecution } from './guarded-execution-backbone.mjs';
 import { buildRuntimeTraceRef } from '../contracts/shared-contract-alignment.mjs';
-import { createOwnerSideDependencyClients } from '../adapters/owner-side-dependency-clients.mjs';
+import {
+  createOwnerSideDependencyClients,
+  getDefaultOwnerSideDependencyClients,
+} from '../adapters/owner-side-dependency-clients.mjs';
 
 function buildFallbackRuntimeIdentity(runtimeRequestEnvelope, now) {
   const requestId = runtimeRequestEnvelope?.request_id ?? `runtime-missing-request-${now.slice(0, 10)}`;
@@ -72,12 +75,18 @@ function resolveDependencyClients({
     };
   }
 
-  const dependencyClients = dependencyClientFactory({
-    runtimeRequestEnvelope,
-    interactionContext,
-    now,
-    ...dependencyClientFactoryOptions,
-  });
+  const useDefaultOwnerSideClients =
+    dependencyClientFactory === createOwnerSideDependencyClients
+    && Object.keys(dependencyClientFactoryOptions ?? {}).length === 0;
+
+  const dependencyClients = useDefaultOwnerSideClients
+    ? getDefaultOwnerSideDependencyClients()
+    : dependencyClientFactory({
+        runtimeRequestEnvelope,
+        interactionContext,
+        now,
+        ...dependencyClientFactoryOptions,
+      });
 
   const resolvedAuthKernelClient = authKernelClient ?? dependencyClients?.authKernelClient ?? null;
   const resolvedDataPlatformClient = dataPlatformClient ?? dependencyClients?.dataPlatformClient ?? null;
