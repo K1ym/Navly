@@ -387,3 +387,36 @@ test('milestone B backbone fail-closes runtime request assembly when bridge-loca
   assert.equal(hostDispatchResult.reply_blocks[0].kind, 'host_runtime_result_rejected');
   assert.deepEqual(hostDispatchResult.reply_blocks[0].reason_codes, ['missing_runtime_request']);
 });
+
+test('milestone B backbone fail-closes runtime request assembly when bridge-local access-context decision ref is missing', () => {
+  const rawHostIngress = buildRawHostIngress({ request_id: 'asp25-request-decision-ref-missing' });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink: {
+      ...authorizedSessionLink,
+      access_context_decision_ref: null,
+    },
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  assert.equal(runtimeRequestEnvelope, null);
+});

@@ -6,23 +6,15 @@ import {
   validateRuntimeRequestEnvelopeShape,
 } from '../adapters/openclaw/bridge-shared-alignment.mjs';
 
-function resolveCanonicalDecisionRef({ gate0Enforcement, authorizedSessionLink, accessContextEnvelope }) {
-  if (!gate0Enforcement?.decision_ref) {
+function resolveCanonicalDecisionRef({ authorizedSessionLink, accessContextEnvelope }) {
+  const contextDecisionRef = accessContextEnvelope.decision_ref;
+  const linkDecisionRef = authorizedSessionLink.access_context_decision_ref;
+
+  if (linkDecisionRef !== contextDecisionRef) {
     return null;
   }
 
-  if (!accessContextEnvelope?.decision_ref) {
-    return null;
-  }
-
-  if (
-    authorizedSessionLink?.access_context_decision_ref
-    && authorizedSessionLink.access_context_decision_ref !== accessContextEnvelope.decision_ref
-  ) {
-    return null;
-  }
-
-  return accessContextEnvelope.decision_ref;
+  return contextDecisionRef;
 }
 
 export function buildRuntimeRequestEnvelope({
@@ -41,7 +33,6 @@ export function buildRuntimeRequestEnvelope({
   validateAccessContextEnvelopeShape(accessContextEnvelope);
 
   const canonicalDecisionRef = resolveCanonicalDecisionRef({
-    gate0Enforcement,
     authorizedSessionLink,
     accessContextEnvelope,
   });
