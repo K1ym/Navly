@@ -8,10 +8,10 @@
   "stage": "host_ingress_normalized",
   "status": "recorded",
   "linked_trace_refs": [
-    "navly:trace:placeholder",
-    "navly:decision:placeholder"
+    "navly:trace:placeholder"
   ],
   "details": {
+    "decision_ref": "navly:decision:placeholder",
     "dispatch_status": "ready_for_runtime_dispatch"
   },
   "occurred_at": "2026-04-06T00:00:00Z"

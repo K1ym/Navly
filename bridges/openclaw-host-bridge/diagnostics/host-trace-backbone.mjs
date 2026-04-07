@@ -59,8 +59,9 @@ export function createMilestoneBTraceBundle({
     createHostTraceEvent({
       hostIngressEnvelope,
       stage: 'gate0_enforced',
-      linkedTraceRefs: [hostIngressEnvelope.trace_ref, gate0Enforcement.decision_ref].filter(Boolean),
+      linkedTraceRefs: [hostIngressEnvelope.trace_ref],
       details: {
+        decision_ref: gate0Enforcement.decision_ref,
         decision_status: gate0Enforcement.decision_status,
         enforcement_status: gate0Enforcement.enforcement_status,
       },
@@ -73,8 +74,10 @@ export function createMilestoneBTraceBundle({
       createHostTraceEvent({
         hostIngressEnvelope,
         stage: 'authorized_session_link_created',
-        linkedTraceRefs: [authorizedSessionLink.trace_ref, authorizedSessionLink.gate0_decision_ref, authorizedSessionLink.access_context_decision_ref].filter(Boolean),
+        linkedTraceRefs: [authorizedSessionLink.trace_ref].filter(Boolean),
         details: {
+          gate0_decision_ref: authorizedSessionLink.gate0_decision_ref,
+          access_context_decision_ref: authorizedSessionLink.access_context_decision_ref,
           session_ref: authorizedSessionLink.session_ref,
           conversation_ref: authorizedSessionLink.conversation_ref,
         },
@@ -88,8 +91,9 @@ export function createMilestoneBTraceBundle({
       createHostTraceEvent({
         hostIngressEnvelope,
         stage: 'runtime_request_envelope_assembled',
-        linkedTraceRefs: [runtimeRequestEnvelope.trace_ref, runtimeRequestEnvelope.decision_ref],
+        linkedTraceRefs: [runtimeRequestEnvelope.trace_ref],
         details: {
+          decision_ref: runtimeRequestEnvelope.decision_ref,
           requested_capability_id: runtimeRequestEnvelope.requested_capability_id ?? null,
           requested_service_object_id: runtimeRequestEnvelope.requested_service_object_id ?? null,
         },
@@ -102,11 +106,9 @@ export function createMilestoneBTraceBundle({
     createHostTraceEvent({
       hostIngressEnvelope,
       stage: 'host_dispatch_handoff_prepared',
-      linkedTraceRefs: uniqueStrings([
-        ...(hostDispatchResult.trace_refs ?? []),
-        runtimeResultEnvelope?.runtime_trace_ref ?? null,
-      ]),
+      linkedTraceRefs: uniqueStrings(hostDispatchResult.trace_refs ?? []),
       details: {
+        decision_ref: hostDispatchResult.decision_ref,
         dispatch_status: hostDispatchResult.dispatch_status,
         dispatch_mode: hostDispatchResult.dispatch_mode,
       },

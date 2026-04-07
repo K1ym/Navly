@@ -81,6 +81,15 @@
 6. `host_dispatch_result` handoff 准备
 7. `host_trace_event` 生成
 
+## 当前最小 cross-module canonical slice
+
+当前 bridge/runtime 的最小 canonical 主链统一到：
+
+- `capability_id = navly.store.member_insight`
+- `service_object_id = navly.service.store.member_insight`
+
+`daily_overview` 不再作为当前最小 cross-module 主链默认值。
+
 ## canonical freeze
 
 - `runtime_request_envelope` 是 bridge -> runtime 的唯一 canonical handoff 名称
