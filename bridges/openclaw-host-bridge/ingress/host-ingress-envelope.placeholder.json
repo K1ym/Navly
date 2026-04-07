@@ -23,7 +23,7 @@
   "message_text": "placeholder user input",
   "attachment_refs": [],
   "structured_input_slots": {},
-  "requested_capability_id": "navly.store.daily_overview",
+  "requested_capability_id": "navly.store.member_insight",
   "requested_service_object_id": null,
   "target_scope_hint": null,
   "target_business_date_hint": "2026-04-06",

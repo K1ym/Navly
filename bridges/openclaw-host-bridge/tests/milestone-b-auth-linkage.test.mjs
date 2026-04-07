@@ -27,7 +27,7 @@ function buildRawHostIngress(overrides = {}) {
       },
     ],
     message_text: '请给我今天的门店概览',
-    requested_capability_id: 'navly.store.daily_overview',
+    requested_capability_id: 'navly.store.member_insight',
     target_business_date_hint: '2026-04-06',
     host_delivery_context: {
       dispatch_mode: 'direct_reply',
@@ -47,8 +47,8 @@ function buildRuntimeResultEnvelope(requestId, traceRef) {
     request_id: requestId,
     runtime_trace_ref: 'navly:runtime-trace:bridge-test-001',
     result_status: 'answered',
-    selected_capability_id: 'navly.store.daily_overview',
-    selected_service_object_id: 'navly.service.store.daily_overview',
+    selected_capability_id: 'navly.store.member_insight',
+    selected_service_object_id: 'navly.service.store.member_insight',
     answer_fragments: [
       {
         kind: 'text',
@@ -57,7 +57,11 @@ function buildRuntimeResultEnvelope(requestId, traceRef) {
     ],
     explanation_fragments: [],
     reason_codes: [],
-    trace_refs: [traceRef],
+    trace_refs: [
+      traceRef,
+      'navly:state-trace:readiness:member-insight-ready',
+      'navly:run-trace:ingestion:member-insight-run',
+    ],
     delivery_hints: {
       dispatch_mode: 'direct_reply',
     },
@@ -99,7 +103,7 @@ test('milestone B backbone assembles ingress identity, authorized session link, 
 
   assert.equal(runtimeRequestEnvelope.decision_ref, accessChain.gate0_result.decision_ref);
   assert.equal(runtimeRequestEnvelope.access_context_envelope.decision_ref, accessChain.access_context_envelope.decision_ref);
-  assert.equal(runtimeRequestEnvelope.requested_capability_id, 'navly.store.daily_overview');
+  assert.equal(runtimeRequestEnvelope.requested_capability_id, 'navly.store.member_insight');
 
   const hostDispatchResult = buildHostDispatchResult({
     hostIngressEnvelope,
@@ -111,6 +115,12 @@ test('milestone B backbone assembles ingress identity, authorized session link, 
 
   assert.equal(hostDispatchResult.dispatch_status, 'ready_for_runtime_dispatch');
   assert.equal(hostDispatchResult.reply_blocks[0].text, '今日门店概览已生成。');
+  assert.deepEqual(hostDispatchResult.trace_refs, [
+    hostIngressEnvelope.trace_ref,
+    'navly:runtime-trace:bridge-test-001',
+    'navly:state-trace:readiness:member-insight-ready',
+    'navly:run-trace:ingestion:member-insight-run',
+  ]);
 
   const pipeline = runOpenClawHostMilestoneBBackbone({
     rawHostIngress: buildRawHostIngress(),
@@ -239,5 +249,95 @@ test('milestone B backbone rejects mismatched runtime result request ids', () =>
   assert.equal(hostDispatchResult.dispatch_status, 'blocked_runtime_result_mismatch');
   assert.equal(hostDispatchResult.reply_blocks[0].kind, 'host_runtime_result_rejected');
   assert.deepEqual(hostDispatchResult.reply_blocks[0].reason_codes, ['runtime_request_mismatch']);
+  assert.equal(hostDispatchResult.runtime_trace_ref, null);
+  assert.deepEqual(hostDispatchResult.trace_refs, [hostIngressEnvelope.trace_ref]);
+});
+
+test('milestone B backbone rejects runtime result capability mismatch', () => {
+  const rawHostIngress = buildRawHostIngress({ request_id: 'asp24-request-capability-mismatch' });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  const hostDispatchResult = buildHostDispatchResult({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    runtimeRequestEnvelope,
+    runtimeResultEnvelope: {
+      ...buildRuntimeResultEnvelope(hostIngressEnvelope.request_id, hostIngressEnvelope.trace_ref),
+      selected_capability_id: 'navly.store.daily_overview',
+    },
+  });
+
+  assert.equal(hostDispatchResult.dispatch_status, 'blocked_runtime_result_mismatch');
+  assert.equal(hostDispatchResult.reply_blocks[0].kind, 'host_runtime_result_rejected');
+  assert.deepEqual(hostDispatchResult.reply_blocks[0].reason_codes, ['runtime_capability_mismatch']);
+  assert.equal(hostDispatchResult.runtime_trace_ref, null);
+});
+
+test('milestone B backbone rejects runtime result missing selected service object when request pins one', () => {
+  const rawHostIngress = buildRawHostIngress({
+    request_id: 'asp24-request-service-object-missing',
+    requested_service_object_id: 'navly.service.store.member_insight',
+  });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  const hostDispatchResult = buildHostDispatchResult({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    runtimeRequestEnvelope,
+    runtimeResultEnvelope: {
+      ...buildRuntimeResultEnvelope(hostIngressEnvelope.request_id, hostIngressEnvelope.trace_ref),
+      selected_service_object_id: null,
+    },
+  });
+
+  assert.equal(hostDispatchResult.dispatch_status, 'blocked_runtime_result_mismatch');
+  assert.equal(hostDispatchResult.reply_blocks[0].kind, 'host_runtime_result_rejected');
+  assert.deepEqual(hostDispatchResult.reply_blocks[0].reason_codes, ['runtime_service_object_mismatch']);
   assert.equal(hostDispatchResult.runtime_trace_ref, null);
 });
