@@ -152,6 +152,32 @@ test('milestone B backbone fail-closes denied gate0 path into host rejection dis
   assert.equal(pipeline.host_dispatch_result.reply_blocks[0].kind, 'host_rejection');
 });
 
+test('milestone B backbone ignores runtime result when Gate 0 disallows runtime handoff', () => {
+  const deniedIngress = buildRawHostIngress({
+    request_id: 'asp19-request-deny-runtime',
+    peer_identity_evidence: [{ alias_namespace: 'wecom_user_id', alias_value: 'missing_user' }],
+  });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress: deniedIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+
+  const pipeline = runOpenClawHostMilestoneBBackbone({
+    rawHostIngress: deniedIngress,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+    runtimeResultEnvelope: buildRuntimeResultEnvelope(hostIngressEnvelope.request_id, hostIngressEnvelope.trace_ref),
+  });
+
+  assert.equal(pipeline.gate0_enforcement.enforcement_status, 'host_rejected');
+  assert.equal(pipeline.runtime_request_envelope, null);
+  assert.equal(pipeline.host_dispatch_result.dispatch_status, 'ready_for_gate0_rejection');
+  assert.equal(pipeline.host_dispatch_result.reply_blocks[0].kind, 'host_rejection');
+  assert.equal(pipeline.host_dispatch_result.runtime_trace_ref, null);
+});
+
 test('milestone B backbone keeps restricted multi-scope gate0 path on host-side scope confirmation', () => {
   const rawIngress = buildRawHostIngress({
     request_id: 'asp19-request-restricted',
@@ -174,4 +200,44 @@ test('milestone B backbone keeps restricted multi-scope gate0 path on host-side 
   assert.equal(pipeline.authorized_session_link, null);
   assert.equal(pipeline.runtime_request_envelope, null);
   assert.equal(pipeline.host_dispatch_result.dispatch_status, 'ready_for_scope_confirmation');
+});
+
+test('milestone B backbone rejects mismatched runtime result request ids', () => {
+  const rawHostIngress = buildRawHostIngress({ request_id: 'asp19-request-mismatch' });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  const hostDispatchResult = buildHostDispatchResult({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    runtimeRequestEnvelope,
+    runtimeResultEnvelope: buildRuntimeResultEnvelope('asp19-request-other', hostIngressEnvelope.trace_ref),
+  });
+
+  assert.equal(hostDispatchResult.dispatch_status, 'blocked_runtime_result_mismatch');
+  assert.equal(hostDispatchResult.reply_blocks[0].kind, 'host_runtime_result_rejected');
+  assert.deepEqual(hostDispatchResult.reply_blocks[0].reason_codes, ['runtime_request_mismatch']);
+  assert.equal(hostDispatchResult.runtime_trace_ref, null);
 });
