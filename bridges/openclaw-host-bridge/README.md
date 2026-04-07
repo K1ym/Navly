@@ -1,30 +1,37 @@
 # Navly_v1 openclaw-host-bridge
 
-状态：milestone-a skeleton / seed only
+状态：milestone-b backbone / host handoff only
 
 本目录是 `Navly_v1` `openclaw-host-bridge` 的实现骨架入口。
 
-当前只完成：
+当前已完成：
 
-- `bridges/openclaw-host-bridge/` 目录骨架
-- host ingress + host trace skeleton
-- bridge local object placeholder
-- bridge <-> runtime shared interaction consumption 对齐
-- 最小 validate 脚本
+- milestone A 目录骨架与 local placeholder
+- milestone B host ingress normalization backbone
+- milestone B ingress identity envelope assembly
+- milestone B Gate 0 enforce backbone
+- milestone B authorized session linkage backbone
+- milestone B `runtime_request_envelope` assembly backbone
+- milestone B host dispatch handoff backbone
+- milestone B host trace event backbone
+- milestone B validate 脚本与最小 node tests
 
 当前**未完成**：
 
-- milestone B `auth-linkage` 闭环
-- milestone C `runtime handoff` 执行闭环
-- milestone D `dispatch + host trace linkage` 完整闭环
 - 完整 host integration
+- milestone C runtime execution closure
+- milestone D dispatch execution / outcome forwarding closure
+- 完整 capability tool publication
 - 任何业务能力逻辑
 - `data-platform` / `auth-kernel` / `runtime` 内部逻辑
 - upstream OpenClaw patch
 
 ## 当前 owning boundary
 
-- 本目录只实现 `openclaw-host-bridge` 的宿主适配 skeleton
+- 本目录只实现 `openclaw-host-bridge` 的宿主适配 / handoff / dispatch / enforce backbone
+- bridge 不拥有 access truth
+- bridge 不拥有 data truth
+- bridge 不把 OpenClaw session / workspace 当 canonical truth
 - bridge local object 保持在 bridge 内部，不提升为 shared canonical contracts
 - bridge <-> runtime 只消费 `shared/contracts/interaction/` 已冻结对象
 - 不修改 `shared/contracts/**`
@@ -33,38 +40,20 @@
 - 不修改 `runtimes/**`
 - 不修改 `upstreams/openclaw/**`
 
-## 当前骨架
-
-```text
-bridges/openclaw-host-bridge/
-  README.md
-  docs/
-  adapters/
-    openclaw/
-  ingress/
-  auth-linkage/
-  tool-publication/
-  runtime-handoff/
-  dispatch/
-  diagnostics/
-  migration/
-  scripts/
-  tests/
-```
-
 ## bridge local objects
 
-以下对象当前只作为 bridge local skeleton 保留：
+以下对象当前仍只作为 bridge local object 保留：
 
 - `host_ingress_envelope`
 - `tool_publication_manifest`
 - `host_dispatch_result`
+- `host_trace_event`
 
 说明：
 
 - 它们服务于宿主适配内部
-- 它们不是当前 milestone A 的 shared primary contracts
-- 如后续出现新的 bridge consumer，再评估是否提升为公共契约
+- 它们不是 shared primary contracts
+- 本轮没有把它们升级成 shared canonical handoff / result objects
 
 ## shared interaction consumption
 
@@ -80,6 +69,18 @@ bridges/openclaw-host-bridge/
 - `shared/contracts/interaction/runtime_result_envelope.schema.json`
 - `shared/contracts/interaction/runtime_outcome_event.schema.json`
 
+## milestone B backbone
+
+当前 backbone 已覆盖：
+
+1. `host_ingress_envelope` 归一化
+2. `ingress_identity_envelope` 组装
+3. Gate 0 结果 enforce
+4. `authorized_session_link` 生成
+5. `runtime_request_envelope` 组装
+6. `host_dispatch_result` handoff 准备
+7. `host_trace_event` 生成
+
 ## canonical freeze
 
 - `runtime_request_envelope` 是 bridge -> runtime 的唯一 canonical handoff 名称
@@ -91,5 +92,5 @@ bridges/openclaw-host-bridge/
 运行：
 
 ```bash
-bridges/openclaw-host-bridge/scripts/validate-milestone-a.sh
+bridges/openclaw-host-bridge/scripts/validate-milestone-b.sh
 ```

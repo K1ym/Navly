@@ -1,18 +1,18 @@
-# Runtime Handoff Skeleton
+# Runtime Handoff Backbone
 
-本目录预留给 bridge <-> runtime interaction boundary。
+本目录承载 bridge <-> runtime interaction handoff backbone。
 
-当前 milestone A 只允许：
+当前 milestone B 已实现：
 
-- 读取 shared interaction contracts
-- 记录 `runtime_request_envelope` 是唯一 canonical handoff 名称
-- 记录 `runtime_result_envelope` / `runtime_outcome_event` 是消费对象
+- `runtime_request_envelope` assembly backbone
+- shared interaction consumption only
+- fail-closed handoff preconditions
 
 当前**不**实现：
 
-- runtime request assembly logic
+- runtime execution
 - runtime result rendering logic
-- fail-closed execution path
+- runtime outcome forwarding
 
 ## shared interaction consumption only
 

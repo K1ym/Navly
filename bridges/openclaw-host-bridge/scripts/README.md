@@ -1,7 +1,8 @@
-# Scripts Skeleton
+# Scripts Backbone
 
-本目录预留给开发辅助脚本。
+本目录提供 bridge milestone 自检脚本。
 
-当前 milestone A 提供：
+当前可用：
 
 - `validate-milestone-a.sh`
+- `validate-milestone-b.sh`

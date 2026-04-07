@@ -1,15 +1,16 @@
-# Auth Linkage Skeleton
+# Auth Linkage Backbone
 
-本目录预留给 bridge -> auth-kernel linkage。
+本目录承载 bridge -> auth-kernel linkage backbone。
 
-当前 milestone A 只做目录边界预留，不实现：
+当前 milestone B 已实现：
 
-- `ingress_identity_envelope` 组装
-- Gate 0 调用
-- `authorized_session_link`
-- conversation binding update
+- `ingress_identity_envelope` assembly
+- Gate 0 enforce backbone
+- `authorized_session_link` backbone
 
-原因：
+当前**不**实现：
 
-- 这些属于 milestone B 及以后
-- milestone A 只做 host ingress + interaction contract freeze
+- auth-kernel 内部 actor resolution logic
+- auth-kernel 内部 binding persistence
+- capability access decision engine
+- conversation binding write-back
