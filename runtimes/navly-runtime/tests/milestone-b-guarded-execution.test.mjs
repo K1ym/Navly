@@ -172,6 +172,23 @@ test('happy path closes route + access + readiness + service + runtime_result_en
   assert.equal(dataPlatformClient.serviceCalls[0].target_business_date, '2026-04-05');
 });
 
+test('happy path without route or dependency warnings preserves empty reason_codes', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = createDataPlatformClient();
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      requested_service_object_id: 'navly.service.store.daily_overview',
+    }),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.runtime_result_envelope.result_status, 'answered');
+  assert.deepEqual(result.runtime_result_envelope.reason_codes, []);
+});
+
 test('unresolved route returns fallback without dependency calls', async () => {
   const authKernelClient = createAuthKernelClient();
   const dataPlatformClient = createDataPlatformClient();
@@ -195,6 +212,52 @@ test('unresolved route returns fallback without dependency calls', async () => {
   assert.equal(authKernelClient.calls.length, 0);
   assert.equal(dataPlatformClient.readinessCalls.length, 0);
   assert.equal(dataPlatformClient.serviceCalls.length, 0);
+});
+
+test('match token resolution ignores entries that do not opt into token matching', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = createDataPlatformClient();
+
+  const routeRegistry = {
+    registry_name: 'capability_route_registry',
+    status: 'milestone_b_backbone',
+    route_strategy: 'capability_first_then_service_object',
+    entries: [
+      {
+        route_id: 'capability.navly.store.daily_overview.explicit_only',
+        match_mode: 'explicit_capability_id',
+        match_tokens: ['门店日报'],
+        capability_id: 'navly.store.daily_overview',
+        default_service_object_id: 'navly.service.store.daily_overview',
+        supported_service_object_ids: ['navly.service.store.daily_overview'],
+        status: 'implemented_milestone_b',
+      },
+    ],
+    default_fallback: {
+      result_status: 'fallback',
+      reason_code: 'runtime.route.unresolved',
+      next_action: 'request_capability_clarification',
+      fallback_capability_id: 'navly.system.capability_explanation',
+      fallback_service_object_id: 'navly.service.system.capability_explanation',
+    },
+  };
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      requested_capability_id: null,
+      requested_service_object_id: null,
+      user_input_text: '门店日报',
+    }),
+    authKernelClient,
+    dataPlatformClient,
+    routeRegistry,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.capability_route_result.route_status, 'unresolved');
+  assert.equal(result.runtime_result_envelope.result_status, 'fallback');
+  assert.equal(authKernelClient.calls.length, 0);
+  assert.equal(dataPlatformClient.readinessCalls.length, 0);
 });
 
 test('access deny returns rejected and does not call readiness/service', async () => {
@@ -278,6 +341,116 @@ test('theme service scope mismatch returns fallback with service reason codes', 
   assert.equal(result.runtime_dependency_outcome.dependency_stage, 'service_not_served');
   assert.equal(result.runtime_result_envelope.result_status, 'fallback');
   assert.ok(result.runtime_result_envelope.reason_codes.includes('scope_out_of_contract'));
+  assert.equal(dataPlatformClient.readinessCalls.length, 1);
+  assert.equal(dataPlatformClient.serviceCalls.length, 1);
+});
+
+test('malformed auth access_decision fails closed with runtime_error', async () => {
+  const authKernelClient = {
+    calls: [],
+    async evaluateCapabilityAccess(request) {
+      this.calls.push(request);
+      return {
+        access_decision: {
+          decision_ref: 'navly:decision:malformed-auth-001',
+          request_id: request.request_id,
+          trace_ref: 'navly:trace:req-runtime-001',
+        },
+      };
+    },
+  };
+  const dataPlatformClient = createDataPlatformClient();
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope(),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.runtime_dependency_outcome.dependency_stage, 'dependency_error');
+  assert.equal(result.runtime_result_envelope.result_status, 'runtime_error');
+  assert.ok(result.runtime_result_envelope.reason_codes.includes('runtime.dependency.auth_invalid_response'));
+  assert.equal(dataPlatformClient.readinessCalls.length, 0);
+  assert.equal(dataPlatformClient.serviceCalls.length, 0);
+});
+
+test('malformed readiness response fails closed with runtime_error', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = {
+    readinessCalls: [],
+    serviceCalls: [],
+    async queryCapabilityReadiness(query) {
+      this.readinessCalls.push(query);
+      return {
+        request_id: query.request_id,
+        trace_ref: query.trace_ref,
+        capability_id: query.capability_id,
+      };
+    },
+    async queryThemeService(query) {
+      this.serviceCalls.push(query);
+      return {};
+    },
+  };
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope(),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.runtime_dependency_outcome.dependency_stage, 'dependency_error');
+  assert.equal(result.runtime_result_envelope.result_status, 'runtime_error');
+  assert.ok(result.runtime_result_envelope.reason_codes.includes('runtime.dependency.readiness_invalid_response'));
+  assert.equal(dataPlatformClient.readinessCalls.length, 1);
+  assert.equal(dataPlatformClient.serviceCalls.length, 0);
+});
+
+test('malformed theme service response fails closed with runtime_error', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = {
+    readinessCalls: [],
+    serviceCalls: [],
+    async queryCapabilityReadiness(query) {
+      this.readinessCalls.push(query);
+      return {
+        request_id: query.request_id,
+        trace_ref: query.trace_ref,
+        capability_id: query.capability_id,
+        readiness_status: 'ready',
+        evaluated_scope_ref: query.target_scope_ref,
+        requested_business_date: query.target_business_date,
+        latest_usable_business_date: '2026-04-05',
+        reason_codes: [],
+        blocking_dependencies: [],
+        state_trace_refs: ['navly:state-trace:readiness:sample'],
+        run_trace_refs: ['navly:run-trace:ingestion:sample'],
+        evaluated_at: FIXED_NOW,
+      };
+    },
+    async queryThemeService(query) {
+      this.serviceCalls.push(query);
+      return {
+        request_id: query.request_id,
+        trace_ref: query.trace_ref,
+        capability_id: query.capability_id,
+        service_object_id: query.service_object_id,
+      };
+    },
+  };
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope(),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.runtime_dependency_outcome.dependency_stage, 'dependency_error');
+  assert.equal(result.runtime_result_envelope.result_status, 'runtime_error');
+  assert.ok(result.runtime_result_envelope.reason_codes.includes('runtime.dependency.service_invalid_response'));
   assert.equal(dataPlatformClient.readinessCalls.length, 1);
   assert.equal(dataPlatformClient.serviceCalls.length, 1);
 });

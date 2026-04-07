@@ -10,6 +10,7 @@ import {
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const defaultRegistryPath = path.join(moduleDir, 'capability-route-registry.seed.json');
+const capabilityRouteRegistryCache = new Map();
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -44,7 +45,7 @@ function normalizeEntry(entry) {
 
   return {
     route_id: entry.route_id,
-    match_mode: entry.match_mode,
+    match_mode: entry.match_mode ?? 'explicit_or_match_tokens',
     match_tokens: Array.isArray(entry.match_tokens)
       ? entry.match_tokens.map((token) => normalizeMatchText(token)).filter((token) => token.length > 0)
       : [],
@@ -53,6 +54,17 @@ function normalizeEntry(entry) {
     supported_service_object_ids: supportedServiceObjectIds,
     status: entry.status,
   };
+}
+
+function cloneRegistry(registry) {
+  if (typeof structuredClone === 'function') {
+    return structuredClone(registry);
+  }
+  return JSON.parse(JSON.stringify(registry));
+}
+
+function supportsMatchTokens(entry) {
+  return entry.match_mode === 'match_tokens' || entry.match_mode === 'explicit_or_match_tokens';
 }
 
 function pickServiceObjectId({ entry, requestedServiceObjectId }) {
@@ -132,6 +144,10 @@ function resolveByMatchTokens({ entries, userInputText, requestedServiceObjectId
   const tokens = splitInputTokens(userInputText);
 
   const match = entries.find((entry) => {
+    if (!supportsMatchTokens(entry)) {
+      return false;
+    }
+
     if (entry.match_tokens.length === 0) {
       return false;
     }
@@ -190,16 +206,34 @@ function chooseTargetScopeRef({ interactionContext }) {
 }
 
 export function loadCapabilityRouteRegistry(registryPath = defaultRegistryPath) {
-  const rawRegistry = readJson(registryPath);
+  const cacheKey = path.resolve(registryPath);
+  const cachedRegistry = capabilityRouteRegistryCache.get(cacheKey);
+  if (cachedRegistry) {
+    return cloneRegistry(cachedRegistry);
+  }
+
+  const rawRegistry = readJson(cacheKey);
   const entries = Array.isArray(rawRegistry.entries) ? rawRegistry.entries.map(normalizeEntry) : [];
 
-  return {
+  const normalizedRegistry = {
     registry_name: rawRegistry.registry_name,
     status: rawRegistry.status,
     route_strategy: rawRegistry.route_strategy,
     entries,
     default_fallback: normalizeFallback(rawRegistry.default_fallback),
   };
+
+  capabilityRouteRegistryCache.set(cacheKey, normalizedRegistry);
+  return cloneRegistry(normalizedRegistry);
+}
+
+export function clearCapabilityRouteRegistryCache(registryPath = null) {
+  if (!registryPath) {
+    capabilityRouteRegistryCache.clear();
+    return;
+  }
+
+  capabilityRouteRegistryCache.delete(path.resolve(registryPath));
 }
 
 export function resolveCapabilityRoute({ interactionContext, routeRegistry = loadCapabilityRouteRegistry() }) {

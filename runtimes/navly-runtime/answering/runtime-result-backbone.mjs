@@ -41,7 +41,20 @@ function collectReasonCodes({ ingressError, routeResult, dependencyOutcome }) {
 
   const routeReasonCodes = routeResult?.reason_codes ?? [];
   const dependencyReasonCodes = dependencyOutcome?.reason_codes ?? [];
-  return normalizeReasonCodes([...routeReasonCodes, ...dependencyReasonCodes], 'runtime.unclassified');
+  const combinedReasonCodes = normalizeReasonCodes([...routeReasonCodes, ...dependencyReasonCodes], null);
+  if (combinedReasonCodes.length > 0) {
+    return combinedReasonCodes;
+  }
+
+  if (!routeResult || routeResult.route_status !== 'resolved') {
+    return normalizeReasonCodes(routeReasonCodes, routeResult?.fallback_plan?.reason_code ?? 'runtime.route.unresolved');
+  }
+
+  if (!dependencyOutcome || dependencyOutcome.dependency_stage === 'served') {
+    return [];
+  }
+
+  return normalizeReasonCodes(dependencyReasonCodes, 'runtime.unclassified');
 }
 
 function buildAnswerFragments({ resultStatus, routeResult, dependencyOutcome }) {

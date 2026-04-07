@@ -91,12 +91,27 @@ export async function runMilestoneBGuardedExecutionChain({
     }
 
     if (routeResult.route_status === 'resolved' && executionPlan) {
-      dependencyOutcome = await runGuardedExecution({
-        interactionContext,
-        executionPlan,
-        authKernelClient,
-        dataPlatformClient,
-      });
+      try {
+        dependencyOutcome = await runGuardedExecution({
+          interactionContext,
+          executionPlan,
+          authKernelClient,
+          dataPlatformClient,
+        });
+      } catch (error) {
+        dependencyOutcome = {
+          dependency_stage: 'dependency_error',
+          reason_codes: ['runtime.dependency.unhandled_error'],
+          error_message: error?.message ?? 'unexpected guarded execution failure',
+          capability_access_request: null,
+          capability_access_response: null,
+          effective_access_context: interactionContext.access_context_envelope,
+          readiness_query: null,
+          readiness_response: null,
+          theme_service_query: null,
+          theme_service_response: null,
+        };
+      }
     }
   }
 

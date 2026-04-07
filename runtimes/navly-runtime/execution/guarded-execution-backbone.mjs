@@ -13,6 +13,16 @@ function assertAdapterMethod(adapter, methodName, adapterName) {
   }
 }
 
+function buildDependencyError(baseOutput, reasonCodes, errorMessage, extra = {}) {
+  return {
+    ...baseOutput,
+    dependency_stage: 'dependency_error',
+    reason_codes: normalizeReasonCodes(reasonCodes, 'runtime.dependency.unclassified'),
+    error_message: errorMessage,
+    ...extra,
+  };
+}
+
 function buildCapabilityAccessRequest({ interactionContext, executionPlan }) {
   return {
     request_id: interactionContext.request_id,
@@ -114,9 +124,6 @@ export async function runGuardedExecution({
 
   if (!capabilityAccessResponse?.access_decision) {
     return {
-      dependency_stage: 'dependency_error',
-      reason_codes: ['runtime.dependency.auth_missing_access_decision'],
-      error_message: 'auth dependency did not return access_decision',
       capability_access_request: capabilityAccessRequest,
       capability_access_response: capabilityAccessResponse ?? null,
       effective_access_context: interactionContext.access_context_envelope,
@@ -124,19 +131,16 @@ export async function runGuardedExecution({
       readiness_response: null,
       theme_service_query: null,
       theme_service_response: null,
+      dependency_stage: 'dependency_error',
+      reason_codes: ['runtime.dependency.auth_missing_access_decision'],
+      error_message: 'auth dependency did not return access_decision',
     };
   }
-
-  const accessDecision = validateAccessDecisionShape(capabilityAccessResponse.access_decision);
-  const effectiveAccessContext = resolveEffectiveAccessContext({
-    interactionContext,
-    capabilityAccessResponse,
-  });
 
   const baseOutput = {
     capability_access_request: capabilityAccessRequest,
     capability_access_response: capabilityAccessResponse,
-    effective_access_context: effectiveAccessContext,
+    effective_access_context: interactionContext.access_context_envelope,
     readiness_query: null,
     readiness_response: null,
     theme_service_query: null,
@@ -145,9 +149,26 @@ export async function runGuardedExecution({
     error_message: null,
   };
 
+  let accessDecision;
+  let effectiveAccessContext;
+  try {
+    accessDecision = validateAccessDecisionShape(capabilityAccessResponse.access_decision);
+    effectiveAccessContext = resolveEffectiveAccessContext({
+      interactionContext,
+      capabilityAccessResponse,
+    });
+  } catch (error) {
+    return buildDependencyError(
+      baseOutput,
+      ['runtime.dependency.auth_invalid_response'],
+      error?.message ?? 'auth dependency returned invalid response',
+    );
+  }
+
   if (accessDecision.decision_status === 'deny') {
     return {
       ...baseOutput,
+      effective_access_context: effectiveAccessContext,
       dependency_stage: 'access_denied',
       reason_codes: normalizeReasonCodes(accessDecision.reason_codes, 'runtime.access.denied'),
     };
@@ -156,6 +177,7 @@ export async function runGuardedExecution({
   if (accessDecision.decision_status === 'escalation') {
     return {
       ...baseOutput,
+      effective_access_context: effectiveAccessContext,
       dependency_stage: 'access_escalated',
       reason_codes: normalizeReasonCodes(accessDecision.reason_codes, 'runtime.access.escalation'),
     };
@@ -172,20 +194,35 @@ export async function runGuardedExecution({
   try {
     readinessResponse = await dataPlatformClient.queryCapabilityReadiness(readinessQuery);
   } catch (error) {
-    return {
-      ...baseOutput,
-      dependency_stage: 'dependency_error',
-      reason_codes: ['runtime.dependency.readiness_error'],
-      error_message: error?.message ?? 'readiness dependency call failed',
-      readiness_query: readinessQuery,
-    };
+    return buildDependencyError(
+      {
+        ...baseOutput,
+        effective_access_context: effectiveAccessContext,
+        readiness_query: readinessQuery,
+      },
+      ['runtime.dependency.readiness_error'],
+      error?.message ?? 'readiness dependency call failed',
+    );
   }
 
-  readinessResponse = validateReadinessResponseShape(readinessResponse);
+  try {
+    readinessResponse = validateReadinessResponseShape(readinessResponse);
+  } catch (error) {
+    return buildDependencyError(
+      {
+        ...baseOutput,
+        effective_access_context: effectiveAccessContext,
+        readiness_query: readinessQuery,
+      },
+      ['runtime.dependency.readiness_invalid_response'],
+      error?.message ?? 'readiness dependency returned invalid response',
+    );
+  }
 
   if (readinessResponse.readiness_status !== 'ready') {
     return {
       ...baseOutput,
+      effective_access_context: effectiveAccessContext,
       dependency_stage: 'readiness_blocked',
       reason_codes: normalizeReasonCodes(readinessResponse.reason_codes, `runtime.readiness.${readinessResponse.readiness_status}`),
       readiness_query: readinessQuery,
@@ -205,22 +242,39 @@ export async function runGuardedExecution({
   try {
     themeServiceResponse = await dataPlatformClient.queryThemeService(themeServiceQuery);
   } catch (error) {
-    return {
-      ...baseOutput,
-      dependency_stage: 'dependency_error',
-      reason_codes: ['runtime.dependency.service_error'],
-      error_message: error?.message ?? 'theme service dependency call failed',
-      readiness_query: readinessQuery,
-      readiness_response: readinessResponse,
-      theme_service_query: themeServiceQuery,
-    };
+    return buildDependencyError(
+      {
+        ...baseOutput,
+        effective_access_context: effectiveAccessContext,
+        readiness_query: readinessQuery,
+        readiness_response: readinessResponse,
+        theme_service_query: themeServiceQuery,
+      },
+      ['runtime.dependency.service_error'],
+      error?.message ?? 'theme service dependency call failed',
+    );
   }
 
-  themeServiceResponse = validateThemeServiceResponseShape(themeServiceResponse);
+  try {
+    themeServiceResponse = validateThemeServiceResponseShape(themeServiceResponse);
+  } catch (error) {
+    return buildDependencyError(
+      {
+        ...baseOutput,
+        effective_access_context: effectiveAccessContext,
+        readiness_query: readinessQuery,
+        readiness_response: readinessResponse,
+        theme_service_query: themeServiceQuery,
+      },
+      ['runtime.dependency.service_invalid_response'],
+      error?.message ?? 'theme service dependency returned invalid response',
+    );
+  }
 
   if (themeServiceResponse.service_status !== 'served') {
     return {
       ...baseOutput,
+      effective_access_context: effectiveAccessContext,
       dependency_stage: 'service_not_served',
       reason_codes: normalizeReasonCodes(
         themeServiceResponse.explanation_object?.reason_codes,
@@ -235,6 +289,7 @@ export async function runGuardedExecution({
 
   return {
     ...baseOutput,
+    effective_access_context: effectiveAccessContext,
     dependency_stage: 'served',
     reason_codes: [],
     readiness_query: readinessQuery,
