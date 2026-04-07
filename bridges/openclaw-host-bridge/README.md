@@ -93,6 +93,13 @@
 ## canonical freeze
 
 - `runtime_request_envelope` 是 bridge -> runtime 的唯一 canonical handoff 名称
+- 在有效 handoff 路径中：
+  - `runtime_request_envelope.decision_ref`
+  - `runtime_request_envelope.access_context_envelope.decision_ref`
+  必须一致
+- 当前 canonical 规则是：
+  - handoff 顶层 `decision_ref` 统一采用 `access_context_envelope.decision_ref`
+  - `gate0_decision_ref` 继续只保留在 bridge local handoff metadata 中
 - 不再使用 legacy handoff alias
 - bridge local objects 不得误写成 shared interaction canonical names
 

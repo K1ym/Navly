@@ -101,8 +101,9 @@ test('milestone B backbone assembles ingress identity, authorized session link, 
     accessContextEnvelope: accessChain.access_context_envelope,
   });
 
-  assert.equal(runtimeRequestEnvelope.decision_ref, accessChain.gate0_result.decision_ref);
+  assert.equal(runtimeRequestEnvelope.decision_ref, accessChain.access_context_envelope.decision_ref);
   assert.equal(runtimeRequestEnvelope.access_context_envelope.decision_ref, accessChain.access_context_envelope.decision_ref);
+  assert.equal(runtimeRequestEnvelope.delivery_hint.gate0_decision_ref, accessChain.gate0_result.decision_ref);
   assert.equal(runtimeRequestEnvelope.requested_capability_id, 'navly.store.member_insight');
 
   const hostDispatchResult = buildHostDispatchResult({
@@ -340,4 +341,115 @@ test('milestone B backbone rejects runtime result missing selected service objec
   assert.equal(hostDispatchResult.reply_blocks[0].kind, 'host_runtime_result_rejected');
   assert.deepEqual(hostDispatchResult.reply_blocks[0].reason_codes, ['runtime_service_object_mismatch']);
   assert.equal(hostDispatchResult.runtime_trace_ref, null);
+});
+
+test('milestone B backbone fail-closes runtime request assembly when bridge-local decision refs are inconsistent', () => {
+  const rawHostIngress = buildRawHostIngress({ request_id: 'asp25-request-decision-ref-mismatch' });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink: {
+      ...authorizedSessionLink,
+      access_context_decision_ref: 'navly:decision:mismatched-local-ref',
+    },
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  assert.equal(runtimeRequestEnvelope, null);
+
+  const hostDispatchResult = buildHostDispatchResult({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    runtimeRequestEnvelope,
+    runtimeResultEnvelope: buildRuntimeResultEnvelope(hostIngressEnvelope.request_id, hostIngressEnvelope.trace_ref),
+  });
+
+  assert.equal(hostDispatchResult.dispatch_status, 'blocked_missing_runtime_request');
+  assert.equal(hostDispatchResult.reply_blocks[0].kind, 'host_runtime_result_rejected');
+  assert.deepEqual(hostDispatchResult.reply_blocks[0].reason_codes, ['missing_runtime_request']);
+});
+
+test('milestone B backbone fail-closes runtime request assembly when bridge-local access-context decision ref is missing', () => {
+  const rawHostIngress = buildRawHostIngress({ request_id: 'asp25-request-decision-ref-missing' });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink: {
+      ...authorizedSessionLink,
+      access_context_decision_ref: null,
+    },
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  assert.equal(runtimeRequestEnvelope, null);
+});
+
+test('milestone B backbone fail-closes runtime request assembly when bridge-local gate0 decision ref is inconsistent', () => {
+  const rawHostIngress = buildRawHostIngress({ request_id: 'asp25-request-gate0-decision-ref-mismatch' });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink: {
+      ...authorizedSessionLink,
+      gate0_decision_ref: 'navly:decision:mismatched-gate0-ref',
+    },
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  assert.equal(runtimeRequestEnvelope, null);
 });

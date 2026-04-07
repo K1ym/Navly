@@ -6,6 +6,23 @@ import {
   validateRuntimeRequestEnvelopeShape,
 } from '../adapters/openclaw/bridge-shared-alignment.mjs';
 
+function resolveCanonicalDecisionRef({ gate0Enforcement, authorizedSessionLink, accessContextEnvelope }) {
+  const contextDecisionRef = accessContextEnvelope.decision_ref;
+  const gate0DecisionRef = gate0Enforcement.decision_ref;
+  const linkGate0DecisionRef = authorizedSessionLink.gate0_decision_ref;
+  const linkDecisionRef = authorizedSessionLink.access_context_decision_ref;
+
+  if (linkGate0DecisionRef !== gate0DecisionRef) {
+    return null;
+  }
+
+  if (linkDecisionRef !== contextDecisionRef) {
+    return null;
+  }
+
+  return contextDecisionRef;
+}
+
 export function buildRuntimeRequestEnvelope({
   hostIngressEnvelope,
   gate0Enforcement,
@@ -20,6 +37,15 @@ export function buildRuntimeRequestEnvelope({
   ensureObject('gate0Enforcement', gate0Enforcement);
   ensureObject('authorizedSessionLink', authorizedSessionLink);
   validateAccessContextEnvelopeShape(accessContextEnvelope);
+
+  const canonicalDecisionRef = resolveCanonicalDecisionRef({
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope,
+  });
+  if (!canonicalDecisionRef) {
+    return null;
+  }
 
   if (ingress.requested_capability_id) {
     assertCapabilityId(ingress.requested_capability_id);
@@ -38,13 +64,14 @@ export function buildRuntimeRequestEnvelope({
     structured_input_slots: ingress.structured_input_slots ?? {},
     response_channel_capabilities: ingress.response_channel_capabilities ?? {},
     access_context_envelope: accessContextEnvelope,
-    decision_ref: gate0Enforcement.decision_ref,
+    decision_ref: canonicalDecisionRef,
     delivery_hint: {
       host_delivery_context: ingress.host_delivery_context,
       host_session_ref: authorizedSessionLink.host_session_ref,
       host_conversation_ref: authorizedSessionLink.host_conversation_ref,
       authorized_session_ref: authorizedSessionLink.session_ref,
       authorized_conversation_ref: authorizedSessionLink.conversation_ref,
+      gate0_decision_ref: authorizedSessionLink.gate0_decision_ref,
       access_context_decision_ref: authorizedSessionLink.access_context_decision_ref,
     },
   };
