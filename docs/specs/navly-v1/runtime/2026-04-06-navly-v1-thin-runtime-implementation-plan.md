@@ -49,7 +49,9 @@ phase-1 先闭合：
 
 ## 3. 推荐第一条 vertical slice
 
-`navly.store.daily_overview -> navly.service.store.daily_overview`
+`navly.store.member_insight -> navly.service.store.member_insight`
+
+`navly.store.daily_overview` 可作为 secondary entry 保留，但不再作为当前最小 canonical slice。
 
 优先证明：
 - runtime 以 capability-first 工作

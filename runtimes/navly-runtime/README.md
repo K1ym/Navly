@@ -13,6 +13,7 @@
 - capability access decision call wiring（消费 access truth）
 - capability readiness query wiring（消费 readiness truth）
 - theme service query wiring（消费 service truth）
+- owner-side auth/data adapter closure（可消费真实 owner surface）
 - `runtime_result_envelope` 主路径闭合（answered / fallback / escalated / rejected / runtime_error）
 - `runtime_outcome_event` 对齐输出
 - Milestone A/B 自检脚本与最小链路测试
@@ -37,8 +38,13 @@
 
 当前最小 capability：
 
+- `navly.store.member_insight`
+- 默认 `service_object_id = navly.service.store.member_insight`
+
+secondary entry（非当前最小闭环）：
+
 - `navly.store.daily_overview`
-- 默认 `service_object_id = navly.service.store.daily_overview`
+- `navly.service.store.daily_overview`
 
 主链路：
 

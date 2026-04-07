@@ -15,7 +15,7 @@ function buildAccessContextEnvelope(overrides = {}) {
     tenant_ref: 'navly:tenant:sample-retail',
     primary_scope_ref: 'navly:scope:store:sample-store-001',
     granted_scope_refs: ['navly:scope:store:sample-store-001'],
-    granted_capability_ids: ['navly.store.daily_overview'],
+    granted_capability_ids: ['navly.store.member_insight'],
     issued_at: FIXED_NOW,
     expires_at: '2026-04-06T09:00:00.000Z',
     ...overrides,
@@ -29,9 +29,9 @@ function buildRuntimeRequestEnvelope(overrides = {}) {
     trace_ref: 'navly:trace:req-runtime-001',
     channel_kind: 'wecom',
     message_mode: 'direct_message',
-    user_input_text: '帮我看下门店日报',
+    user_input_text: '帮我看下会员洞察',
     structured_input_slots: {},
-    requested_capability_id: 'navly.store.daily_overview',
+    requested_capability_id: 'navly.store.member_insight',
     requested_service_object_id: null,
     target_scope_hint: 'navly:scope:store:sample-store-001',
     target_business_date_hint: '2026-04-06',
@@ -117,8 +117,8 @@ function createDataPlatformClient({ readinessStatus = 'ready', readinessReasonCo
         service_object_id: query.service_object_id,
         service_status: serviceStatus,
         service_object: {
-          summary: 'store daily overview',
-          total_sales: 12345,
+          summary: 'store member insight',
+          customer_count: 11,
         },
         data_window: {
           from: query.target_business_date,
@@ -160,11 +160,18 @@ test('happy path closes route + access + readiness + service + runtime_result_en
   });
 
   assert.equal(result.capability_route_result.route_status, 'resolved');
-  assert.equal(result.runtime_execution_plan.selected_service_object_id, 'navly.service.store.daily_overview');
+  assert.equal(result.runtime_execution_plan.selected_service_object_id, 'navly.service.store.member_insight');
   assert.equal(result.runtime_result_envelope.result_status, 'answered');
-  assert.equal(result.runtime_result_envelope.selected_capability_id, 'navly.store.daily_overview');
-  assert.equal(result.runtime_result_envelope.selected_service_object_id, 'navly.service.store.daily_overview');
+  assert.equal(result.runtime_result_envelope.selected_capability_id, 'navly.store.member_insight');
+  assert.equal(result.runtime_result_envelope.selected_service_object_id, 'navly.service.store.member_insight');
   assert.ok(result.runtime_result_envelope.reason_codes.includes('runtime.route.service_binding_defaulted'));
+  assert.ok(result.runtime_result_envelope.trace_refs.every((ref) => !ref.startsWith('navly:decision:')));
+  assert.ok(result.runtime_result_envelope.trace_refs.every((ref) => (
+    ref.startsWith('navly:trace:')
+    || ref.startsWith('navly:state-trace:')
+    || ref.startsWith('navly:run-trace:')
+    || ref.startsWith('navly:runtime-trace:')
+  )));
 
   assert.equal(authKernelClient.calls.length, 1);
   assert.equal(dataPlatformClient.readinessCalls.length, 1);
@@ -178,7 +185,7 @@ test('happy path without route or dependency warnings preserves empty reason_cod
 
   const result = await runMilestoneBGuardedExecutionChain({
     runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
-      requested_service_object_id: 'navly.service.store.daily_overview',
+      requested_service_object_id: 'navly.service.store.member_insight',
     }),
     authKernelClient,
     dataPlatformClient,
@@ -224,12 +231,12 @@ test('match token resolution ignores entries that do not opt into token matching
     route_strategy: 'capability_first_then_service_object',
     entries: [
       {
-        route_id: 'capability.navly.store.daily_overview.explicit_only',
+        route_id: 'capability.navly.store.member_insight.explicit_only',
         match_mode: 'explicit_capability_id',
-        match_tokens: ['门店日报'],
-        capability_id: 'navly.store.daily_overview',
-        default_service_object_id: 'navly.service.store.daily_overview',
-        supported_service_object_ids: ['navly.service.store.daily_overview'],
+        match_tokens: ['会员洞察'],
+        capability_id: 'navly.store.member_insight',
+        default_service_object_id: 'navly.service.store.member_insight',
+        supported_service_object_ids: ['navly.service.store.member_insight'],
         status: 'implemented_milestone_b',
       },
     ],
@@ -246,7 +253,7 @@ test('match token resolution ignores entries that do not opt into token matching
     runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
       requested_capability_id: null,
       requested_service_object_id: null,
-      user_input_text: '门店日报',
+      user_input_text: '会员洞察',
     }),
     authKernelClient,
     dataPlatformClient,

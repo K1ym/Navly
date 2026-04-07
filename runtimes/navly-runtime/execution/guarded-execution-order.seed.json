@@ -13,5 +13,5 @@
     "consume_theme_service_response",
     "assemble_runtime_result_envelope"
   ],
-  "notes": "Milestone B closes route + guarded execution backbone for navly.store.daily_overview."
+  "notes": "Milestone B closes route + guarded execution backbone for navly.store.member_insight and keeps daily_overview secondary."
 }

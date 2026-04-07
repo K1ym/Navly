@@ -4,7 +4,24 @@
   "route_strategy": "capability_first_then_service_object",
   "entries": [
     {
-      "route_id": "capability.navly.store.daily_overview",
+      "route_id": "capability.navly.store.member_insight",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "member_insight",
+        "store_member_insight",
+        "member insight",
+        "会员洞察",
+        "会员分析"
+      ],
+      "capability_id": "navly.store.member_insight",
+      "default_service_object_id": "navly.service.store.member_insight",
+      "supported_service_object_ids": [
+        "navly.service.store.member_insight"
+      ],
+      "status": "implemented_milestone_b_primary"
+    },
+    {
+      "route_id": "capability.navly.store.daily_overview.secondary",
       "match_mode": "explicit_or_match_tokens",
       "match_tokens": [
         "daily_overview",
@@ -18,7 +35,7 @@
       "supported_service_object_ids": [
         "navly.service.store.daily_overview"
       ],
-      "status": "implemented_milestone_b"
+      "status": "implemented_secondary_entry"
     }
   ],
   "default_fallback": {
@@ -28,5 +45,5 @@
     "fallback_capability_id": "navly.system.capability_explanation",
     "fallback_service_object_id": "navly.service.system.capability_explanation"
   },
-  "notes": "Milestone B closes route resolution and default service binding selection for navly.store.daily_overview."
+  "notes": "Milestone B keeps member_insight as canonical minimal slice and daily_overview as a secondary entry."
 }

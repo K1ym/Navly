@@ -19,6 +19,14 @@ function loadPattern(relativePath) {
   return new RegExp(schema.pattern);
 }
 
+function loadPatternOrFallback(relativePath, fallbackPattern) {
+  const schema = loadSchema(relativePath);
+  if (schema.pattern) {
+    return new RegExp(schema.pattern);
+  }
+  return fallbackPattern;
+}
+
 function loadEnum(relativePath) {
   const schema = loadSchema(relativePath);
   if (!Array.isArray(schema.enum)) {
@@ -31,6 +39,12 @@ export const sharedPatterns = {
   capabilityId: loadPattern('capability/capability_id.schema.json'),
   serviceObjectId: loadPattern('service/service_object_id.schema.json'),
   traceRef: loadPattern('trace/trace_ref.schema.json'),
+  stateTraceRef: loadPattern('trace/state_trace_ref.schema.json'),
+  runTraceRef: loadPattern('trace/run_trace_ref.schema.json'),
+  runtimeTraceRef: loadPatternOrFallback(
+    'interaction/runtime_trace_ref.schema.json',
+    /^navly:runtime-trace:[A-Za-z0-9._:-]+$/,
+  ),
   decisionRef: loadPattern('access/decision_ref.schema.json'),
   scopeRef: loadPattern('access/scope_ref.schema.json'),
   actorRef: loadPattern('access/actor_ref.schema.json'),
@@ -238,6 +252,25 @@ export function mergeTraceRefs(...traceRefCollections) {
     }
   }
   return merged;
+}
+
+export function isTraceFamilyRef(value) {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return false;
+  }
+
+  const allowedPatterns = [
+    sharedPatterns.traceRef,
+    sharedPatterns.stateTraceRef,
+    sharedPatterns.runTraceRef,
+    sharedPatterns.runtimeTraceRef,
+  ];
+
+  return allowedPatterns.some((pattern) => pattern.test(value));
+}
+
+export function filterTraceRefsByFamily(...traceRefCollections) {
+  return mergeTraceRefs(...traceRefCollections).filter((ref) => isTraceFamilyRef(ref));
 }
 
 export function todayIsoDate(now = new Date().toISOString()) {

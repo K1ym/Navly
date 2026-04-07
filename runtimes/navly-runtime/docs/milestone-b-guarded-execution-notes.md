@@ -12,7 +12,8 @@
 - theme service query wiring
 - `runtime_result_envelope` 主路径闭合
 - `runtime_outcome_event` 输出闭合
-- 最小 vertical slice：`navly.store.daily_overview -> navly.service.store.daily_overview`
+- 最小 vertical slice：`navly.store.member_insight -> navly.service.store.member_insight`
+- `navly.store.daily_overview` 保留为 secondary entry，不再作为当前最小闭环
 
 ## 本轮未交付
 
