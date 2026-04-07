@@ -1,35 +1,32 @@
 {
   "registry_name": "capability_route_registry",
-  "status": "milestone_a_seed",
+  "status": "milestone_b_backbone",
   "route_strategy": "capability_first_then_service_object",
   "entries": [
     {
-      "route_id": "explicit.navly.store.daily_overview",
-      "match_mode": "explicit_capability_id",
+      "route_id": "capability.navly.store.daily_overview",
+      "match_mode": "explicit_or_match_tokens",
       "match_tokens": [
         "daily_overview",
-        "store_daily_overview"
+        "store_daily_overview",
+        "store overview",
+        "日报",
+        "门店日报"
       ],
       "capability_id": "navly.store.daily_overview",
       "default_service_object_id": "navly.service.store.daily_overview",
-      "status": "seeded_not_implemented"
-    },
-    {
-      "route_id": "explicit.navly.store.member_insight",
-      "match_mode": "explicit_capability_id",
-      "match_tokens": [
-        "member_insight",
-        "store_member_insight"
+      "supported_service_object_ids": [
+        "navly.service.store.daily_overview"
       ],
-      "capability_id": "navly.store.member_insight",
-      "default_service_object_id": "navly.service.store.member_insight",
-      "status": "seeded_not_implemented"
+      "status": "implemented_milestone_b"
     }
   ],
   "default_fallback": {
     "result_status": "fallback",
     "reason_code": "runtime.route.unresolved",
-    "next_action": "request_capability_clarification"
+    "next_action": "request_capability_clarification",
+    "fallback_capability_id": "navly.system.capability_explanation",
+    "fallback_service_object_id": "navly.service.system.capability_explanation"
   },
-  "notes": "Milestone A freeze only; route closure and guarded execution are out of scope."
+  "notes": "Milestone B closes route resolution and default service binding selection for navly.store.daily_overview."
 }

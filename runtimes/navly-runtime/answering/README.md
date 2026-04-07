@@ -1,7 +1,7 @@
 # Runtime answering
 
-milestone A 范围：
+milestone B 范围：
 
-- answer/fallback 结构占位
-- 不做业务回答细节扩张
-- 不做 richer orchestration
+- `runtime_result_envelope` 主路径闭合
+- answered / fallback / escalated / rejected / runtime_error 结构化输出
+- 不引入 rich orchestration

@@ -1,6 +1,6 @@
 {
   "manifest_name": "runtime_shared_contract_consumption",
-  "status": "milestone_a_freeze",
+  "status": "milestone_b_backbone",
   "consumes": [
     {
       "name": "access_context_envelope",
@@ -55,5 +55,5 @@
       "ownership": "shared_only"
     }
   ],
-  "notes": "Runtime milestone A consumes shared contracts only; no local contract fork is allowed."
+  "notes": "Runtime milestone B continues shared-contract-only consumption and closes guarded execution path without forking enums."
 }

@@ -1,7 +1,8 @@
 # Runtime local docs
 
-本目录仅存放 runtime 模块内的实现说明与 milestone 记录。
+本目录仅存放 runtime 模块内的里程碑记录。
 
 当前包含：
 
-- milestone A skeleton 边界说明
+- milestone A skeleton 边界记录
+- milestone B guarded execution 与 route closure 记录

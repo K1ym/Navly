@@ -1,17 +1,19 @@
 {
   "contract_name": "capability_route_entry",
-  "status": "milestone_a_seed",
+  "status": "milestone_b_backbone",
   "fields": [
     "route_id",
     "match_mode",
     "match_tokens",
     "capability_id",
     "default_service_object_id",
+    "supported_service_object_ids",
     "status"
   ],
   "constraints": {
     "capability_id_format": "navly.<domain>.<capability_name>",
     "service_object_id_format": "navly.service.<domain>.<object_name>",
-    "route_strategy": "capability_first_then_service_object"
+    "route_strategy": "capability_first_then_service_object",
+    "default_binding_selection": "requested_service_object_id_if_supported_else_default"
   }
 }

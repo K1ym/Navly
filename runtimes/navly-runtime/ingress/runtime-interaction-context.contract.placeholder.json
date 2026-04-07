@@ -1,8 +1,9 @@
 {
   "contract_name": "runtime_interaction_context",
-  "status": "milestone_a_placeholder",
+  "status": "milestone_b_backbone",
   "fields": [
     "request_id",
+    "trace_ref",
     "runtime_trace_ref",
     "channel_kind",
     "message_mode",
@@ -11,6 +12,9 @@
     "requested_service_object_id",
     "target_scope_hint",
     "target_business_date_hint",
-    "decision_ref"
-  ]
+    "freshness_mode",
+    "decision_ref",
+    "access_context_envelope"
+  ],
+  "notes": "Milestone B validates runtime_request_envelope and closes interaction context normalization for guarded execution."
 }

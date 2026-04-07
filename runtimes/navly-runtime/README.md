@@ -1,57 +1,89 @@
 # Navly_v1 thin runtime shell
 
-状态：milestone-a-skeleton  
-用途：建立 `runtimes/navly-runtime/` 的 phase-1 / milestone A 最小执行壳骨架（interaction + route registry freeze）。
+状态：milestone-b-guarded-execution-backbone  
+用途：在 `runtimes/navly-runtime/` 内推进 Phase-1 ASP-18 Milestone B：route closure + guarded execution + runtime result closure。
 
-## 当前范围（Milestone A）
+## 当前范围（ASP-18 / Milestone B）
 
-本目录当前只实现：
+本目录当前实现：
 
-- runtime 目录骨架
-- interaction 边界对齐（bridge -> runtime -> outcome）
-- capability route registry seed
-- 最小约束校验脚本
+- `runtime_request_envelope` ingress 校验与 `runtime_interaction_context` 归一化
+- capability route resolution closure（`capability_id`）
+- default service binding selection closure（`service_object_id`）
+- capability access decision call wiring（消费 access truth）
+- capability readiness query wiring（消费 readiness truth）
+- theme service query wiring（消费 service truth）
+- `runtime_result_envelope` 主路径闭合（answered / fallback / escalated / rejected / runtime_error）
+- `runtime_outcome_event` 对齐输出
+- Milestone A/B 自检脚本与最小链路测试
 
 本轮明确不做：
 
-- milestone B/C/D
 - rich orchestration
 - LangGraph integration
-- 业务回答细节扩张
+- 跨 capability 编排
+- prompt glue / query glue 回归
 
-## runtime 当前只消费的 shared contracts
+## owning boundary
 
-- `access_context_envelope`
-- `access_decision`
-- `capability_readiness_query` / `capability_readiness_response`
-- `theme_service_query` / `theme_service_response`
-- `runtime_request_envelope`
-- `runtime_result_envelope`
-- `runtime_outcome_event`
+- 只写 `runtimes/navly-runtime/**`
+- runtime 只消费：
+  - access truth（`access_context_envelope` / `access_decision`）
+  - readiness truth（`capability_readiness_response`）
+  - service truth（`theme_service_response`）
+- runtime 不直读 raw / warehouse / auth internal state
 
-详见：`contracts/runtime-shared-contract-consumption.manifest.json`
+## 最小 capability 闭环
 
-## milestone A 冻结约束
+当前最小 capability：
 
-- canonical `capability_id` 必须使用 namespaced 格式：`navly.<domain>.<capability_name>`
-- canonical `service_object_id` 必须使用 namespaced 格式：`navly.service.<domain>.<object_name>`
-- interaction contract 语义必须对齐 `shared/contracts/interaction/*`
-- `runtime_result_status` 必须沿用 shared enum，不在 runtime 内扩写
+- `navly.store.daily_overview`
+- 默认 `service_object_id = navly.service.store.daily_overview`
 
-## 当前骨架
+主链路：
 
 ```text
-runtimes/navly-runtime/
-  README.md
-  docs/
-  contracts/
-  ingress/
-  routing/
-  execution/
-  answering/
-  outcome/
-  adapters/
-  migration/
-  scripts/
-  tests/
+runtime_request_envelope
+  -> runtime_interaction_context
+  -> capability_route_result
+  -> runtime_execution_plan
+  -> capability access decision
+  -> capability readiness query
+  -> theme service query
+  -> runtime_result_envelope
+  -> runtime_outcome_event
 ```
+
+## 当前 backbone 文件
+
+- `contracts/shared-contract-alignment.mjs`
+- `ingress/runtime-ingress-backbone.mjs`
+- `routing/capability-route-backbone.mjs`
+- `execution/guarded-execution-backbone.mjs`
+- `execution/runtime-chain-backbone.mjs`
+- `answering/runtime-result-backbone.mjs`
+- `outcome/runtime-outcome-event-backbone.mjs`
+
+## 自检
+
+- `scripts/validate-milestone-a.sh`
+- `scripts/validate-milestone-b.sh`
+- `node --test tests/milestone-b-guarded-execution.test.mjs`
+
+## canonical freeze
+
+- `runtime_result_status` 只允许 shared 主枚举：
+  - `answered`
+  - `fallback`
+  - `escalated`
+  - `rejected`
+  - `runtime_error`
+- runtime route 只围绕 `capability_id` / `service_object_id`
+- 没有有效 access context / decision 时 fail closed
+
+## 参考文档
+
+- `docs/specs/navly-v1/runtime/2026-04-06-navly-v1-thin-runtime-phase-1.md`
+- `docs/specs/navly-v1/runtime/2026-04-06-navly-v1-thin-runtime-external-interfaces.md`
+- `docs/specs/navly-v1/runtime/2026-04-06-navly-v1-thin-runtime-implementation-plan.md`
+- `docs/specs/navly-v1/shared-contracts/2026-04-06-navly-v1-shared-contracts-interaction.md`

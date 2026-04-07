@@ -1,13 +1,17 @@
 {
   "plan_name": "guarded_execution_order",
-  "status": "milestone_a_seed",
+  "status": "milestone_b_backbone",
   "steps": [
-    "consume_access_context_envelope",
+    "consume_runtime_interaction_context",
+    "resolve_capability_route",
+    "select_default_service_binding",
+    "issue_capability_access_request",
     "consume_access_decision",
     "issue_capability_readiness_query",
     "consume_capability_readiness_response",
-    "issue_theme_service_query",
-    "consume_theme_service_response"
+    "issue_theme_service_query_when_ready",
+    "consume_theme_service_response",
+    "assemble_runtime_result_envelope"
   ],
-  "notes": "Readiness and service execution closure are deferred to milestone C."
+  "notes": "Milestone B closes route + guarded execution backbone for navly.store.daily_overview."
 }
