@@ -13,3 +13,4 @@
 - member insight vertical slice / replay / artifact tree
 - Qinqin v1.1 contract governance registry completeness
 - field catalog / landing policy / variance register consistency
+- member insight owner-side readiness / theme service surface
