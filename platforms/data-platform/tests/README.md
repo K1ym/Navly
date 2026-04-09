@@ -1,5 +1,15 @@
-# Tests Skeleton
+# Data Platform Tests
 
-本目录预留给 contract / structure / replay / state / readiness / serving 的测试。
+本目录承载 data-platform 的 contract / replay / state 回归测试。
 
-当前 milestone A 只建立测试目录。
+当前已覆盖：
+
+- fixture transport regression
+- live transport happy path
+- transport HTTP error taxonomy
+- source business error taxonomy
+- replay artifact 写出
+- CLI runner artifact tree
+- member insight vertical slice / replay / artifact tree
+- Qinqin v1.1 contract governance registry completeness
+- field catalog / landing policy / variance register consistency

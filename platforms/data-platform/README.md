@@ -7,9 +7,9 @@
 当前已经完成：
 
 - `platforms/data-platform/` 目录骨架
-- C0 seed
-  - data-platform owner contracts seed
-  - directory / registry seed / placeholder
+- C0 contract governance freeze
+  - data-platform owner contracts freeze
+  - Qinqin v1.1 directory formal registry
 - shared connector substrate（seed/backbone）
   - `backbone_support/qinqin_substrate.py`
   - `connectors/qinqin/qinqin_substrate.py`
@@ -26,6 +26,7 @@
   - `navly.store.member_insight`
   - `navly.service.store.member_insight`
 - 基础单测与 CLI runner
+- Qinqin v1.1 contract governance consistency tests
 
 当前**未完成**：
 
@@ -40,7 +41,7 @@
 
 - 跨模块 shared contracts owner：`shared/contracts`
 - `platforms/data-platform/contracts/`：只保留 data-platform owner contracts
-- `platforms/data-platform/directory/`：承载 data-platform 当前纳管 registry、seed 与 placeholder
+- `platforms/data-platform/directory/`：承载 data-platform 当前纳管 registry；Qinqin v1.1 contract governance 已进入 formal registry，其余对象仍可能是 seed / placeholder
 - data-platform 不拥有 access truth
 - data-platform 当前实现仍然只是在自身 owner scope 内推进 raw truth / canonical fact truth / latest state backbone
 

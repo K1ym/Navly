@@ -4,7 +4,10 @@
 
 当前可用：
 
-- `run_member_insight_vertical_slice.py`：使用 fixture transport 跑当前 member insight milestone B sample，并把实际 artifact tree 写到 `--output-dir`
+- `run_member_insight_vertical_slice.py`
+  - 支持 `fixture` transport
+  - 支持 `live` transport
+  - 把实际 artifact tree 写到 `--output-dir`
 
 当前边界：
 

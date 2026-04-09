@@ -1,13 +1,21 @@
 {
   "contract_name": "endpoint_field_catalog_entry",
   "owner": "data-platform",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
   "fields": [
     "endpoint_contract_id",
-    "field_path",
-    "data_type",
+    "response_root_path",
     "catalog_status",
     "truth_source_doc",
+    "field_count",
+    "response_fields",
     "notes"
-  ]
+  ],
+  "response_field_shape": [
+    "field_path",
+    "data_type",
+    "path_kind",
+    "landing_policy_id"
+  ],
+  "notes": "Catalog entries are endpoint-scoped ledgers containing fully enumerated response_fields. This keeps the registry machine-consumable without repeating endpoint metadata per field."
 }

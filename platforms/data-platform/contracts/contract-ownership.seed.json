@@ -1,6 +1,6 @@
 {
   "schema_version": "navly.data_platform.contract_ownership.seed.v1",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
   "module": "data-platform",
   "ownership_scope": "data-platform-only",
   "shared_contract_owner_path": "shared/contracts",
@@ -41,5 +41,5 @@
       "capability_explanation"
     ]
   },
-  "note": "Milestone A seed only. No shared contract definitions are duplicated here."
+  "note": "Phase-1 contract governance freeze for Qinqin v1.1. No shared contract definitions are duplicated here."
 }

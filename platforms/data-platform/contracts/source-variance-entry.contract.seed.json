@@ -1,7 +1,7 @@
 {
   "contract_name": "source_variance_entry",
   "owner": "data-platform",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
   "fields": [
     "variance_id",
     "variance_kind",
@@ -13,5 +13,14 @@
     "resolution_status",
     "notes",
     "resolution_rule"
-  ]
+  ],
+  "allowed_values": {
+    "variance_kind": [
+      "parameter_name_drift",
+      "path_resolution_constraint",
+      "response_shape_drift",
+      "auth_header_requirement",
+      "documented_field_name_drift"
+    ]
+  }
 }

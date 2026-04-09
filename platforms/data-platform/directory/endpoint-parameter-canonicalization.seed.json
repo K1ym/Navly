@@ -1,76 +1,262 @@
 {
   "registry_name": "endpoint_parameter_registry",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
+  "canonicalization_rules": [
+    {
+      "canonicalization_rule_id": "qinqin.v1_1.md5_ascii_sort_ignore_case",
+      "parameter_sorting": "ascii_ascending_ignore_case",
+      "signature_excluded_parameter_keys": [
+        "sign"
+      ],
+      "signature_appended_secret_name": "AppSecret",
+      "signature_hash": "md5_lower_hex",
+      "truth_source_doc": "docs/api/qinqin/auth-and-signing.md"
+    }
+  ],
   "entries": [
     {
       "parameter_key": "org_id",
       "semantic_name": "org_id",
+      "preferred_wire_name": "OrgId",
       "known_wire_variants": [
         "OrgId",
         "OrgID"
       ],
+      "request_location": "body",
+      "value_type": "string",
+      "value_source": "caller_input",
+      "required_endpoint_contract_ids": [
+        "qinqin.member.get_customers_list.v1_1",
+        "qinqin.member.get_consume_bill_list.v1_2",
+        "qinqin.member.get_recharge_bill_list.v1_3",
+        "qinqin.member.get_user_trade_list.v1_4",
+        "qinqin.staff.get_person_list.v1_5",
+        "qinqin.staff.get_tech_up_clock_list.v1_6",
+        "qinqin.staff.get_tech_market_list.v1_7",
+        "qinqin.staff.get_tech_commission_set_list.v1_8"
+      ],
+      "optional_endpoint_contract_ids": [],
+      "participates_in_signature": true,
       "applies_to": "all_qinqin_endpoints",
-      "status": "seeded_pending_wire_freeze",
-      "notes": "Canonical semantic key only; final wire usage per endpoint is deferred.",
-      "preferred_wire_name": "OrgId"
+      "status": "wire_name_governed",
+      "notes": "Canonical org_id semantic key shared by all eight formal endpoints."
     },
     {
       "parameter_key": "sign",
       "semantic_name": "sign",
+      "preferred_wire_name": "Sign",
       "known_wire_variants": [
         "Sign"
       ],
+      "request_location": "body",
+      "value_type": "string",
+      "value_source": "computed_signature",
+      "required_endpoint_contract_ids": [
+        "qinqin.member.get_customers_list.v1_1",
+        "qinqin.member.get_consume_bill_list.v1_2",
+        "qinqin.member.get_recharge_bill_list.v1_3",
+        "qinqin.member.get_user_trade_list.v1_4",
+        "qinqin.staff.get_person_list.v1_5",
+        "qinqin.staff.get_tech_up_clock_list.v1_6",
+        "qinqin.staff.get_tech_market_list.v1_7",
+        "qinqin.staff.get_tech_commission_set_list.v1_8"
+      ],
+      "optional_endpoint_contract_ids": [],
+      "participates_in_signature": false,
       "applies_to": "all_qinqin_endpoints",
-      "status": "seeded_pending_wire_freeze",
-      "notes": "Signature parameter required by shared auth/signing rule.",
-      "preferred_wire_name": "Sign"
+      "status": "wire_name_governed",
+      "notes": "Sign is computed after canonical parameter ordering and never included in its own signature source."
     },
     {
       "parameter_key": "start_time",
       "semantic_name": "start_time",
+      "preferred_wire_name": "Stime",
       "known_wire_variants": [
         "Stime",
         "STime"
       ],
+      "request_location": "body",
+      "value_type": "string",
+      "value_source": "caller_input",
+      "required_endpoint_contract_ids": [
+        "qinqin.member.get_customers_list.v1_1",
+        "qinqin.member.get_consume_bill_list.v1_2",
+        "qinqin.member.get_recharge_bill_list.v1_3",
+        "qinqin.member.get_user_trade_list.v1_4",
+        "qinqin.staff.get_tech_up_clock_list.v1_6",
+        "qinqin.staff.get_tech_market_list.v1_7"
+      ],
+      "optional_endpoint_contract_ids": [],
+      "participates_in_signature": true,
       "applies_to": "windowed_qinqin_endpoints",
-      "status": "seeded_pending_wire_freeze",
-      "notes": "Known naming drift captured from docs and audits.",
-      "preferred_wire_name": "Stime"
+      "status": "wire_name_governed",
+      "notes": "Canonical start_time semantic key for time-window endpoints."
     },
     {
       "parameter_key": "end_time",
       "semantic_name": "end_time",
+      "preferred_wire_name": "Etime",
       "known_wire_variants": [
         "Etime",
         "ETime"
       ],
+      "request_location": "body",
+      "value_type": "string",
+      "value_source": "caller_input",
+      "required_endpoint_contract_ids": [
+        "qinqin.member.get_customers_list.v1_1",
+        "qinqin.member.get_consume_bill_list.v1_2",
+        "qinqin.member.get_recharge_bill_list.v1_3",
+        "qinqin.member.get_user_trade_list.v1_4",
+        "qinqin.staff.get_tech_up_clock_list.v1_6",
+        "qinqin.staff.get_tech_market_list.v1_7"
+      ],
+      "optional_endpoint_contract_ids": [],
+      "participates_in_signature": true,
       "applies_to": "windowed_qinqin_endpoints",
-      "status": "seeded_pending_wire_freeze",
-      "notes": "Known naming drift captured from docs and audits.",
-      "preferred_wire_name": "Etime"
+      "status": "wire_name_governed",
+      "notes": "Canonical end_time semantic key for time-window endpoints."
     },
     {
       "parameter_key": "page_index",
       "semantic_name": "page_index",
+      "preferred_wire_name": "PageIndex",
       "known_wire_variants": [
         "PageIndex",
         "Page"
       ],
+      "request_location": "body",
+      "value_type": "number",
+      "value_source": "caller_input",
+      "required_endpoint_contract_ids": [
+        "qinqin.member.get_customers_list.v1_1",
+        "qinqin.member.get_consume_bill_list.v1_2",
+        "qinqin.member.get_recharge_bill_list.v1_3"
+      ],
+      "optional_endpoint_contract_ids": [],
+      "participates_in_signature": true,
       "applies_to": "paged_qinqin_endpoints",
-      "status": "seeded_pending_wire_freeze",
-      "notes": "Known naming drift captured from docs and audits.",
-      "preferred_wire_name": "PageIndex"
+      "status": "wire_name_governed",
+      "notes": "Canonical page index key for paged endpoints."
     },
     {
       "parameter_key": "page_size",
       "semantic_name": "page_size",
+      "preferred_wire_name": "PageSize",
       "known_wire_variants": [
         "PageSize"
       ],
+      "request_location": "body",
+      "value_type": "number",
+      "value_source": "caller_input",
+      "required_endpoint_contract_ids": [
+        "qinqin.member.get_customers_list.v1_1",
+        "qinqin.member.get_consume_bill_list.v1_2",
+        "qinqin.member.get_recharge_bill_list.v1_3"
+      ],
+      "optional_endpoint_contract_ids": [],
+      "participates_in_signature": true,
       "applies_to": "paged_qinqin_endpoints",
-      "status": "seeded_pending_wire_freeze",
-      "notes": "Shared pagination size parameter.",
-      "preferred_wire_name": "PageSize"
+      "status": "wire_name_governed",
+      "notes": "Canonical page size key for paged endpoints."
+    },
+    {
+      "parameter_key": "member_card_id",
+      "semantic_name": "member_card_id",
+      "preferred_wire_name": "Id",
+      "known_wire_variants": [
+        "Id"
+      ],
+      "request_location": "body",
+      "value_type": "string",
+      "value_source": "caller_input",
+      "required_endpoint_contract_ids": [],
+      "optional_endpoint_contract_ids": [
+        "qinqin.member.get_user_trade_list.v1_4"
+      ],
+      "participates_in_signature": true,
+      "applies_to": "qinqin.member.get_user_trade_list.v1_4",
+      "status": "wire_name_governed",
+      "notes": "Optional member card filter for account-trade lookup."
+    },
+    {
+      "parameter_key": "trade_type",
+      "semantic_name": "trade_type",
+      "preferred_wire_name": "Type",
+      "known_wire_variants": [
+        "Type"
+      ],
+      "request_location": "body",
+      "value_type": "number",
+      "value_source": "caller_input",
+      "required_endpoint_contract_ids": [],
+      "optional_endpoint_contract_ids": [
+        "qinqin.member.get_user_trade_list.v1_4"
+      ],
+      "participates_in_signature": true,
+      "applies_to": "qinqin.member.get_user_trade_list.v1_4",
+      "status": "wire_name_governed",
+      "notes": "Optional trade type filter for account-trade lookup."
+    },
+    {
+      "parameter_key": "staff_code",
+      "semantic_name": "staff_code",
+      "preferred_wire_name": "Code",
+      "known_wire_variants": [
+        "Code"
+      ],
+      "request_location": "body",
+      "value_type": "string",
+      "value_source": "caller_input",
+      "required_endpoint_contract_ids": [],
+      "optional_endpoint_contract_ids": [
+        "qinqin.staff.get_tech_up_clock_list.v1_6",
+        "qinqin.staff.get_tech_market_list.v1_7"
+      ],
+      "participates_in_signature": true,
+      "applies_to": "staff_filterable_qinqin_endpoints",
+      "status": "wire_name_governed",
+      "notes": "Optional staff code filter for staff performance endpoints."
+    },
+    {
+      "parameter_key": "authorization_header",
+      "semantic_name": "authorization_header",
+      "preferred_wire_name": "Authorization",
+      "known_wire_variants": [
+        "Authorization"
+      ],
+      "request_location": "header",
+      "value_type": "string",
+      "value_source": "runtime_secret",
+      "required_endpoint_contract_ids": [
+        "qinqin.staff.get_tech_commission_set_list.v1_8"
+      ],
+      "optional_endpoint_contract_ids": [],
+      "participates_in_signature": false,
+      "runtime_secret_ref": "qinqin.authorization_bearer_token",
+      "applies_to": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "status": "runtime_secret_governed",
+      "notes": "Runtime-injected bearer token header required by tech commission set endpoint; actual secret is never stored in docs or registry."
+    },
+    {
+      "parameter_key": "runtime_token_header",
+      "semantic_name": "runtime_token_header",
+      "preferred_wire_name": "Token",
+      "known_wire_variants": [
+        "Token"
+      ],
+      "request_location": "header",
+      "value_type": "string",
+      "value_source": "runtime_secret",
+      "required_endpoint_contract_ids": [
+        "qinqin.staff.get_tech_commission_set_list.v1_8"
+      ],
+      "optional_endpoint_contract_ids": [],
+      "participates_in_signature": false,
+      "runtime_secret_ref": "qinqin.runtime_token",
+      "applies_to": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "status": "runtime_secret_governed",
+      "notes": "Runtime-injected token header required by tech commission set endpoint; actual secret is never stored in docs or registry."
     }
   ]
 }

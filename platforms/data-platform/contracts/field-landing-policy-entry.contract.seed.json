@@ -1,8 +1,9 @@
 {
   "contract_name": "field_landing_policy_entry",
   "owner": "data-platform",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
   "fields": [
+    "policy_id",
     "endpoint_contract_id",
     "field_selector",
     "landing_tier",
@@ -15,5 +16,6 @@
     "tier_a_structured",
     "tier_b_preserved",
     "tier_c_documented_only"
-  ]
+  ],
+  "notes": "field_selector uses a small registry mini-language such as explicit:[...], prefix:..., exclude_prefixes:[...], or multi:[...]. Field catalog entries should point directly to policy_id so runtime consumers do not need to guess selector precedence."
 }

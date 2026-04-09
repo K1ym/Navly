@@ -45,8 +45,8 @@
 
 根据网页恢复内容：
 
-- 正式访问窗口：每日 `03:00-04:00`
-- 数据对接调试阶段：每日 `03:00-18:00`
+- 正式访问窗口：每日 `03:00-04:00`，按北京时间 / `Asia/Shanghai` 处理
+- 数据对接调试阶段：每日 `03:00-18:00`，按北京时间 / `Asia/Shanghai` 处理
 
 ## 凭证信息
 
@@ -128,6 +128,19 @@ string sign = MD5(待签名字符串).ToLower();
 
 由于签名依赖参数名排序，这些差异会直接影响签名结果。  
 实现 live adapter 前必须先对真实接口做一次签名实测。
+
+## 治理落点
+
+为避免 runtime、bridge、auth 再猜参数名或签名口径，当前正式治理落点固定为：
+
+- source system / access window / auth profile：`platforms/data-platform/directory/source-systems.seed.json`
+- endpoint 参数 canonicalization：`platforms/data-platform/directory/endpoint-parameter-canonicalization.seed.json`
+- 已知命名漂移 / path / shape / auth 差异：`platforms/data-platform/directory/source-variance.seed.json`
+
+说明：
+
+- 本页继续作为共享输入文档真相源
+- 跨模块机器消费应读取上述 registry，而不是重复解析 Markdown
 
 ## 连通性验证
 
