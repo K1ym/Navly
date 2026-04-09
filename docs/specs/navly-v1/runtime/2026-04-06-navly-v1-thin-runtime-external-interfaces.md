@@ -108,7 +108,7 @@ runtime phase-1 默认消费或输出以下 shared contracts：
 
 ### 5.1 bridge -> runtime：Runtime Request Envelope
 
-bridge 在完成入口标准化、拿到 `Gate 0 Result`、并形成可用 `access_context_envelope` 后，应向 runtime 提供 **Runtime Request Envelope**。
+bridge 在完成入口标准化、并拿到 Gate 0 结果后，应向 runtime 提供 **Runtime Request Envelope**。
 
 推荐字段：
 
@@ -126,7 +126,7 @@ bridge 在完成入口标准化、拿到 `Gate 0 Result`、并形成可用 `acce
 | `target_business_date_hint` | 期望业务日期提示 |
 | `response_channel_capabilities` | 当前渠道可投递的响应形式 |
 | `access_context_envelope` | 来自 `auth-kernel` 的标准访问上下文 |
-| `decision_ref` | runtime handoff 的 canonical 决策引用，必须与 `access_context_envelope.decision_ref` 一致 |
+| `decision_ref` | 入口 Gate 0 决策引用 |
 | `trace_ref` | bridge 侧追踪引用 |
 
 说明：
@@ -134,8 +134,6 @@ bridge 在完成入口标准化、拿到 `Gate 0 Result`、并形成可用 `acce
 - bridge 提供的是 **已规范化的入口请求**，不是业务路由结论
 - `target_scope_hint` 只是 hint，最终以 `auth-kernel` 授权与 `data-platform` scope 校验为准
 - runtime 不需要理解 OpenClaw 内部 session 结构，只需消费受控引用和宿主能力元数据
-- `runtime_request_envelope.decision_ref` 不再默认表示“原始 Gate 0 decision ref”；它的 canonical 语义是 **当前 handoff 所绑定的 access-context decision ref**
-- 若 bridge 需要保留 `gate0_decision_ref`，应只放在 bridge local metadata / `delivery_hint` 中，不应再作为 runtime handoff 顶层 canonical `decision_ref`
 
 ### 5.2 runtime -> bridge：Runtime Result Envelope
 
@@ -200,7 +198,7 @@ runtime 不应把以下内容当权限真相：
 | `request_id` | 本次调用请求 ID |
 | `session_ref` | 当前授权 session |
 | `conversation_ref` | 当前 conversation |
-| `prior_decision_ref` | `runtime_request_envelope.decision_ref`；即当前 handoff canonical 决策引用 |
+| `prior_decision_ref` | 入口 Gate 0 决策引用 |
 | `requested_capability_id` | 目标 capability |
 | `requested_scope_ref` | 期望作用范围 |
 | `requested_service_object_id` | 可选，便于审计与受限能力解释 |
@@ -362,7 +360,7 @@ runtime 与 `data-platform` 之间禁止：
 1. bridge 接到用户请求并完成 ingress normalization
 2. bridge 调用 auth-kernel 做 Gate 0
 3. auth-kernel 返回 gate decision + access_context_envelope
-4. bridge 组装 runtime_request_envelope，并保证顶层 `decision_ref = access_context_envelope.decision_ref`
+4. bridge 组装 runtime_request_envelope -> runtime
 5. runtime 校验 request envelope
 6. runtime 解析 capability route，得到 capability_id / service_object_id
 7. runtime 向 auth-kernel 发起 capability access request
