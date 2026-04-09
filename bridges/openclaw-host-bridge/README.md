@@ -100,6 +100,7 @@
 - 当前 canonical 规则是：
   - handoff 顶层 `decision_ref` 统一采用 `access_context_envelope.decision_ref`
   - `gate0_decision_ref` 继续只保留在 bridge local handoff metadata 中
+- runtime ingress 会把上述一致性当成 hard precondition；bridge 不得把 raw Gate 0 ref 冒充成顶层 handoff `decision_ref`
 - 不再使用 legacy handoff alias
 - bridge local objects 不得误写成 shared interaction canonical names
 

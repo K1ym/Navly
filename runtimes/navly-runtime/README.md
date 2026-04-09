@@ -8,6 +8,7 @@
 本目录当前实现：
 
 - `runtime_request_envelope` ingress 校验与 `runtime_interaction_context` 归一化
+  - 顶层 `decision_ref` 与 `access_context_envelope.decision_ref` 失配时 fail closed
 - capability route resolution closure（`capability_id`）
 - default service binding selection closure（`service_object_id`）
 - capability access decision call wiring（消费 access truth）
@@ -84,6 +85,8 @@ runtime_request_envelope
   - `escalated`
   - `rejected`
   - `runtime_error`
+- `runtime_request_envelope.decision_ref` 的 canonical 语义是当前 handoff 绑定的 `access_context_envelope.decision_ref`
+- `gate0_decision_ref` 不是 runtime handoff 顶层 canonical 字段；bridge 若要保留，只能放在 bridge local metadata / `delivery_hint`
 - runtime route 只围绕 `capability_id` / `service_object_id`
 - 没有有效 access context / decision 时 fail closed
 
