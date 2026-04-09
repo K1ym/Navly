@@ -153,6 +153,28 @@ Qinqin 接入相关的运行时真相不得散落硬编码在实现中。
 - 是否回退到 mock
 - 是否允许 `mode=real`
 
+## 3.1 当前 Navly data-platform member_insight live slice 已读取的最小配置
+
+截至 2026-04-09，`platforms/data-platform/scripts/run_member_insight_vertical_slice.py`
+在 `--transport live` 下会读取以下最小配置：
+
+### 必需
+
+- `QINQIN_API_BASE_URL`（推荐）或 `QINQIN_REAL_DATA_URL`（兼容旧名，二选一）
+
+### 可选
+
+- `QINQIN_API_REQUEST_TIMEOUT_MS`
+- `QINQIN_API_AUTHORIZATION`
+- `QINQIN_API_TOKEN`
+- `QINQIN_REAL_DATA_TOKEN`（兼容旧名）
+
+当前约束：
+
+- live mode 不会因为缺少 live 配置而自动回退到 fixture
+- 真实 secret 仍然只允许通过运行时注入，不允许进入文档或 git tracked 文件
+- 当前最小 live slice 只覆盖 `GetCustomersList` 与 `GetConsumeBillList`
+
 ---
 
 ## 4. Navly 推荐配置分层
