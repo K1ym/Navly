@@ -131,6 +131,23 @@ bash bridges/openclaw-host-bridge/scripts/validate-milestone-b.sh
 python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'
 ```
 
+### First usable alpha smoke baseline
+
+当前 first usable alpha 的 smoke baseline 见：
+
+- `docs/specs/navly-v1/verification/2026-04-09-navly-v1-first-usable-alpha-smoke-and-status-board.md`
+
+当前最小命令集是：
+
+```bash
+python3 -m unittest platforms/data-platform/tests/test_qinqin_contract_governance.py
+python3 -m unittest platforms/data-platform/tests/test_member_insight_vertical_slice.py
+python3 -m unittest platforms/data-platform/tests/test_member_insight_owner_surface.py
+bash platforms/auth-kernel/scripts/validate-milestone-b.sh
+bash runtimes/navly-runtime/scripts/validate-milestone-b.sh
+bash bridges/openclaw-host-bridge/scripts/validate-milestone-b.sh
+```
+
 ### Run the current data-platform sample slice
 
 下面这个示例会用 fixture transport 跑一个 Qinqin member insight 垂直切片，并把产物写到临时目录：
