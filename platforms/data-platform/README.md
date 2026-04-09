@@ -25,6 +25,9 @@
 - vertical slice orchestration backbone
   - `navly.store.member_insight`
   - `navly.service.store.member_insight`
+- first formal owner-side readiness / theme service surface
+  - `completeness/member_insight_readiness_surface.py`
+  - `serving/member_insight_theme_service_surface.py`
 - 基础单测与 CLI runner
 - Qinqin v1.1 contract governance consistency tests
 
@@ -68,6 +71,7 @@
   - `completeness/`
   - `projections/`
 - 当前 milestone B 已具备 backbone，但这**不等于** ready / service runtime 已完成
+- 当前已对 `member_insight` 发布 formal owner-side readiness / theme service surface，但 runtime 还未在默认路径消费该 surface
 
 ## 重要说明
 
