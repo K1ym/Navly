@@ -60,13 +60,17 @@
 | `target_business_date_hint` | `date` | extend | 宿主侧业务日期提示 |
 | `response_channel_capabilities` | `object` | freeze | 当前渠道可支持的响应能力 |
 | `access_context_envelope` | `object` | freeze | 由 `auth-kernel` 签发的访问上下文 |
-| `decision_ref` | `string` | freeze | 当前入口或前置授权决策引用 |
+| `decision_ref` | `string` | freeze | 当前 handoff 的 canonical 决策引用；必须与 `access_context_envelope.decision_ref` 一致 |
 | `delivery_hint` | `object` | extend | 给 bridge 的投递偏好提示 |
 
 约束：
 
 - bridge 只能组装和透传，不得把宿主私有字段升级为核心字段
 - runtime 只能消费，不得重新定义其主字段语义
+- `runtime_request_envelope` 是 bridge -> runtime 的唯一 canonical handoff object
+- 顶层 `decision_ref` 的 canonical 语义是当前 handoff 绑定的 `access_context_envelope.decision_ref`，不再默认表示原始 `Gate 0 Result.decision_ref`
+- 若 bridge 需要保留 `gate0_decision_ref`，只能放在 bridge local metadata、`authorized_session_link`、`delivery_hint` 等宿主适配上下文中
+- runtime 在 `decision_ref` 缺失或与 `access_context_envelope.decision_ref` 失配时必须 fail closed
 
 ### 3.2 `runtime_result_envelope`
 
@@ -158,3 +162,5 @@
 3. `runtime_outcome_event` 是 runtime 的跨模块治理事件。
 4. `runtime_result_status` 必须作为 interaction family 的共享主枚举维护。
 5. bridge -> runtime 的跨模块 canonical 名称统一为 `runtime_request_envelope`。
+6. `runtime_request_envelope.decision_ref` 的 canonical 语义已经收口为 `access_context_envelope.decision_ref`。
+7. `gate0_decision_ref` 继续留在 bridge local metadata，不进入 runtime handoff 顶层 canonical 字段。
