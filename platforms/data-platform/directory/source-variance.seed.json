@@ -1,6 +1,6 @@
 {
   "registry_name": "source_variance_registry",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
   "entries": [
     {
       "variance_id": "qinqin.param.page-name-drift",
@@ -15,8 +15,9 @@
       "evidence_docs": [
         "docs/api/qinqin/auth-and-signing.md"
       ],
-      "resolution_status": "seeded_pending_validation",
-      "notes": "Must not be silently hardcoded per endpoint."
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Page-index name drift must stay governed and cannot be guessed inside runtime or bridge code.",
+      "resolution_rule": "use_page_index canonical key and preferred wire name PageIndex unless a future live variance entry overrides it."
     },
     {
       "variance_id": "qinqin.param.start-time-name-drift",
@@ -31,8 +32,9 @@
       "evidence_docs": [
         "docs/api/qinqin/auth-and-signing.md"
       ],
-      "resolution_status": "seeded_pending_validation",
-      "notes": "Captured from docs; final wire freeze deferred."
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Start-time name drift affects signature ordering and must remain governed.",
+      "resolution_rule": "use start_time canonical key and preferred wire name Stime for phase-1."
     },
     {
       "variance_id": "qinqin.param.end-time-name-drift",
@@ -47,8 +49,9 @@
       "evidence_docs": [
         "docs/api/qinqin/auth-and-signing.md"
       ],
-      "resolution_status": "seeded_pending_validation",
-      "notes": "Captured from docs; final wire freeze deferred."
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "End-time name drift affects signature ordering and must remain governed.",
+      "resolution_rule": "use end_time canonical key and preferred wire name Etime for phase-1."
     },
     {
       "variance_id": "qinqin.param.org-id-name-drift",
@@ -63,29 +66,206 @@
       "evidence_docs": [
         "docs/api/qinqin/auth-and-signing.md"
       ],
-      "resolution_status": "seeded_pending_validation",
-      "notes": "Must remain governed as variance, not hidden in ad-hoc code."
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "OrgId casing drift affects signature ordering and cannot be hidden in ad-hoc code.",
+      "resolution_rule": "use org_id canonical key and preferred wire name OrgId for phase-1."
     },
     {
-      "variance_id": "qinqin.path.legacy-path-required",
+      "variance_id": "qinqin.path.consume-bill-legacy-path-required",
       "variance_kind": "path_resolution_constraint",
       "source_system_id": "qinqin.v1_1",
-      "endpoint_contract_id": "qinqin.v1_1.shared",
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "canonical_form": "/api/thirdparty/GetConsumeBillList",
       "observed_variants": [
-        "GetConsumptionList",
-        "GetRechargeList",
-        "GetAccountList",
-        "GetStaffList",
-        "GetTechClockList",
-        "GetSalesCommissionList",
+        "GetConsumptionList"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/endpoint-manifest.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Live verification showed the legacy path name remains required.",
+      "resolution_rule": "use manifest path /api/thirdparty/GetConsumeBillList."
+    },
+    {
+      "variance_id": "qinqin.path.recharge-bill-legacy-path-required",
+      "variance_kind": "path_resolution_constraint",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "canonical_form": "/api/thirdparty/GetRechargeBillList",
+      "observed_variants": [
+        "GetRechargeList"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/endpoint-manifest.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Live verification showed the legacy path name remains required.",
+      "resolution_rule": "use manifest path /api/thirdparty/GetRechargeBillList."
+    },
+    {
+      "variance_id": "qinqin.path.user-trade-legacy-path-required",
+      "variance_kind": "path_resolution_constraint",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.member.get_user_trade_list.v1_4",
+      "canonical_form": "/api/thirdparty/GetUserTradeList",
+      "observed_variants": [
+        "GetAccountList"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/endpoint-manifest.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Live verification showed the legacy path name remains required.",
+      "resolution_rule": "use manifest path /api/thirdparty/GetUserTradeList."
+    },
+    {
+      "variance_id": "qinqin.path.person-list-legacy-path-required",
+      "variance_kind": "path_resolution_constraint",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
+      "canonical_form": "/api/thirdparty/GetPersonList",
+      "observed_variants": [
+        "GetStaffList"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/endpoint-manifest.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Live verification showed the legacy path name remains required.",
+      "resolution_rule": "use manifest path /api/thirdparty/GetPersonList."
+    },
+    {
+      "variance_id": "qinqin.path.tech-up-clock-legacy-path-required",
+      "variance_kind": "path_resolution_constraint",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.staff.get_tech_up_clock_list.v1_6",
+      "canonical_form": "/api/thirdparty/GetTechUpClockList",
+      "observed_variants": [
+        "GetTechClockList"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/endpoint-manifest.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Live verification showed the legacy path name remains required.",
+      "resolution_rule": "use manifest path /api/thirdparty/GetTechUpClockList."
+    },
+    {
+      "variance_id": "qinqin.path.tech-market-legacy-path-required",
+      "variance_kind": "path_resolution_constraint",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.staff.get_tech_market_list.v1_7",
+      "canonical_form": "/api/thirdparty/GetTechMarketList",
+      "observed_variants": [
+        "GetSalesCommissionList"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/endpoint-manifest.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Live verification showed the legacy path name remains required.",
+      "resolution_rule": "use manifest path /api/thirdparty/GetTechMarketList."
+    },
+    {
+      "variance_id": "qinqin.path.tech-commission-set-legacy-path-required",
+      "variance_kind": "path_resolution_constraint",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "canonical_form": "/api/thirdparty/GetTechCommissionSetList",
+      "observed_variants": [
         "GetStaffBaseCommissionList"
       ],
       "evidence_docs": [
         "docs/api/qinqin/endpoint-manifest.md"
       ],
-      "resolution_status": "seeded_frozen_for_phase_1",
-      "notes": "Manifest paths are authoritative for phase-1.",
-      "resolution_rule": "use_manifest_paths_as_frozen_for_v1_1"
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Live verification showed the legacy path name remains required.",
+      "resolution_rule": "use manifest path /api/thirdparty/GetTechCommissionSetList."
+    },
+    {
+      "variance_id": "qinqin.response.user-trade-retdata-root-shape-drift",
+      "variance_kind": "response_shape_drift",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.member.get_user_trade_list.v1_4",
+      "canonical_form": "RetData=array_record_list",
+      "observed_variants": [
+        "response field table labels RetData as object",
+        "response example shows RetData as array"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/member/1.4-user-account-trades.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Governance binding freezes RetData as array-shaped record list.",
+      "resolution_rule": "treat RetData as array_record_list in registry and downstream contract consumers."
+    },
+    {
+      "variance_id": "qinqin.response.person-list-retdata-root-shape-drift",
+      "variance_kind": "response_shape_drift",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
+      "canonical_form": "RetData=array_record_list",
+      "observed_variants": [
+        "response field table labels RetData as object",
+        "response example shows RetData as array"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/staff/1.5-staff-base.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Governance binding freezes RetData as array-shaped record list.",
+      "resolution_rule": "treat RetData as array_record_list in registry and downstream contract consumers."
+    },
+    {
+      "variance_id": "qinqin.response.tech-market-retdata-root-shape-drift",
+      "variance_kind": "response_shape_drift",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.staff.get_tech_market_list.v1_7",
+      "canonical_form": "RetData=array_record_list",
+      "observed_variants": [
+        "response field table labels RetData as object",
+        "response example shows RetData as array"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/staff/1.7-staff-sales-commission.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Governance binding freezes RetData as array-shaped record list.",
+      "resolution_rule": "treat RetData as array_record_list in registry and downstream contract consumers."
+    },
+    {
+      "variance_id": "qinqin.auth.tech-commission-set-runtime-headers-required",
+      "variance_kind": "auth_header_requirement",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "canonical_form": "signed_body_plus_runtime_headers",
+      "observed_variants": [
+        "Authorization header",
+        "Token header"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/staff/1.8-staff-base-commission.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Tech commission set endpoint requires extra runtime auth headers beyond the signed body contract.",
+      "resolution_rule": "apply auth profile qinqin.v1_1.signature_body_plus_runtime_headers."
+    },
+    {
+      "variance_id": "qinqin.field.consume-bill-payment-source-typo",
+      "variance_kind": "documented_field_name_drift",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "canonical_form": "RetData.Data.Payments.PyamentSource",
+      "observed_variants": [
+        "PyamentSource",
+        "PaymentSource"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/member/1.2-user-consume-details.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Field catalog preserves the documented wire name PyamentSource until live evidence proves otherwise.",
+      "resolution_rule": "keep documented field name PyamentSource in contract governance; add a new variance entry if live payload differs."
     }
   ]
 }

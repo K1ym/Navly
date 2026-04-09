@@ -1,0 +1,2937 @@
+{
+  "registry_name": "endpoint_field_catalog",
+  "status": "phase_1_contract_frozen",
+  "scope": "documented_response_fields_governed",
+  "entries": [
+    {
+      "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
+      "response_root_path": "RetData",
+      "catalog_status": "documented_fields_governed",
+      "truth_source_doc": "docs/api/qinqin/member/1.1-user-base.md",
+      "field_count": 166,
+      "response_fields": [
+        {
+          "field_path": "Code",
+          "data_type": "number",
+          "path_kind": "response_status",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.raw-envelope"
+        },
+        {
+          "field_path": "Msg",
+          "data_type": "string",
+          "path_kind": "response_message",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.raw-envelope"
+        },
+        {
+          "field_path": "RetData",
+          "data_type": "object",
+          "path_kind": "payload_root",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Total",
+          "data_type": "number",
+          "path_kind": "page_total",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Data",
+          "data_type": "array",
+          "path_kind": "record_collection",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Data.Id",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.Avatar",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.Name",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.OrgId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.Phone",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.Labels",
+          "data_type": "array",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.Assets",
+          "data_type": "array",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.StoredAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.ConsumeAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.CTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.LastConsumeTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.SilentDays",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.MarketerId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.MarketerCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.MarketerName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.From",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.Type",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.Sex",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.Storeds",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Id",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Type",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.OrgId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.OrgName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.CardNo",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.CardPing",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.MasterCardId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.OldCardNo",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.CardState",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.CardTypeId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.CardTypeName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.UserId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.UserName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.UserPhone",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.UserOpenId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Password",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Sex",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.CupId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Integral",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Balance",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.RealityBalance",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.DonateBalance",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Total",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Reality",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Donate",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Consume",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.IsOverdue",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Overdue",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.IsDonate",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.IsGift",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.IsBindSMS",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.OpenTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.ExpireTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.LastUseTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Remark",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.OptId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.Operator",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.OptTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.State",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.WX_CardId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.OpenId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.OpenCode",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.OpenName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.InviteIntegral",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Equitys",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Tickets",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Coupons",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Id",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Type",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.OrgId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.OrgName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.CardNo",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.CardPing",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.MasterCardId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.OldCardNo",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.CardState",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.CardTypeId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.CardTypeName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.UserId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.UserName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.UserPhone",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.UserOpenId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Password",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Sex",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.CupId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Integral",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Balance",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.RealityBalance",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.DonateBalance",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Total",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Reality",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Donate",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Consume",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.IsOverdue",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Overdue",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.IsDonate",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.IsGift",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.IsBindSMS",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.OpenTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.ExpireTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.LastUseTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Remark",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.OptId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.Operator",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.OptTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.State",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.WX_CardId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.OpenId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.OpenCode",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.OpenName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Equitys.InviteIntegral",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys"
+        },
+        {
+          "field_path": "RetData.Data.Storeds.BirthDay",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds"
+        },
+        {
+          "field_path": "RetData.Data.Birthday",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.Id",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.OrgId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.UserId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.UserName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.UserPhone",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.CardTradeId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.CouponTypeId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.CouponTypeName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.Type",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.DeductionAmount",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.AmountLimit",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.SettleId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.ConsumeId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.ExpireTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.IsUsed",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.State",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.OptTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.OptId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.OptCode",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.OptName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.Remark",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.UsedTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.CTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Coupons.Source",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.Id",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.OrgId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.UserId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.UserName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.UserPhone",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.CardTradeId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.SettleId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.ConsumeId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.ItemId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.ExpireTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.IsUsed",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.State",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.CardTradeTicketId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.OptId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.OptCode",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.OptName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.OptTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.TicketId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.TicketName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.TicketPrice",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.TicketNumIndex",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.TicketType",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.Remark",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.CardNo",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        },
+        {
+          "field_path": "RetData.Data.Tickets.CardPing",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket"
+        }
+      ],
+      "notes": "Machine-consumable field ledger derived from the current Qinqin API document and frozen for phase-1 governance."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "response_root_path": "RetData",
+      "catalog_status": "documented_fields_governed",
+      "truth_source_doc": "docs/api/qinqin/member/1.2-user-consume-details.md",
+      "field_count": 46,
+      "response_fields": [
+        {
+          "field_path": "Code",
+          "data_type": "number",
+          "path_kind": "response_status",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.raw-envelope"
+        },
+        {
+          "field_path": "Msg",
+          "data_type": "string",
+          "path_kind": "response_message",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.raw-envelope"
+        },
+        {
+          "field_path": "RetData",
+          "data_type": "object",
+          "path_kind": "payload_root",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Total",
+          "data_type": "number",
+          "path_kind": "page_total",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Data",
+          "data_type": "array",
+          "path_kind": "record_collection",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Data.SettleId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.SettleNo",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.Consume",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.Pay",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.HandCardCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.RoomCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.DiscName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.Remark",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.CTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.OptTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.IsAnti",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.CCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.CName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.OptCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.OptName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.SysId",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.DonateAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.DiscountAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.FavAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.DeductionAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.TicketAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.FullcutAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.ShoppromoAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.IntegralAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.IntegralNum",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.VirTotal",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.VirMode",
+          "data_type": "array",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.Payments",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.Id",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.PaymentId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.Name",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.PyamentSource",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.Amount",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.PaymentType",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.CallNumber",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Infos",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-info"
+        },
+        {
+          "field_path": "RetData.Data.HandCardCodes",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.RoomCodes",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.CallNumber",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.OrderAreaId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        },
+        {
+          "field_path": "RetData.Data.AntiTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill"
+        }
+      ],
+      "notes": "Machine-consumable field ledger derived from the current Qinqin API document and frozen for phase-1 governance."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "response_root_path": "RetData",
+      "catalog_status": "documented_fields_governed",
+      "truth_source_doc": "docs/api/qinqin/member/1.3-user-recharge-details.md",
+      "field_count": 39,
+      "response_fields": [
+        {
+          "field_path": "Code",
+          "data_type": "number",
+          "path_kind": "response_status",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.raw-envelope"
+        },
+        {
+          "field_path": "Msg",
+          "data_type": "string",
+          "path_kind": "response_message",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.raw-envelope"
+        },
+        {
+          "field_path": "RetData",
+          "data_type": "object",
+          "path_kind": "payload_root",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Total",
+          "data_type": "number",
+          "path_kind": "page_total",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Data",
+          "data_type": "array",
+          "path_kind": "record_collection",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Data.Payments",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.PrimaryId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.Id",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.Name",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.Payments.Amount",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-payment"
+        },
+        {
+          "field_path": "RetData.Data.TicketEquity",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Sales",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-sales"
+        },
+        {
+          "field_path": "RetData.Data.CouponNum",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Tickets",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-ticket"
+        },
+        {
+          "field_path": "RetData.Data.SysId",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Id",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.SnNo",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.CardId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Type",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.MemberName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.MemberPhone",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.CardNo",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Category",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.CardTypeName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.CardTypeId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Pay",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Total",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Reality",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Donate",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.OptId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.OptCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.OptName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.OptTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.CorsOrgName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.IsAnti",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.Integral",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.ChainTradeId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.ChainNoAnti",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        },
+        {
+          "field_path": "RetData.Data.IsNotAllowAnti",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill"
+        }
+      ],
+      "notes": "Machine-consumable field ledger derived from the current Qinqin API document and frozen for phase-1 governance."
+    },
+    {
+      "endpoint_contract_id": "qinqin.member.get_user_trade_list.v1_4",
+      "response_root_path": "RetData",
+      "catalog_status": "documented_fields_governed",
+      "truth_source_doc": "docs/api/qinqin/member/1.4-user-account-trades.md",
+      "field_count": 18,
+      "response_fields": [
+        {
+          "field_path": "Code",
+          "data_type": "number",
+          "path_kind": "response_status",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.raw-envelope"
+        },
+        {
+          "field_path": "Msg",
+          "data_type": "string",
+          "path_kind": "response_message",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.raw-envelope"
+        },
+        {
+          "field_path": "RetData",
+          "data_type": "object",
+          "path_kind": "record_collection",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.OptTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.TradeNo",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.CardOptType",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.OrgName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.OrgId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.ChangeBalance",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.ChangeReality",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.ChangeDonate",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.EndBalance",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.EndReality",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.EndDonate",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.ChangeIntegral",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.EndIntegral",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.IsAnti",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        },
+        {
+          "field_path": "RetData.PaymentType",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade"
+        }
+      ],
+      "notes": "Machine-consumable field ledger derived from the current Qinqin API document and frozen for phase-1 governance."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
+      "response_root_path": "RetData",
+      "catalog_status": "documented_fields_governed",
+      "truth_source_doc": "docs/api/qinqin/staff/1.5-staff-base.md",
+      "field_count": 97,
+      "response_fields": [
+        {
+          "field_path": "Code",
+          "data_type": "number",
+          "path_kind": "response_status",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.raw-envelope"
+        },
+        {
+          "field_path": "Msg",
+          "data_type": "string",
+          "path_kind": "response_message",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.raw-envelope"
+        },
+        {
+          "field_path": "RetData",
+          "data_type": "object",
+          "path_kind": "record_collection",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.FyAuditStatus",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Address",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.AddWorkETime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.AddWorkSTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.AIClockAuth",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.AllowUpClockChooseItem",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.App_Volume",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.BaseWages",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.BirthDay",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.CardCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ClassId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ClassName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ClassNameAbbr",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ClockType",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Code",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ConsumeDuration",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ConsumeHandCardCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ConsumeId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ConsumeItemCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ConsumeItemDuration",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ConsumeItemName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ConsumeRoomCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ConsumeState",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.CurrentWheelTime",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.DeptId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.DeptName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Discount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.DisplayModeSize",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.FavourableMoney",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.FingerPrint",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.FreeMoney",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.HireDate",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Id",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IDCard",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Img",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ImgUrl",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IndustryExp",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsAddClass",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsAddClassTemp",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsAddWork",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsCircleCard",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsJob",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsMajor",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsManage",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsNotice",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsShowABAcount",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsSys",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsUseAIClock",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsWork",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ItemCategory",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.ItemList",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff-item"
+        },
+        {
+          "field_path": "RetData.ItemList.ItemCategory",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff-item"
+        },
+        {
+          "field_path": "RetData.ItemList.ItemCode",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff-item"
+        },
+        {
+          "field_path": "RetData.ItemList.ItemId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff-item"
+        },
+        {
+          "field_path": "RetData.ItemList.ItemName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff-item"
+        },
+        {
+          "field_path": "RetData.ItemList.ItemTypeId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff-item"
+        },
+        {
+          "field_path": "RetData.ItemList.ItemTypeName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff-item"
+        },
+        {
+          "field_path": "RetData.ItemList.JobType",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff-item"
+        },
+        {
+          "field_path": "RetData.ItemList.PersonId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff-item"
+        },
+        {
+          "field_path": "RetData.LevelId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Location",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.MoveRankClockNum",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Name",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.NativePlace",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.NotMoveRankClockNum",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.OpenId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Operator",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.OptId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.OptTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.OrgId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.OrgName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.PersonState",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.PersonStateName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.PersonUpClockScene",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Phone",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.PointClockNum",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.PointNum",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.PostId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.PostName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.PostType",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Remark",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.Sex",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.SortDuration",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.State",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.TechRoomId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.TechRoomName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.TmpShowTotalDurationTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.TotalDuration",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.VirtualWheelClock",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.WheelClock",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.WheelClockNum",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.NickName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.IsShowC",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        },
+        {
+          "field_path": "RetData.SortC",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_person_list.v1_5.staff"
+        }
+      ],
+      "notes": "Machine-consumable field ledger derived from the current Qinqin API document and frozen for phase-1 governance."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_up_clock_list.v1_6",
+      "response_root_path": "RetData",
+      "catalog_status": "documented_fields_governed",
+      "truth_source_doc": "docs/api/qinqin/staff/1.6-staff-clock-details.md",
+      "field_count": 42,
+      "response_fields": [
+        {
+          "field_path": "Code",
+          "data_type": "number",
+          "path_kind": "response_status",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.raw-envelope"
+        },
+        {
+          "field_path": "Msg",
+          "data_type": "string",
+          "path_kind": "response_message",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.raw-envelope"
+        },
+        {
+          "field_path": "RetData",
+          "data_type": "object",
+          "path_kind": "payload_root",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.raw-envelope"
+        },
+        {
+          "field_path": "RetData.Items",
+          "data_type": "array",
+          "path_kind": "record_collection",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.ItemName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.ItemCategory",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.PersonCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.PersonName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.HandCardCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.ClockType",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.AddClockType",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.Count",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.Turnover",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.Income",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.BasicComm",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.OverComm",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.AddClockTypeComm",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.CTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.Duration",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.WaitTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.STime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.ETime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.SettleTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.SettleNo",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.Comm",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.AddClockDesc",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Items.IsAddWork",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item"
+        },
+        {
+          "field_path": "RetData.Main",
+          "data_type": "object",
+          "path_kind": "summary_object",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Main.Total",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Main.Wheel",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Main.Point",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Main.Add",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Main.Buy",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Main.Call",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Extra",
+          "data_type": "object",
+          "path_kind": "summary_object",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Extra.Total",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Extra.Wheel",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Extra.Point",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Extra.Add",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Extra.Buy",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.Extra.Call",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        },
+        {
+          "field_path": "RetData.TotalClock",
+          "data_type": "number",
+          "path_kind": "summary_field",
+          "landing_policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary"
+        }
+      ],
+      "notes": "Machine-consumable field ledger derived from the current Qinqin API document and frozen for phase-1 governance."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_market_list.v1_7",
+      "response_root_path": "RetData",
+      "catalog_status": "documented_fields_governed",
+      "truth_source_doc": "docs/api/qinqin/staff/1.7-staff-sales-commission.md",
+      "field_count": 31,
+      "response_fields": [
+        {
+          "field_path": "Code",
+          "data_type": "number",
+          "path_kind": "response_status",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.raw-envelope"
+        },
+        {
+          "field_path": "Msg",
+          "data_type": "string",
+          "path_kind": "response_message",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.raw-envelope"
+        },
+        {
+          "field_path": "RetData",
+          "data_type": "object",
+          "path_kind": "record_collection",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.RoomCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.HandCardCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.PersonCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.PersonName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.Sex",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.CTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.SettleTime",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.SettleNo",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.ItemTypeName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.OrderAreaId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.OrderAreaName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.SalesName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.SalesCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.PostId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.ItemName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.ItemId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.ItemCode",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.Id",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.Count",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.Price",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.Discount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.ShoppromoAmount",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.AfterDisc",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.FavourShare",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.ClockType",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.ItemCategory",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.Commission",
+          "data_type": "number",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        },
+        {
+          "field_path": "RetData.IsDonate",
+          "data_type": "boolean",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission"
+        }
+      ],
+      "notes": "Machine-consumable field ledger derived from the current Qinqin API document and frozen for phase-1 governance."
+    },
+    {
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "response_root_path": "RetData",
+      "catalog_status": "documented_fields_governed",
+      "truth_source_doc": "docs/api/qinqin/staff/1.8-staff-base-commission.md",
+      "field_count": 36,
+      "response_fields": [
+        {
+          "field_path": "Code",
+          "data_type": "number",
+          "path_kind": "response_status",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.raw-envelope"
+        },
+        {
+          "field_path": "Msg",
+          "data_type": "string",
+          "path_kind": "response_message",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.raw-envelope"
+        },
+        {
+          "field_path": "RetData",
+          "data_type": "array",
+          "path_kind": "record_collection",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting"
+        },
+        {
+          "field_path": "RetData.ItemName",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting"
+        },
+        {
+          "field_path": "RetData.ItemId",
+          "data_type": "string",
+          "path_kind": "record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting"
+        },
+        {
+          "field_path": "RetData.PCBaseList",
+          "data_type": "array",
+          "path_kind": "nested_record_collection",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.Add",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.AddBuy",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.AddCall",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.AddClock",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.AddPoint",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.AddWheel",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.Amount",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.Appoint",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.Buy",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.Call",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.EPoint",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.Id",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.IsOpenMultiple",
+          "data_type": "boolean",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.ItemId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.ItemName",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.Multiple",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.OptTime",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.OrgId",
+          "data_type": "string",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.OverAdd",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.OverBuy",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.OverCall",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.OverPoint",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.OverWheel",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.Sex",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.SPoint",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.State",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.Wheel",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.BaseCommissionChannel",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.OverCommissionChannel",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        },
+        {
+          "field_path": "RetData.PCBaseList.AddCommissionChannel",
+          "data_type": "number",
+          "path_kind": "nested_record_field",
+          "landing_policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail"
+        }
+      ],
+      "notes": "Machine-consumable field ledger derived from the current Qinqin API document and frozen for phase-1 governance."
+    }
+  ]
+}
