@@ -1,6 +1,6 @@
 {
   "registry_name": "source_system_registry",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
   "entries": [
     {
       "source_system_id": "qinqin.v1_1",
@@ -12,11 +12,58 @@
         "docs/api/qinqin/endpoint-manifest.md",
         "docs/api/qinqin/auth-and-signing.md"
       ],
-      "audit_docs": [
-        "docs/audits/qinqin/README.md"
+      "status": "contract_frozen",
+      "notes": "Qinqin v1.1 is the formal phase-1 source system for Navly data-platform contract governance."
+    }
+  ],
+  "operational_window_profiles": [
+    {
+      "operational_window_profile_id": "qinqin.v1_1.bj_daily_window",
+      "source_system_id": "qinqin.v1_1",
+      "timezone": "Asia/Shanghai",
+      "formal_access_window": "03:00-04:00",
+      "historical_debug_window": "03:00-18:00",
+      "truth_source_doc": "docs/api/qinqin/auth-and-signing.md",
+      "notes": "Formal access window is treated as Beijing time (UTC+8). Historical debug window is kept as recovered documentation context only."
+    }
+  ],
+  "signature_rules": [
+    {
+      "signature_rule_id": "qinqin.v1_1.md5_ascii_sort_ignore_case",
+      "source_system_id": "qinqin.v1_1",
+      "sort_order": "ascii_ascending_ignore_case",
+      "excluded_wire_names": [
+        "Sign"
       ],
-      "status": "seeded_not_implemented",
-      "notes": "Milestone A only seeds source registration; no live adapter implementation yet."
+      "appended_secret_name": "AppSecret",
+      "hash_algorithm": "md5_lower_hex",
+      "truth_source_doc": "docs/api/qinqin/auth-and-signing.md",
+      "notes": "Shared signing rule for all eight formal endpoints."
+    }
+  ],
+  "auth_profiles": [
+    {
+      "auth_profile_id": "qinqin.v1_1.signature_body_only",
+      "source_system_id": "qinqin.v1_1",
+      "required_static_headers": {
+        "Content-Type": "application/json"
+      },
+      "runtime_secret_headers": [],
+      "signature_rule_id": "qinqin.v1_1.md5_ascii_sort_ignore_case",
+      "notes": "Default Qinqin auth profile: signed JSON body only."
+    },
+    {
+      "auth_profile_id": "qinqin.v1_1.signature_body_plus_runtime_headers",
+      "source_system_id": "qinqin.v1_1",
+      "required_static_headers": {
+        "Content-Type": "application/json"
+      },
+      "runtime_secret_headers": [
+        "Authorization",
+        "Token"
+      ],
+      "signature_rule_id": "qinqin.v1_1.md5_ascii_sort_ignore_case",
+      "notes": "Extended auth profile used by GetTechCommissionSetList."
     }
   ]
 }

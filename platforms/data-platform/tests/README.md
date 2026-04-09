@@ -1,4 +1,4 @@
-# Tests
+# Data Platform Tests
 
 本目录承载 data-platform 的 contract / replay / state 回归测试。
 
@@ -10,3 +10,6 @@
 - source business error taxonomy
 - replay artifact 写出
 - CLI runner artifact tree
+- member insight vertical slice / replay / artifact tree
+- Qinqin v1.1 contract governance registry completeness
+- field catalog / landing policy / variance register consistency

@@ -1,116 +1,342 @@
 {
   "registry_name": "field_landing_policy_registry",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
   "entries": [
     {
+      "policy_id": "qinqin.member.get_customers_list.v1_1.raw-envelope",
       "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
-      "field_selector": "structured_targets.*",
-      "landing_tier": "tier_a_structured",
-      "target_layer": "L1",
-      "target_dataset": [
-        "customer",
-        "customer_card",
-        "customer_ticket",
-        "customer_coupon"
-      ],
-      "policy_status": "seeded",
-      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
-    },
-    {
-      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
-      "field_selector": "structured_targets.*",
-      "landing_tier": "tier_a_structured",
-      "target_layer": "L1",
-      "target_dataset": [
-        "consume_bill",
-        "consume_bill_payment",
-        "consume_bill_info"
-      ],
-      "policy_status": "seeded",
-      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
-    },
-    {
-      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
-      "field_selector": "structured_targets.*",
-      "landing_tier": "tier_a_structured",
-      "target_layer": "L1",
-      "target_dataset": [
-        "recharge_bill",
-        "recharge_bill_payment",
-        "recharge_bill_ticket",
-        "recharge_bill_sales"
-      ],
-      "policy_status": "seeded",
-      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
-    },
-    {
-      "endpoint_contract_id": "qinqin.member.get_user_trade_list.v1_4",
-      "field_selector": "structured_targets.*",
-      "landing_tier": "tier_a_structured",
-      "target_layer": "L1",
-      "target_dataset": [
-        "account_trade"
-      ],
-      "policy_status": "seeded",
-      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
-    },
-    {
-      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
-      "field_selector": "structured_targets.*",
-      "landing_tier": "tier_a_structured",
-      "target_layer": "L1",
-      "target_dataset": [
-        "staff",
-        "staff_item"
-      ],
-      "policy_status": "seeded",
-      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
-    },
-    {
-      "endpoint_contract_id": "qinqin.staff.get_tech_up_clock_list.v1_6",
-      "field_selector": "structured_targets.*",
-      "landing_tier": "tier_a_structured",
-      "target_layer": "L1",
-      "target_dataset": [
-        "tech_shift_item",
-        "tech_shift_summary"
-      ],
-      "policy_status": "seeded",
-      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
-    },
-    {
-      "endpoint_contract_id": "qinqin.staff.get_tech_market_list.v1_7",
-      "field_selector": "structured_targets.*",
-      "landing_tier": "tier_a_structured",
-      "target_layer": "L1",
-      "target_dataset": [
-        "sales_commission"
-      ],
-      "policy_status": "seeded",
-      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
-    },
-    {
-      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
-      "field_selector": "structured_targets.*",
-      "landing_tier": "tier_a_structured",
-      "target_layer": "L1",
-      "target_dataset": [
-        "commission_setting",
-        "commission_setting_detail"
-      ],
-      "policy_status": "seeded",
-      "notes": "Structured targets from endpoint manifest are pre-designated as Tier A."
-    },
-    {
-      "endpoint_contract_id": "qinqin.v1_1.shared",
-      "field_selector": "all_non_structured_documented_fields",
+      "field_selector": "explicit:[Code,Msg,RetData,RetData.Total,RetData.Data]",
       "landing_tier": "tier_b_preserved",
       "target_layer": "L0",
       "target_dataset": [
         "raw_response_page"
       ],
-      "policy_status": "seeded",
-      "notes": "Documented but not yet structured fields must still be preserved in raw truth."
+      "policy_status": "policy_frozen",
+      "notes": "Envelope and pagination metadata are preserved in raw truth for replay and state derivation."
+    },
+    {
+      "policy_id": "qinqin.member.get_customers_list.v1_1.customer",
+      "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
+      "field_selector": "prefix:RetData.Data;exclude_prefixes:[RetData.Data.Storeds,RetData.Data.Equitys,RetData.Data.Tickets,RetData.Data.Coupons]",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "customer"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Top-level customer record fields land to customer canonical dataset."
+    },
+    {
+      "policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-storeds",
+      "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
+      "field_selector": "prefix:RetData.Data.Storeds",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "customer_card"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Stored card records land to customer_card canonical dataset."
+    },
+    {
+      "policy_id": "qinqin.member.get_customers_list.v1_1.customer-card-equitys",
+      "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
+      "field_selector": "prefix:RetData.Data.Equitys",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "customer_card"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Equity card records also land to customer_card canonical dataset."
+    },
+    {
+      "policy_id": "qinqin.member.get_customers_list.v1_1.customer-ticket",
+      "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
+      "field_selector": "prefix:RetData.Data.Tickets",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "customer_ticket"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Ticket records land to customer_ticket canonical dataset."
+    },
+    {
+      "policy_id": "qinqin.member.get_customers_list.v1_1.customer-coupon",
+      "endpoint_contract_id": "qinqin.member.get_customers_list.v1_1",
+      "field_selector": "prefix:RetData.Data.Coupons",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "customer_coupon"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Coupon records land to customer_coupon canonical dataset."
+    },
+    {
+      "policy_id": "qinqin.member.get_consume_bill_list.v1_2.raw-envelope",
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "field_selector": "explicit:[Code,Msg,RetData,RetData.Total,RetData.Data]",
+      "landing_tier": "tier_b_preserved",
+      "target_layer": "L0",
+      "target_dataset": [
+        "raw_response_page"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Envelope and paging metadata stay in raw truth."
+    },
+    {
+      "policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill",
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "field_selector": "prefix:RetData.Data;exclude_prefixes:[RetData.Data.Payments,RetData.Data.Infos]",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "consume_bill"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Top-level consume bill facts land to consume_bill."
+    },
+    {
+      "policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-payment",
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "field_selector": "prefix:RetData.Data.Payments",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "consume_bill_payment"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Payment rows land to consume_bill_payment."
+    },
+    {
+      "policy_id": "qinqin.member.get_consume_bill_list.v1_2.consume-bill-info",
+      "endpoint_contract_id": "qinqin.member.get_consume_bill_list.v1_2",
+      "field_selector": "prefix:RetData.Data.Infos",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "consume_bill_info"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Detailed bill info rows land to consume_bill_info."
+    },
+    {
+      "policy_id": "qinqin.member.get_recharge_bill_list.v1_3.raw-envelope",
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "field_selector": "explicit:[Code,Msg,RetData,RetData.Total,RetData.Data]",
+      "landing_tier": "tier_b_preserved",
+      "target_layer": "L0",
+      "target_dataset": [
+        "raw_response_page"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Envelope and paging metadata stay in raw truth."
+    },
+    {
+      "policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill",
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "field_selector": "prefix:RetData.Data;exclude_prefixes:[RetData.Data.Payments,RetData.Data.Sales,RetData.Data.Tickets]",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "recharge_bill"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Top-level recharge bill facts land to recharge_bill."
+    },
+    {
+      "policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-payment",
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "field_selector": "prefix:RetData.Data.Payments",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "recharge_bill_payment"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Recharge payment rows land to recharge_bill_payment."
+    },
+    {
+      "policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-sales",
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "field_selector": "prefix:RetData.Data.Sales",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "recharge_bill_sales"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Recharge sales attribution rows land to recharge_bill_sales."
+    },
+    {
+      "policy_id": "qinqin.member.get_recharge_bill_list.v1_3.recharge-bill-ticket",
+      "endpoint_contract_id": "qinqin.member.get_recharge_bill_list.v1_3",
+      "field_selector": "prefix:RetData.Data.Tickets",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "recharge_bill_ticket"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Recharge ticket detail rows land to recharge_bill_ticket."
+    },
+    {
+      "policy_id": "qinqin.member.get_user_trade_list.v1_4.raw-envelope",
+      "endpoint_contract_id": "qinqin.member.get_user_trade_list.v1_4",
+      "field_selector": "explicit:[Code,Msg]",
+      "landing_tier": "tier_b_preserved",
+      "target_layer": "L0",
+      "target_dataset": [
+        "raw_response_page"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Only status envelope fields are preserved separately from account trade records."
+    },
+    {
+      "policy_id": "qinqin.member.get_user_trade_list.v1_4.account-trade",
+      "endpoint_contract_id": "qinqin.member.get_user_trade_list.v1_4",
+      "field_selector": "prefix:RetData",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "account_trade"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Account trade record list lands to account_trade."
+    },
+    {
+      "policy_id": "qinqin.staff.get_person_list.v1_5.raw-envelope",
+      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
+      "field_selector": "explicit:[Code,Msg]",
+      "landing_tier": "tier_b_preserved",
+      "target_layer": "L0",
+      "target_dataset": [
+        "raw_response_page"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Only status envelope fields are preserved separately from staff records."
+    },
+    {
+      "policy_id": "qinqin.staff.get_person_list.v1_5.staff",
+      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
+      "field_selector": "prefix:RetData;exclude_prefixes:[RetData.ItemList]",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "staff"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Top-level staff record fields land to staff."
+    },
+    {
+      "policy_id": "qinqin.staff.get_person_list.v1_5.staff-item",
+      "endpoint_contract_id": "qinqin.staff.get_person_list.v1_5",
+      "field_selector": "prefix:RetData.ItemList",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "staff_item"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Staff skill/item rows land to staff_item."
+    },
+    {
+      "policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.raw-envelope",
+      "endpoint_contract_id": "qinqin.staff.get_tech_up_clock_list.v1_6",
+      "field_selector": "explicit:[Code,Msg,RetData]",
+      "landing_tier": "tier_b_preserved",
+      "target_layer": "L0",
+      "target_dataset": [
+        "raw_response_page"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Envelope root object is preserved in raw truth."
+    },
+    {
+      "policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-item",
+      "endpoint_contract_id": "qinqin.staff.get_tech_up_clock_list.v1_6",
+      "field_selector": "prefix:RetData.Items",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "tech_shift_item"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Clock detail rows land to tech_shift_item."
+    },
+    {
+      "policy_id": "qinqin.staff.get_tech_up_clock_list.v1_6.tech-shift-summary",
+      "endpoint_contract_id": "qinqin.staff.get_tech_up_clock_list.v1_6",
+      "field_selector": "multi:[prefix:RetData.Main,prefix:RetData.Extra,explicit:RetData.TotalClock]",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "tech_shift_summary"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Main/extra summary blocks and total clock metric land to tech_shift_summary."
+    },
+    {
+      "policy_id": "qinqin.staff.get_tech_market_list.v1_7.raw-envelope",
+      "endpoint_contract_id": "qinqin.staff.get_tech_market_list.v1_7",
+      "field_selector": "explicit:[Code,Msg]",
+      "landing_tier": "tier_b_preserved",
+      "target_layer": "L0",
+      "target_dataset": [
+        "raw_response_page"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Only status envelope fields are preserved separately from sales commission records."
+    },
+    {
+      "policy_id": "qinqin.staff.get_tech_market_list.v1_7.sales-commission",
+      "endpoint_contract_id": "qinqin.staff.get_tech_market_list.v1_7",
+      "field_selector": "prefix:RetData",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "sales_commission"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Sales commission record list lands to sales_commission."
+    },
+    {
+      "policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.raw-envelope",
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "field_selector": "explicit:[Code,Msg]",
+      "landing_tier": "tier_b_preserved",
+      "target_layer": "L0",
+      "target_dataset": [
+        "raw_response_page"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Only status envelope fields are preserved separately from commission setting records."
+    },
+    {
+      "policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting",
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "field_selector": "explicit:[RetData,RetData.ItemName,RetData.ItemId]",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "commission_setting"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Top-level commission setting rows land to commission_setting."
+    },
+    {
+      "policy_id": "qinqin.staff.get_tech_commission_set_list.v1_8.commission-setting-detail",
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "field_selector": "prefix:RetData.PCBaseList",
+      "landing_tier": "tier_a_structured",
+      "target_layer": "L1",
+      "target_dataset": [
+        "commission_setting_detail"
+      ],
+      "policy_status": "policy_frozen",
+      "notes": "Commission detail rows land to commission_setting_detail."
     }
   ]
 }

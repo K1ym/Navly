@@ -1,7 +1,7 @@
 {
   "contract_name": "endpoint_contract_registry_entry",
   "owner": "data-platform",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
   "fields": [
     "endpoint_contract_id",
     "source_system_id",
@@ -22,5 +22,5 @@
       "daily_full_replace"
     ]
   },
-  "notes": "Phase-1 seed. Virtual shared contracts may set increment_strategy to null because they are governance-only entries, not actual source endpoints."
+  "notes": "Entry shape stays minimal for backbone compatibility. Registry root may additionally define endpoint_governance_bindings that connect each formal endpoint to parameter, field-catalog, landing-policy, auth-profile, and variance objects."
 }

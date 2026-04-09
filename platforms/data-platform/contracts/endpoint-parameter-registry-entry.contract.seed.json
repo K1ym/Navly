@@ -1,14 +1,22 @@
 {
   "contract_name": "endpoint_parameter_registry_entry",
   "owner": "data-platform",
-  "status": "milestone_a_seed",
+  "status": "phase_1_contract_frozen",
   "fields": [
     "parameter_key",
     "semantic_name",
     "preferred_wire_name",
     "known_wire_variants",
+    "request_location",
+    "value_type",
+    "value_source",
+    "required_endpoint_contract_ids",
+    "optional_endpoint_contract_ids",
+    "participates_in_signature",
+    "runtime_secret_ref",
     "applies_to",
     "status",
     "notes"
-  ]
+  ],
+  "notes": "Registry root may additionally define canonicalization_rules for shared signing/canonicalization behavior. Existing backbone readers continue to use preferred_wire_name and known_wire_variants only."
 }
