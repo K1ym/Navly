@@ -124,6 +124,82 @@ function buildReadinessQuery({
   };
 }
 
+function buildOwnerSurfaceResult({
+  requestId = 'req-owner-adapter-001',
+  traceRef = 'navly:trace:req-owner-adapter-001',
+  targetScopeRef = 'navly:scope:store:sample-store-001',
+  businessDate = '2026-03-23',
+  readinessStatus = 'ready',
+  serviceStatus = 'served',
+} = {}) {
+  return {
+    readiness_response: {
+      request_id: requestId,
+      trace_ref: traceRef,
+      capability_id: 'navly.store.member_insight',
+      readiness_status: readinessStatus,
+      evaluated_scope_ref: targetScopeRef,
+      requested_business_date: businessDate,
+      latest_usable_business_date: businessDate,
+      reason_codes: readinessStatus === 'ready' ? [] : ['missing_dependency'],
+      blocking_dependencies: readinessStatus === 'ready'
+        ? []
+        : [
+          {
+            dependency_kind: 'input_data',
+            dependency_ref: 'qinqin.member.get_consume_bill_list.v1_2',
+            blocking_reason_code: 'missing_dependency',
+          },
+        ],
+      state_trace_refs: ['navly:state-trace:owner-surface:sample'],
+      run_trace_refs: ['navly:run-trace:owner-surface:sample'],
+      evaluated_at: FIXED_NOW,
+      extensions: {
+        owner_surface: 'member_insight',
+      },
+    },
+    theme_service_response: {
+      request_id: requestId,
+      trace_ref: traceRef,
+      capability_id: 'navly.store.member_insight',
+      service_object_id: 'navly.service.store.member_insight',
+      service_status: serviceStatus,
+      service_object: serviceStatus === 'served'
+        ? {
+          capability_id: 'navly.store.member_insight',
+          service_object_id: 'navly.service.store.member_insight',
+          target_scope_ref: targetScopeRef,
+          target_business_date: businessDate,
+          customer_count: 1,
+          customer_card_count: 1,
+          consume_bill_count: 1,
+          consume_bill_payment_count: 1,
+          consume_bill_info_count: 1,
+        }
+        : {},
+      data_window: {
+        from: businessDate,
+        to: businessDate,
+      },
+      explanation_object: serviceStatus === 'served'
+        ? undefined
+        : {
+          capability_id: 'navly.store.member_insight',
+          explanation_scope: 'service',
+          reason_codes: ['missing_dependency'],
+          state_trace_refs: ['navly:state-trace:owner-surface:sample'],
+          run_trace_refs: ['navly:run-trace:owner-surface:sample'],
+        },
+      state_trace_refs: ['navly:state-trace:owner-surface:sample'],
+      run_trace_refs: ['navly:run-trace:owner-surface:sample'],
+      served_at: FIXED_NOW,
+      extensions: {
+        owner_surface: 'member_insight',
+      },
+    },
+  };
+}
+
 test('owner-side adapter closure serves member_insight without mocked clients', async () => {
   const result = await runMilestoneBGuardedExecutionChain({
     runtimeRequestEnvelope: buildOwnerRuntimeRequestEnvelope(),
@@ -203,25 +279,14 @@ test('owner-side data adapter cache is bounded by runCacheMaxEntries', async () 
   const adapter = createOwnerSideDataPlatformAdapter({
     runCacheMaxEntries: 2,
     runCacheTtlMs: 0,
-    runMemberInsightBackboneImpl: async ({ input }) => {
+    runMemberInsightOwnerSurfaceImpl: async ({ input }) => {
       runCount += 1;
-      return {
-        trace_ref: `navly:trace:cache-${runCount}`,
-        capability_id: 'navly.store.member_insight',
-        service_object_id: 'navly.service.store.member_insight',
-        backbone_status: 'backbone_ready',
-        latest_usable_business_date: input.requested_business_date,
-        state_trace_ref: `navly:state-trace:cache:${input.requested_business_date}`,
-        run_trace_ref: `navly:run-trace:cache:${runCount}`,
-        updated_at: FIXED_NOW,
-        service_object: {
-          customer_count: 1,
-          customer_card_count: 1,
-          consume_bill_count: 1,
-          consume_bill_payment_count: 1,
-          consume_bill_info_count: 1,
-        },
-      };
+      return buildOwnerSurfaceResult({
+        requestId: input.request_id,
+        traceRef: input.trace_ref,
+        targetScopeRef: input.target_scope_ref,
+        businessDate: input.requested_business_date,
+      });
     },
   });
 
@@ -238,29 +303,18 @@ test('owner-side data adapter removes rejected promise entries so next attempt c
   const adapter = createOwnerSideDataPlatformAdapter({
     runCacheMaxEntries: 4,
     runCacheTtlMs: 0,
-    runMemberInsightBackboneImpl: async ({ input }) => {
+    runMemberInsightOwnerSurfaceImpl: async ({ input }) => {
       runCount += 1;
       if (runCount === 1) {
         throw new Error(`synthetic failure for ${input.requested_business_date}`);
       }
 
-      return {
-        trace_ref: `navly:trace:retry-${runCount}`,
-        capability_id: 'navly.store.member_insight',
-        service_object_id: 'navly.service.store.member_insight',
-        backbone_status: 'backbone_ready',
-        latest_usable_business_date: input.requested_business_date,
-        state_trace_ref: `navly:state-trace:retry:${input.requested_business_date}`,
-        run_trace_ref: `navly:run-trace:retry:${runCount}`,
-        updated_at: FIXED_NOW,
-        service_object: {
-          customer_count: 1,
-          customer_card_count: 1,
-          consume_bill_count: 1,
-          consume_bill_payment_count: 1,
-          consume_bill_info_count: 1,
-        },
-      };
+      return buildOwnerSurfaceResult({
+        requestId: input.request_id,
+        traceRef: input.trace_ref,
+        targetScopeRef: input.target_scope_ref,
+        businessDate: input.requested_business_date,
+      });
     },
   });
 

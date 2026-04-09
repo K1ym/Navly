@@ -18,7 +18,7 @@ const defaultFixtureBundlePath = path.join(
 const canonicalCapabilityId = 'navly.store.member_insight';
 const canonicalServiceObjectId = 'navly.service.store.member_insight';
 
-const memberInsightRunnerCode = String.raw`import json
+const memberInsightOwnerSurfaceCode = String.raw`import json
 import sys
 from pathlib import Path
 
@@ -26,40 +26,39 @@ data_platform_root = Path(sys.argv[1]).resolve()
 if str(data_platform_root) not in sys.path:
     sys.path.insert(0, str(data_platform_root))
 
-from backbone_support.qinqin_substrate import FixtureQinqinTransport
-from ingestion.member_insight_vertical_slice import run_member_insight_vertical_slice
+from connectors.qinqin.qinqin_substrate import (
+    DEFAULT_LIVE_TIMEOUT_MS,
+    FixtureQinqinTransport,
+    LiveQinqinTransport,
+)
+from workflows.member_insight_owner_surface import build_member_insight_owner_surface
 
 args = json.loads(sys.argv[2])
-fixture_bundle = json.loads(Path(args["fixture_bundle_path"]).read_text(encoding="utf-8"))
-transport = FixtureQinqinTransport(fixture_bundle)
-result = run_member_insight_vertical_slice(
+transport_kind = args.get("transport_kind") or "fixture"
+if transport_kind == "fixture":
+    fixture_bundle = json.loads(Path(args["fixture_bundle_path"]).read_text(encoding="utf-8"))
+    transport = FixtureQinqinTransport(fixture_bundle)
+else:
+    live_timeout_ms = args.get("live_timeout_ms") or DEFAULT_LIVE_TIMEOUT_MS
+    transport = LiveQinqinTransport(
+        base_url=args["live_base_url"],
+        timeout_ms=int(live_timeout_ms),
+        authorization=args.get("live_authorization"),
+        token=args.get("live_token"),
+    )
+
+result = build_member_insight_owner_surface(
+    request_id=args["request_id"],
+    trace_ref=args["trace_ref"],
+    target_scope_ref=args["target_scope_ref"],
+    target_business_date=args["requested_business_date"],
     org_id=args["org_id"],
     start_time=args["start_time"],
     end_time=args["end_time"],
-    requested_business_date=args["requested_business_date"],
     app_secret=args["app_secret"],
     transport=transport,
 )
-
-state = result["latest_state_artifacts"]["vertical_slice_backbone_state"]
-summary = {
-    "trace_ref": result["trace_ref"],
-    "capability_id": result["capability_id"],
-    "service_object_id": result["service_object_id"],
-    "backbone_status": state["backbone_status"],
-    "latest_usable_business_date": state["requested_business_date"],
-    "state_trace_ref": state["state_trace_ref"],
-    "run_trace_ref": result["historical_run_truth"]["ingestion_run"]["run_trace_ref"],
-    "updated_at": state["updated_at"],
-    "service_object": {
-        "customer_count": len(result["canonical_artifacts"]["customer"]),
-        "customer_card_count": len(result["canonical_artifacts"]["customer_card"]),
-        "consume_bill_count": len(result["canonical_artifacts"]["consume_bill"]),
-        "consume_bill_payment_count": len(result["canonical_artifacts"]["consume_bill_payment"]),
-        "consume_bill_info_count": len(result["canonical_artifacts"]["consume_bill_info"]),
-    },
-}
-print(json.dumps(summary, ensure_ascii=False))`;
+print(json.dumps(result, ensure_ascii=False))`;
 
 function asNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
@@ -87,21 +86,47 @@ function resolveDataContext(query, adapterOptions) {
   const fixtureBundlePath = asNonEmptyString(contextFromQuery.fixture_bundle_path)
     ?? asNonEmptyString(adapterOptions.fixtureBundlePath)
     ?? defaultFixtureBundlePath;
+  const transportKind = asNonEmptyString(contextFromQuery.transport_kind) ?? 'fixture';
 
   const startTime = asNonEmptyString(contextFromQuery.start_time) ?? `${targetBusinessDate} 00:00:00`;
   const endTime = asNonEmptyString(contextFromQuery.end_time) ?? `${targetBusinessDate} 23:59:59`;
+  const liveBaseUrl = asNonEmptyString(contextFromQuery.live_base_url)
+    ?? asNonEmptyString(adapterOptions.liveBaseUrl)
+    ?? asNonEmptyString(process.env.QINQIN_API_BASE_URL)
+    ?? asNonEmptyString(process.env.QINQIN_REAL_DATA_URL);
+  const liveAuthorization = asNonEmptyString(contextFromQuery.live_authorization)
+    ?? asNonEmptyString(adapterOptions.liveAuthorization)
+    ?? asNonEmptyString(process.env.QINQIN_API_AUTHORIZATION);
+  const liveToken = asNonEmptyString(contextFromQuery.live_token)
+    ?? asNonEmptyString(adapterOptions.liveToken)
+    ?? asNonEmptyString(process.env.QINQIN_API_TOKEN)
+    ?? asNonEmptyString(process.env.QINQIN_REAL_DATA_TOKEN);
+  const liveTimeoutMs = Number(
+    contextFromQuery.live_timeout_ms
+      ?? adapterOptions.liveTimeoutMs
+      ?? process.env.QINQIN_API_REQUEST_TIMEOUT_MS
+      ?? 15000,
+  );
 
   return {
+    request_id: query.request_id,
+    trace_ref: query.trace_ref,
+    target_scope_ref: query.target_scope_ref,
     org_id: orgId,
     requested_business_date: targetBusinessDate,
     start_time: startTime,
     end_time: endTime,
     app_secret: appSecret,
     fixture_bundle_path: fixtureBundlePath,
+    transport_kind: transportKind,
+    live_base_url: liveBaseUrl,
+    live_authorization: liveAuthorization,
+    live_token: liveToken,
+    live_timeout_ms: Number.isFinite(liveTimeoutMs) ? liveTimeoutMs : 15000,
   };
 }
 
-async function runMemberInsightBackbone({
+async function runMemberInsightOwnerSurface({
   pythonExecutable,
   dataPlatformRoot,
   input,
@@ -111,7 +136,7 @@ async function runMemberInsightBackbone({
     pythonExecutable,
     [
       '-c',
-      memberInsightRunnerCode,
+      memberInsightOwnerSurfaceCode,
       dataPlatformRoot,
       JSON.stringify(input),
     ],
@@ -207,26 +232,42 @@ export function createOwnerSideDataPlatformAdapter({
   defaultOrgId = null,
   defaultAppSecret = null,
   fixtureBundlePath = defaultFixtureBundlePath,
+  liveBaseUrl = null,
+  liveAuthorization = null,
+  liveToken = null,
+  liveTimeoutMs = 15000,
   runCacheMaxEntries = 32,
   runCacheTtlMs = 5 * 60 * 1000,
   nowEpochMsFactory = () => Date.now(),
-  runMemberInsightBackboneImpl = runMemberInsightBackbone,
+  runMemberInsightOwnerSurfaceImpl = runMemberInsightOwnerSurface,
 } = {}) {
   const runCache = new Map();
 
-  async function loadMemberInsightSummary(query) {
+  async function loadMemberInsightOwnerSurface(query) {
     const context = resolveDataContext(query, {
       defaultOrgId,
       defaultAppSecret,
       fixtureBundlePath,
+      liveBaseUrl,
+      liveAuthorization,
+      liveToken,
+      liveTimeoutMs,
     });
 
     const cacheKey = JSON.stringify([
+      query.request_id,
+      query.trace_ref,
+      query.target_scope_ref,
       context.org_id,
       context.requested_business_date,
       context.start_time,
       context.end_time,
       context.fixture_bundle_path,
+      context.transport_kind,
+      context.live_base_url,
+      context.live_authorization,
+      context.live_token,
+      context.live_timeout_ms,
     ]);
 
     const nowEpochMsCandidate = Number(nowEpochMsFactory());
@@ -238,7 +279,7 @@ export function createOwnerSideDataPlatformAdapter({
       return cachedEntry.promise;
     }
 
-    const runPromise = runMemberInsightBackboneImpl({
+    const runPromise = runMemberInsightOwnerSurfaceImpl({
       pythonExecutable,
       dataPlatformRoot,
       input: context,
@@ -262,23 +303,8 @@ export function createOwnerSideDataPlatformAdapter({
         return buildUnsupportedReadiness(query);
       }
 
-      const summary = await loadMemberInsightSummary(query);
-      const readinessStatus = summary.backbone_status === 'backbone_ready' ? 'ready' : 'pending';
-
-      return {
-        request_id: query.request_id,
-        trace_ref: query.trace_ref,
-        capability_id: query.capability_id,
-        readiness_status: readinessStatus,
-        evaluated_scope_ref: query.target_scope_ref,
-        requested_business_date: query.target_business_date,
-        latest_usable_business_date: summary.latest_usable_business_date ?? query.target_business_date,
-        reason_codes: readinessStatus === 'ready' ? [] : ['missing_dependency'],
-        blocking_dependencies: [],
-        state_trace_refs: summary.state_trace_ref ? [summary.state_trace_ref] : [],
-        run_trace_refs: summary.run_trace_ref ? [summary.run_trace_ref] : [],
-        evaluated_at: summary.updated_at ?? new Date().toISOString(),
-      };
+      const ownerSurface = await loadMemberInsightOwnerSurface(query);
+      return ownerSurface.readiness_response;
     },
 
     async queryThemeService(query) {
@@ -286,33 +312,8 @@ export function createOwnerSideDataPlatformAdapter({
         return buildScopeMismatchService(query);
       }
 
-      const summary = await loadMemberInsightSummary(query);
-      if (summary.backbone_status !== 'backbone_ready') {
-        return buildScopeMismatchService(query, ['missing_dependency']);
-      }
-
-      return {
-        request_id: query.request_id,
-        trace_ref: query.trace_ref,
-        capability_id: query.capability_id,
-        service_object_id: query.service_object_id,
-        service_status: 'served',
-        service_object: {
-          ...summary.service_object,
-          capability_id: query.capability_id,
-          service_object_id: query.service_object_id,
-          target_scope_ref: query.target_scope_ref,
-          target_business_date: query.target_business_date,
-        },
-        data_window: {
-          from: summary.latest_usable_business_date ?? query.target_business_date,
-          to: summary.latest_usable_business_date ?? query.target_business_date,
-        },
-        explanation_object: null,
-        state_trace_refs: summary.state_trace_ref ? [summary.state_trace_ref] : [],
-        run_trace_refs: summary.run_trace_ref ? [summary.run_trace_ref] : [],
-        served_at: summary.updated_at ?? new Date().toISOString(),
-      };
+      const ownerSurface = await loadMemberInsightOwnerSurface(query);
+      return ownerSurface.theme_service_response;
     },
   };
 }
