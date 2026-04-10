@@ -24,3 +24,8 @@
 - field catalog / landing policy / variance register consistency
 - commission setting quality / schema-alignment / backfill / completeness surface
 - member insight owner-side readiness / theme service surface
+- finance summary owner-side readiness / theme service surface
+- staff board owner-side readiness / theme service surface
+- daily overview aggregate readiness / theme service surface
+- capability explanation companion service surface
+- phase-1 service-surface registry status and shared explanation dependency wiring

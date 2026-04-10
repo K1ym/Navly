@@ -8,6 +8,15 @@
   - 为 `navly.service.store.member_insight` 产出 formal `theme_service_response`
   - 在非 ready 场景下返回 `not_ready` 与 explanation object
   - 在 capability / service object 不匹配时返回 `scope_mismatch`
+- `finance_summary_theme_service_surface.py`
+  - 为 `navly.service.store.finance_summary` 发布 formal owner-side service surface
+- `staff_board_theme_service_surface.py`
+  - 为 `navly.service.store.staff_board` 发布 formal owner-side service surface
+- `daily_overview_theme_service_surface.py`
+  - 为 `navly.service.store.daily_overview` 聚合已发布 store service objects
+  - 在 service object 中显式携带 governed business-day boundary policy
+- `capability_explanation_service_surface.py`
+  - 为 `navly.service.system.capability_explanation` 发布 companion explanation service surface
 
 当前边界：
 

@@ -1,6 +1,6 @@
 # Navly Data Platform
 
-状态：milestone-b backbone
+状态：milestone-b backbone with published phase-1 owner surfaces
 
 本目录是 `Navly_v1` 数据中台的实现骨架与 backbone 入口。
 
@@ -30,9 +30,27 @@
 - vertical slice orchestration backbone
   - `navly.store.member_insight`
   - `navly.service.store.member_insight`
-- first formal owner-side readiness / theme service surface
+- formal owner-side readiness / service surfaces
   - `completeness/member_insight_readiness_surface.py`
   - `serving/member_insight_theme_service_surface.py`
+  - `completeness/finance_summary_readiness_surface.py`
+  - `serving/finance_summary_theme_service_surface.py`
+  - `completeness/staff_board_readiness_surface.py`
+  - `serving/staff_board_theme_service_surface.py`
+  - `completeness/daily_overview_readiness_surface.py`
+  - `serving/daily_overview_theme_service_surface.py`
+  - `serving/capability_explanation_service_surface.py`
+- owner-side orchestration
+  - `workflows/member_insight_owner_surface.py`
+  - `workflows/finance_summary_owner_surface.py`
+  - `workflows/staff_board_owner_surface.py`
+  - `workflows/daily_overview_owner_surface.py`
+  - `workflows/capability_explanation_owner_surface.py`
+- service projections
+  - `projections/finance_summary_service_projection.py`
+  - `projections/staff_board_service_projection.py`
+  - `projections/daily_overview_service_projection.py`
+  - `projections/capability_explanation_service_projection.py`
 - 基础单测与 CLI runner
 - Qinqin v1.1 contract governance consistency tests
 
@@ -76,7 +94,9 @@
   - `completeness/`
   - `projections/`
 - 当前 milestone B 已具备 backbone，但这**不等于** ready / service runtime 已完成
-- 当前已对 `member_insight` 发布 formal owner-side readiness / theme service surface，但 runtime 还未在默认路径消费该 surface
+- 当前已对 `member_insight` / `finance_summary` / `staff_board` / `daily_overview` 发布 formal owner-side readiness / theme service surface
+- `navly.service.system.capability_explanation` 作为 companion service surface 已可从 serving boundary 受控读取
+- runtime 还未在默认路径消费完整 phase-1 service set
 
 ## 重要说明
 

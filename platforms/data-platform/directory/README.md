@@ -12,11 +12,11 @@
 - field landing policy registry
 - source variance registry
 
-其余 capability 相关对象仍可能保留 seed / placeholder 状态：
+当前 capability 相关对象状态：
 
-- capability registry seed
-- capability service binding seed
-- capability dependency placeholder
+- capability registry：phase-1 owner surface 已发布
+- capability service binding registry：phase-1 default binding 已发布
+- capability dependency registry：仍为 placeholder，待后续治理对象提升
 
 维护约束：
 
