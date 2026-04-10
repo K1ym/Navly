@@ -53,6 +53,10 @@
   - `projections/capability_explanation_service_projection.py`
 - 基础单测与 CLI runner
 - Qinqin v1.1 contract governance consistency tests
+- capability dependency registry freeze
+  - `contracts/capability-dependency-entry.contract.seed.json`
+  - `directory/capability-dependency-registry.seed.json`
+  - `directory/capability_dependency_registry.py`
 
 当前**未完成**：
 
@@ -67,7 +71,8 @@
 
 - 跨模块 shared contracts owner：`shared/contracts`
 - `platforms/data-platform/contracts/`：只保留 data-platform owner contracts
-- `platforms/data-platform/directory/`：承载 data-platform 当前纳管 registry；Qinqin v1.1 contract governance 已进入 formal registry，其余对象仍可能是 seed / placeholder
+- `platforms/data-platform/directory/`：承载 data-platform 当前纳管 registry；Qinqin v1.1 contract governance、business-day boundary policy、capability dependency matrix 已进入 formal registry，其余 capability 元数据仍可能保留 seed 状态
+- readiness / serving / ingestion 若需要 capability dependency truth，应读取 `capability-dependency-registry.seed.json`
 - data-platform 不拥有 access truth
 - data-platform 当前实现仍然只是在自身 owner scope 内推进 raw truth / canonical fact truth / latest state backbone
 

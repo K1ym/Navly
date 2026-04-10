@@ -21,6 +21,7 @@
   ],
   "data_platform_owned_contracts": [
     "business_day_boundary_policy_entry",
+    "capability_dependency_entry",
     "source_system_registry_entry",
     "endpoint_contract_registry_entry",
     "endpoint_parameter_registry_entry",

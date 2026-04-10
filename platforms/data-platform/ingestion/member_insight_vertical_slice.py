@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import json
 import sys
 import uuid
 from functools import lru_cache
@@ -16,23 +15,18 @@ from connectors.qinqin.qinqin_substrate import (
     load_seed_backed_qinqin_registry,
     normalize_fetch_page_result,
 )
+from directory.capability_dependency_registry import load_capability_dependency_entry
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
 VERTICAL_SLICE_CAPABILITY_ID = 'navly.store.member_insight'
 SOURCE_SYSTEM_ID = 'qinqin.v1_1'
 DEFAULT_PAGE_SIZE = 200
 
-
-def _load_json(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding='utf-8'))
-
-
 def _load_member_insight_dependency_entry(data_platform_root: Path = DATA_PLATFORM_ROOT) -> dict[str, Any]:
-    registry = _load_json(data_platform_root / 'directory' / 'capability-dependency-registry.placeholder.json')
-    for entry in registry['entries']:
-        if entry['capability_id'] == VERTICAL_SLICE_CAPABILITY_ID:
-            return entry
-    raise KeyError(f'Missing dependency entry for {VERTICAL_SLICE_CAPABILITY_ID}')
+    return load_capability_dependency_entry(
+        VERTICAL_SLICE_CAPABILITY_ID,
+        data_platform_root=data_platform_root,
+    )
 
 
 def _new_trace_ref() -> str:
@@ -112,6 +106,9 @@ def run_member_insight_vertical_slice(
     data_platform_root: Path = DATA_PLATFORM_ROOT,
 ) -> dict[str, Any]:
     dependency_entry = _load_member_insight_dependency_entry(data_platform_root=data_platform_root)
+    required_endpoint_contract_ids = dependency_entry['required_endpoint_contract_ids']
+    if not required_endpoint_contract_ids:
+        raise ValueError(f'No endpoints defined for capability {VERTICAL_SLICE_CAPABILITY_ID}')
     service_object_id = dependency_entry['default_service_object_id']
     registry = load_seed_backed_qinqin_registry(data_platform_root=data_platform_root)
     resolved_transport_kind = _transport_kind(transport)
@@ -130,7 +127,7 @@ def run_member_insight_vertical_slice(
     raw_pages_by_endpoint: dict[str, list[dict[str, Any]]] = {}
     completed_endpoint_runs: list[dict[str, Any]] = []
 
-    for endpoint_contract_id in dependency_entry.get('endpoint_contract_ids', []):
+    for endpoint_contract_id in required_endpoint_contract_ids:
         endpoint_run = artifact_store.start_endpoint_run(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,

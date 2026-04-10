@@ -5,6 +5,7 @@
 当前文件：
 
 - `business-day-boundary-policy-registry.md`：business date 切换边界的 governed registry 参考说明
+- `capability-dependency-registry.md`：phase-1 capability dependency matrix 的 governed registry 参考说明
 - `commission-setting-quality-and-state-objects.md`：`GetTechCommissionSetList` 的 L2 quality / state 对象说明
 - `secrets-and-config.md`：Qinqin API 运行时 secrets 与配置规范
 - `../runbooks/data-platform/member-insight-live-transport.md`：member_insight live transport 的运行方式与 replay artifact 说明

@@ -171,6 +171,14 @@ class FinanceSummaryVerticalSliceTest(unittest.TestCase):
 
         self.assertEqual(result['capability_id'], 'navly.store.finance_summary')
         self.assertEqual(result['service_object_id'], 'navly.service.store.finance_summary')
+        self.assertEqual(result['dependency_entry']['dependency_status'], 'phase_1_contract_frozen')
+        self.assertEqual(
+            result['dependency_entry']['required_endpoint_contract_ids'],
+            [
+                'qinqin.member.get_recharge_bill_list.v1_3',
+                'qinqin.member.get_user_trade_list.v1_4',
+            ],
+        )
         self.assertEqual(result['historical_run_truth']['ingestion_run']['run_status'], 'completed')
         self.assertEqual(len(result['historical_run_truth']['endpoint_runs']), 2)
         self.assertTrue(all(run['terminal_outcome_category'] == 'success' for run in result['historical_run_truth']['endpoint_runs']))

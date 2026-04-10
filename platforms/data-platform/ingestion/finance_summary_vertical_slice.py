@@ -13,6 +13,7 @@ from connectors.qinqin.qinqin_substrate import (
     load_seed_backed_qinqin_registry,
     normalize_fetch_page_result,
 )
+from directory.capability_dependency_registry import load_capability_dependency_entry
 from warehouse.finance_summary_canonical import (
     ACCOUNT_TRADE_ENDPOINT_ID,
     RECHARGE_ENDPOINT_ID,
@@ -24,23 +25,6 @@ FINANCE_SUMMARY_CAPABILITY_ID = 'navly.store.finance_summary'
 FINANCE_SUMMARY_SERVICE_OBJECT_ID = 'navly.service.store.finance_summary'
 SOURCE_SYSTEM_ID = 'qinqin.v1_1'
 DEFAULT_PAGE_SIZE = 200
-FINANCE_SUMMARY_DEPENDENCY_BOUNDARY = {
-    'capability_id': FINANCE_SUMMARY_CAPABILITY_ID,
-    'default_service_object_id': FINANCE_SUMMARY_SERVICE_OBJECT_ID,
-    'dependency_status': 'local_slice_governed',
-    'notes': 'ASP-32 keeps the finance_summary dependency boundary local to the finance slice until the global registry is promoted beyond placeholder status.',
-    'endpoint_contract_ids': [
-        RECHARGE_ENDPOINT_ID,
-        ACCOUNT_TRADE_ENDPOINT_ID,
-    ],
-    'required_canonical_datasets': [
-        'recharge_bill',
-        'recharge_bill_payment',
-        'recharge_bill_sales',
-        'recharge_bill_ticket',
-        'account_trade',
-    ],
-}
 SOURCE_EMPTY_MESSAGE_MARKERS = ('暂无数据', '无数据', '没有数据', '未查询到数据')
 AUTH_MESSAGE_MARKERS = ('授权', '认证', '登录', 'token', '未授权', '无权限', '权限')
 SIGN_MESSAGE_MARKERS = ('验签', '签名', 'sign')
@@ -52,6 +36,13 @@ class SourceSchemaError(ValueError):
 
 def _new_trace_ref() -> str:
     return f'navly:trace:{uuid.uuid4().hex[:16]}'
+
+
+def _load_finance_summary_dependency_entry(data_platform_root: Path = DATA_PLATFORM_ROOT) -> dict[str, Any]:
+    return load_capability_dependency_entry(
+        FINANCE_SUMMARY_CAPABILITY_ID,
+        data_platform_root=data_platform_root,
+    )
 
 
 def _run_status(endpoint_runs: list[dict[str, Any]]) -> str:
@@ -244,6 +235,10 @@ def run_finance_summary_vertical_slice(
     output_root: str | Path | None = None,
     data_platform_root: Path = DATA_PLATFORM_ROOT,
 ) -> dict[str, Any]:
+    dependency_entry = _load_finance_summary_dependency_entry(data_platform_root=data_platform_root)
+    required_endpoint_contract_ids = dependency_entry['required_endpoint_contract_ids']
+    if not required_endpoint_contract_ids:
+        raise ValueError(f'No endpoints defined for capability {FINANCE_SUMMARY_CAPABILITY_ID}')
     registry = load_seed_backed_qinqin_registry(data_platform_root=data_platform_root)
     resolved_transport_kind = _transport_kind(transport)
     artifact_store = _vertical_slice_artifact_store(output_root=output_root)
@@ -260,7 +255,7 @@ def run_finance_summary_vertical_slice(
     raw_pages_by_endpoint: dict[str, list[dict[str, Any]]] = {}
     completed_endpoint_runs: list[dict[str, Any]] = []
 
-    for endpoint_contract_id in FINANCE_SUMMARY_DEPENDENCY_BOUNDARY['endpoint_contract_ids']:
+    for endpoint_contract_id in required_endpoint_contract_ids:
         endpoint_run = artifact_store.start_endpoint_run(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,
@@ -488,7 +483,7 @@ def run_finance_summary_vertical_slice(
         'transport_kind': resolved_transport_kind,
         'capability_id': FINANCE_SUMMARY_CAPABILITY_ID,
         'service_object_id': FINANCE_SUMMARY_SERVICE_OBJECT_ID,
-        'dependency_boundary': FINANCE_SUMMARY_DEPENDENCY_BOUNDARY,
+        'dependency_entry': dependency_entry,
         'historical_run_truth': {
             'ingestion_run': finalized_ingestion_run,
             'endpoint_runs': completed_endpoint_runs,
@@ -508,7 +503,6 @@ def run_finance_summary_vertical_slice(
 __all__ = [
     'DEFAULT_PAGE_SIZE',
     'FINANCE_SUMMARY_CAPABILITY_ID',
-    'FINANCE_SUMMARY_DEPENDENCY_BOUNDARY',
     'FINANCE_SUMMARY_SERVICE_OBJECT_ID',
     'run_finance_summary_vertical_slice',
 ]

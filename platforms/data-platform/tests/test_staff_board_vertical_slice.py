@@ -116,6 +116,15 @@ class StaffBoardVerticalSliceTest(unittest.TestCase):
 
             self.assertEqual(result['capability_id'], 'navly.store.staff_board')
             self.assertEqual(result['service_object_id'], 'navly.service.store.staff_board')
+            self.assertEqual(result['dependency_entry']['dependency_status'], 'phase_1_contract_frozen')
+            self.assertEqual(
+                result['dependency_entry']['required_endpoint_contract_ids'],
+                [
+                    'qinqin.staff.get_person_list.v1_5',
+                    'qinqin.staff.get_tech_up_clock_list.v1_6',
+                    'qinqin.staff.get_tech_market_list.v1_7',
+                ],
+            )
             self.assertEqual(result['historical_run_truth']['ingestion_run']['run_status'], 'completed')
             self.assertEqual(len(result['historical_run_truth']['endpoint_runs']), 3)
             self.assertEqual(len(result['raw_replay']['raw_response_pages']), 3)
@@ -171,21 +180,15 @@ class StaffBoardVerticalSliceTest(unittest.TestCase):
             'backbone_ready',
         )
 
-    def test_missing_capability_registry_entry_raises_descriptive_error(self) -> None:
+    def test_missing_capability_dependency_entry_raises_descriptive_error(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
             directory = root / 'directory'
             directory.mkdir(parents=True, exist_ok=True)
-            (directory / 'capability-registry.seed.json').write_text(json.dumps({
+            (directory / 'capability-dependency-registry.seed.json').write_text(json.dumps({
                 'entries': [],
             }), encoding='utf-8')
-            (directory / 'field-landing-policy.seed.json').write_text(json.dumps({
-                'entries': [],
-            }), encoding='utf-8')
-            (directory / 'endpoint-contracts.seed.json').write_text(json.dumps({
-                'entries': [],
-            }), encoding='utf-8')
-            with self.assertRaisesRegex(ValueError, 'Missing capability registry entry'):
+            with self.assertRaisesRegex(KeyError, 'Missing capability dependency entry'):
                 _load_staff_board_dependency_entry(data_platform_root=root)
 
     def test_pagination_total_ignores_non_object_retdata(self) -> None:

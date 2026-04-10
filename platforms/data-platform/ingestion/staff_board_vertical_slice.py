@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import json
 import sys
 import uuid
 from functools import lru_cache
@@ -15,6 +14,7 @@ from connectors.qinqin.qinqin_substrate import (
     load_seed_backed_qinqin_registry,
     normalize_fetch_page_result,
 )
+from directory.capability_dependency_registry import load_capability_dependency_entry
 from warehouse.staff_workforce_canonical_backbone import (
     PERSON_ENDPOINT_ID,
     TECH_MARKET_ENDPOINT_ID,
@@ -37,48 +37,11 @@ SOURCE_EMPTY_KEYWORDS = ('暂无数据', '无数据', '没有数据', '未查询
 SOURCE_SIGN_KEYWORDS = ('验签', '签名', 'sign')
 SOURCE_AUTH_KEYWORDS = ('未授权', '无权限', '鉴权', '认证', 'token', 'authorization', 'auth')
 
-
-def _load_json(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding='utf-8'))
-
-
 def _load_staff_board_dependency_entry(data_platform_root: Path = DATA_PLATFORM_ROOT) -> dict[str, Any]:
-    capability_registry = _load_json(data_platform_root / 'directory' / 'capability-registry.seed.json')
-    capability_entry = next(
-        (
-            entry
-            for entry in capability_registry['entries']
-            if entry['capability_id'] == VERTICAL_SLICE_CAPABILITY_ID
-        ),
-        None,
+    return load_capability_dependency_entry(
+        VERTICAL_SLICE_CAPABILITY_ID,
+        data_platform_root=data_platform_root,
     )
-    if capability_entry is None:
-        raise ValueError(
-            f'Missing capability registry entry for {VERTICAL_SLICE_CAPABILITY_ID} in {data_platform_root / "directory" / "capability-registry.seed.json"}.'
-        )
-    field_landing = _load_json(data_platform_root / 'directory' / 'field-landing-policy.seed.json')
-    endpoint_order = [
-        entry['endpoint_contract_id']
-        for entry in _load_json(data_platform_root / 'directory' / 'endpoint-contracts.seed.json')['entries']
-    ]
-    required_dataset_set = set(DEFAULT_REQUIRED_CANONICAL_DATASETS)
-    endpoint_ids = {
-        entry['endpoint_contract_id']
-        for entry in field_landing['entries']
-        if set(entry.get('target_dataset') or []).intersection(required_dataset_set)
-    }
-    ordered_endpoint_ids = [
-        endpoint_contract_id
-        for endpoint_contract_id in endpoint_order
-        if endpoint_contract_id in endpoint_ids
-    ]
-    return {
-        'capability_id': VERTICAL_SLICE_CAPABILITY_ID,
-        'dependency_status': 'derived_from_field_landing_policy',
-        'default_service_object_id': capability_entry['default_service_object_id'],
-        'endpoint_contract_ids': ordered_endpoint_ids,
-        'required_canonical_datasets': list(DEFAULT_REQUIRED_CANONICAL_DATASETS),
-    }
 
 
 def _new_trace_ref() -> str:
@@ -264,11 +227,14 @@ def run_staff_board_vertical_slice(
     data_platform_root: Path = DATA_PLATFORM_ROOT,
 ) -> dict[str, Any]:
     dependency_entry = _load_staff_board_dependency_entry(data_platform_root=data_platform_root)
+    required_endpoint_contract_ids = dependency_entry['required_endpoint_contract_ids']
+    if not required_endpoint_contract_ids:
+        raise ValueError(f'No endpoints defined for capability {VERTICAL_SLICE_CAPABILITY_ID}')
     service_object_id = dependency_entry['default_service_object_id']
     registry = load_seed_backed_qinqin_registry(data_platform_root=data_platform_root)
     resolved_transport_kind = _transport_kind(transport)
     artifact_store = _vertical_slice_artifact_store(output_root=output_root)
-    source_system_id = registry.endpoint_contract(dependency_entry['endpoint_contract_ids'][0]).source_system_id
+    source_system_id = registry.endpoint_contract(required_endpoint_contract_ids[0]).source_system_id
     ingestion_run = artifact_store.start_ingestion_run(
         capability_id=VERTICAL_SLICE_CAPABILITY_ID,
         service_object_id=service_object_id,
@@ -283,7 +249,7 @@ def run_staff_board_vertical_slice(
     raw_pages_by_endpoint: dict[str, list[dict[str, Any]]] = {}
     completed_endpoint_runs: list[dict[str, Any]] = []
 
-    for endpoint_contract_id in dependency_entry['endpoint_contract_ids']:
+    for endpoint_contract_id in required_endpoint_contract_ids:
         endpoint_run = artifact_store.start_endpoint_run(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,
