@@ -19,6 +19,7 @@
     "data_access_audit_event"
   ],
   "data_platform_owned_contracts": [
+    "business_day_boundary_policy_entry",
     "source_system_registry_entry",
     "endpoint_contract_registry_entry",
     "endpoint_parameter_registry_entry",
@@ -41,5 +42,5 @@
       "capability_explanation"
     ]
   },
-  "note": "Phase-1 contract governance freeze for Qinqin v1.1. No shared contract definitions are duplicated here."
+  "note": "Phase-1 contract governance freeze for Qinqin v1.1 plus the business-day boundary policy registry. No shared contract definitions are duplicated here."
 }

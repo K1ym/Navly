@@ -4,6 +4,7 @@
 
 当前与 Qinqin v1.1 contract governance 直接相关的正式对象包括：
 
+- business day boundary policy registry
 - source system registry
 - endpoint contract registry
 - parameter canonicalization registry
@@ -20,5 +21,6 @@
 维护约束：
 
 - runtime / bridge / auth 不应再从 Markdown 或旧代码猜参数名、字段名、path、header 组合
+- runtime / ingestion / completeness 不应再从环境变量或临时常量猜 business day boundary
 - 如果某个治理对象已进入本目录的 formal registry，就应优先读取本目录，而不是重复解析 `docs/api/qinqin/**`
 - 不允许把 live secret 或 tenant/store 常量写进这些 registry
