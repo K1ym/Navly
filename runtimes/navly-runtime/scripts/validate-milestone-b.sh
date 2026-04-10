@@ -47,23 +47,32 @@ if (routeRegistry.status !== 'milestone_b_backbone') {
   throw new Error(`route registry status must be milestone_b_backbone, got ${routeRegistry.status}`);
 }
 
-const expectedCapabilityId = 'navly.store.member_insight';
-const expectedServiceObjectId = 'navly.service.store.member_insight';
+const expectedCapabilityBindings = [
+  ['navly.store.member_insight', 'navly.service.store.member_insight'],
+  ['navly.store.daily_overview', 'navly.service.store.daily_overview'],
+  ['navly.store.staff_board', 'navly.service.store.staff_board'],
+  ['navly.store.finance_summary', 'navly.service.store.finance_summary'],
+];
 
-const entry = (routeRegistry.entries ?? []).find((item) => item.capability_id === expectedCapabilityId);
-if (!entry) {
-  throw new Error(`route registry must include ${expectedCapabilityId}`);
-}
-if (entry.default_service_object_id !== expectedServiceObjectId) {
-  throw new Error(`default_service_object_id must be ${expectedServiceObjectId}`);
-}
-if (entry.status !== 'implemented_milestone_b_primary') {
-  throw new Error(`canonical entry status must be implemented_milestone_b_primary, got ${entry.status}`);
+for (const [expectedCapabilityId, expectedServiceObjectId] of expectedCapabilityBindings) {
+  const entry = (routeRegistry.entries ?? []).find((item) => item.capability_id === expectedCapabilityId);
+  if (!entry) {
+    throw new Error(`route registry must include ${expectedCapabilityId}`);
+  }
+  if (entry.default_service_object_id !== expectedServiceObjectId) {
+    throw new Error(`default_service_object_id must be ${expectedServiceObjectId}`);
+  }
+  if (!(entry.supported_service_object_ids ?? []).includes(expectedServiceObjectId)) {
+    throw new Error(`${expectedCapabilityId} must support its default service object`);
+  }
+  if (!(entry.supported_service_object_ids ?? []).includes('navly.service.system.capability_explanation')) {
+    throw new Error(`${expectedCapabilityId} must support the companion capability explanation service binding`);
+  }
 }
 
-const secondaryDaily = (routeRegistry.entries ?? []).find((item) => item.capability_id === 'navly.store.daily_overview');
-if (secondaryDaily && secondaryDaily.status === 'implemented_milestone_b_primary') {
-  throw new Error('daily_overview cannot remain the primary minimal slice');
+const memberInsightEntry = (routeRegistry.entries ?? []).find((item) => item.capability_id === 'navly.store.member_insight');
+if (memberInsightEntry?.status !== 'implemented_milestone_b_primary') {
+  throw new Error(`canonical entry status must be implemented_milestone_b_primary, got ${memberInsightEntry?.status}`);
 }
 
 const fallback = routeRegistry.default_fallback ?? {};

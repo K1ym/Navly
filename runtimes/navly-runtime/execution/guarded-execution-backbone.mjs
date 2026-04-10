@@ -7,6 +7,8 @@ import {
   validateThemeServiceResponseShape,
 } from '../contracts/shared-contract-alignment.mjs';
 
+const EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
+
 function assertAdapterMethod(adapter, methodName, adapterName) {
   if (!adapter || typeof adapter[methodName] !== 'function') {
     throw new Error(`${adapterName}.${methodName} is required for runtime guarded execution`);
@@ -45,6 +47,14 @@ function buildDataAdapterContext(interactionContext) {
     end_time: pickString(slots.data_window_end_time),
     app_secret: pickString(slots.data_app_secret),
     fixture_bundle_path: pickString(slots.data_fixture_bundle_path),
+    fixture_bundle_paths: Array.isArray(slots.data_fixture_bundle_paths)
+      ? slots.data_fixture_bundle_paths.filter((value) => typeof value === 'string' && value.trim().length > 0)
+      : null,
+    transport_kind: pickString(slots.data_transport_kind),
+    live_base_url: pickString(slots.data_live_base_url),
+    live_authorization: pickString(slots.data_live_authorization),
+    live_token: pickString(slots.data_live_token),
+    live_timeout_ms: slots.data_live_timeout_ms ?? null,
   };
 }
 
@@ -128,6 +138,90 @@ function buildThemeServiceQuery({
   };
 }
 
+function buildExplanationServiceQuery({
+  interactionContext,
+  executionPlan,
+  effectiveAccessContext,
+  accessDecision,
+  readinessResponse,
+}) {
+  const baseQuery = buildThemeServiceQuery({
+    interactionContext,
+    executionPlan: {
+      ...executionPlan,
+      selected_service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
+    },
+    effectiveAccessContext,
+    accessDecision,
+    readinessResponse,
+  });
+
+  return {
+    ...baseQuery,
+    extensions: {
+      ...(baseQuery.extensions ?? {}),
+      selected_service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
+    },
+  };
+}
+
+function uniqueCodes(codes) {
+  return [...new Set((codes ?? []).filter((code) => typeof code === 'string' && code.trim().length > 0))];
+}
+
+async function queryValidatedThemeService({
+  dataPlatformClient,
+  query,
+  baseOutput,
+  effectiveAccessContext,
+  readinessQuery,
+  readinessResponse,
+}) {
+  let themeServiceResponse;
+  try {
+    themeServiceResponse = await dataPlatformClient.queryThemeService(query);
+  } catch (error) {
+    return {
+      ok: false,
+      failure: buildDependencyError(
+        {
+          ...baseOutput,
+          effective_access_context: effectiveAccessContext,
+          readiness_query: readinessQuery,
+          readiness_response: readinessResponse,
+          theme_service_query: query,
+        },
+        ['runtime.dependency.service_error'],
+        error?.message ?? 'theme service dependency call failed',
+      ),
+    };
+  }
+
+  try {
+    themeServiceResponse = validateThemeServiceResponseShape(themeServiceResponse);
+  } catch (error) {
+    return {
+      ok: false,
+      failure: buildDependencyError(
+        {
+          ...baseOutput,
+          effective_access_context: effectiveAccessContext,
+          readiness_query: readinessQuery,
+          readiness_response: readinessResponse,
+          theme_service_query: query,
+        },
+        ['runtime.dependency.service_invalid_response'],
+        error?.message ?? 'theme service dependency returned invalid response',
+      ),
+    };
+  }
+
+  return {
+    ok: true,
+    response: themeServiceResponse,
+  };
+}
+
 export async function runGuardedExecution({
   interactionContext,
   executionPlan,
@@ -181,8 +275,13 @@ export async function runGuardedExecution({
     readiness_response: null,
     theme_service_query: null,
     theme_service_response: null,
+    explanation_service_query: null,
+    explanation_service_response: null,
     reason_codes: [],
     error_message: null,
+    access_decision_status: null,
+    restriction_codes: [],
+    obligation_codes: [],
   };
 
   let accessDecision;
@@ -207,6 +306,9 @@ export async function runGuardedExecution({
       effective_access_context: effectiveAccessContext,
       dependency_stage: 'access_denied',
       reason_codes: normalizeReasonCodes(accessDecision.reason_codes, 'runtime.access.denied'),
+      access_decision_status: accessDecision.decision_status,
+      restriction_codes: uniqueCodes(accessDecision.restriction_codes),
+      obligation_codes: uniqueCodes(accessDecision.obligation_codes),
     };
   }
 
@@ -216,6 +318,9 @@ export async function runGuardedExecution({
       effective_access_context: effectiveAccessContext,
       dependency_stage: 'access_escalated',
       reason_codes: normalizeReasonCodes(accessDecision.reason_codes, 'runtime.access.escalation'),
+      access_decision_status: accessDecision.decision_status,
+      restriction_codes: uniqueCodes(accessDecision.restriction_codes),
+      obligation_codes: uniqueCodes(accessDecision.obligation_codes),
     };
   }
 
@@ -256,13 +361,87 @@ export async function runGuardedExecution({
   }
 
   if (readinessResponse.readiness_status !== 'ready') {
-    return {
+    const readinessBlockedOutput = {
       ...baseOutput,
       effective_access_context: effectiveAccessContext,
-      dependency_stage: 'readiness_blocked',
-      reason_codes: normalizeReasonCodes(readinessResponse.reason_codes, `runtime.readiness.${readinessResponse.readiness_status}`),
+      reason_codes: normalizeReasonCodes(
+        accessDecision.reason_codes,
+        accessDecision.decision_status === 'restricted' ? 'runtime.access.restricted' : null,
+      ),
       readiness_query: readinessQuery,
       readiness_response: readinessResponse,
+      access_decision_status: accessDecision.decision_status,
+      restriction_codes: uniqueCodes(accessDecision.restriction_codes),
+      obligation_codes: uniqueCodes(accessDecision.obligation_codes),
+    };
+    const explanationServiceQuery = buildExplanationServiceQuery({
+      interactionContext,
+      executionPlan,
+      effectiveAccessContext,
+      accessDecision,
+      readinessResponse,
+    });
+
+    if (executionPlan.selected_service_object_id === EXPLANATION_SERVICE_OBJECT_ID) {
+      const explanationServiceResult = await queryValidatedThemeService({
+        dataPlatformClient,
+        query: explanationServiceQuery,
+        baseOutput,
+        effectiveAccessContext,
+        readinessQuery,
+        readinessResponse,
+      });
+      if (!explanationServiceResult.ok) {
+        return explanationServiceResult.failure;
+      }
+
+      const themeServiceResponse = explanationServiceResult.response;
+      if (themeServiceResponse.service_status !== 'served') {
+        return {
+          ...readinessBlockedOutput,
+          dependency_stage: 'service_not_served',
+          reason_codes: normalizeReasonCodes(
+            themeServiceResponse.explanation_object?.reason_codes,
+            `runtime.service.${themeServiceResponse.service_status}`,
+          ),
+          theme_service_query: explanationServiceQuery,
+          theme_service_response: themeServiceResponse,
+        };
+      }
+
+      return {
+        ...readinessBlockedOutput,
+        dependency_stage: 'served',
+        theme_service_query: explanationServiceQuery,
+        theme_service_response: themeServiceResponse,
+      };
+    }
+
+    let explanationServiceResponse = null;
+    const explanationServiceResult = await queryValidatedThemeService({
+      dataPlatformClient,
+      query: explanationServiceQuery,
+      baseOutput,
+      effectiveAccessContext,
+      readinessQuery,
+      readinessResponse,
+    });
+    if (explanationServiceResult.ok && explanationServiceResult.response.service_status === 'served') {
+      explanationServiceResponse = explanationServiceResult.response;
+    }
+
+    return {
+      ...readinessBlockedOutput,
+      dependency_stage: 'readiness_blocked',
+      reason_codes: normalizeReasonCodes(
+        [
+          ...readinessResponse.reason_codes,
+          ...readinessBlockedOutput.reason_codes,
+        ],
+        `runtime.readiness.${readinessResponse.readiness_status}`,
+      ),
+      explanation_service_query: explanationServiceQuery,
+      explanation_service_response: explanationServiceResponse,
     };
   }
 
@@ -274,38 +453,18 @@ export async function runGuardedExecution({
     readinessResponse,
   });
 
-  let themeServiceResponse;
-  try {
-    themeServiceResponse = await dataPlatformClient.queryThemeService(themeServiceQuery);
-  } catch (error) {
-    return buildDependencyError(
-      {
-        ...baseOutput,
-        effective_access_context: effectiveAccessContext,
-        readiness_query: readinessQuery,
-        readiness_response: readinessResponse,
-        theme_service_query: themeServiceQuery,
-      },
-      ['runtime.dependency.service_error'],
-      error?.message ?? 'theme service dependency call failed',
-    );
+  const themeServiceResult = await queryValidatedThemeService({
+    dataPlatformClient,
+    query: themeServiceQuery,
+    baseOutput,
+    effectiveAccessContext,
+    readinessQuery,
+    readinessResponse,
+  });
+  if (!themeServiceResult.ok) {
+    return themeServiceResult.failure;
   }
-
-  try {
-    themeServiceResponse = validateThemeServiceResponseShape(themeServiceResponse);
-  } catch (error) {
-    return buildDependencyError(
-      {
-        ...baseOutput,
-        effective_access_context: effectiveAccessContext,
-        readiness_query: readinessQuery,
-        readiness_response: readinessResponse,
-        theme_service_query: themeServiceQuery,
-      },
-      ['runtime.dependency.service_invalid_response'],
-      error?.message ?? 'theme service dependency returned invalid response',
-    );
-  }
+  const themeServiceResponse = themeServiceResult.response;
 
   if (themeServiceResponse.service_status !== 'served') {
     return {
@@ -320,6 +479,9 @@ export async function runGuardedExecution({
       readiness_response: readinessResponse,
       theme_service_query: themeServiceQuery,
       theme_service_response: themeServiceResponse,
+      access_decision_status: accessDecision.decision_status,
+      restriction_codes: uniqueCodes(accessDecision.restriction_codes),
+      obligation_codes: uniqueCodes(accessDecision.obligation_codes),
     };
   }
 
@@ -327,10 +489,16 @@ export async function runGuardedExecution({
     ...baseOutput,
     effective_access_context: effectiveAccessContext,
     dependency_stage: 'served',
-    reason_codes: [],
+    reason_codes: normalizeReasonCodes(
+      accessDecision.reason_codes,
+      accessDecision.decision_status === 'restricted' ? 'runtime.access.restricted' : null,
+    ),
     readiness_query: readinessQuery,
     readiness_response: readinessResponse,
     theme_service_query: themeServiceQuery,
     theme_service_response: themeServiceResponse,
+    access_decision_status: accessDecision.decision_status,
+    restriction_codes: uniqueCodes(accessDecision.restriction_codes),
+    obligation_codes: uniqueCodes(accessDecision.obligation_codes),
   };
 }

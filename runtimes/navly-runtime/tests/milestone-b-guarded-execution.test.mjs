@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import { runMilestoneBGuardedExecutionChain } from '../execution/runtime-chain-backbone.mjs';
 
 const FIXED_NOW = '2026-04-06T08:00:00.000Z';
+const EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
+
+const capabilityServiceBinding = {
+  'navly.store.member_insight': 'navly.service.store.member_insight',
+  'navly.store.daily_overview': 'navly.service.store.daily_overview',
+  'navly.store.staff_board': 'navly.service.store.staff_board',
+  'navly.store.finance_summary': 'navly.service.store.finance_summary',
+};
 
 function buildAccessContextEnvelope(overrides = {}) {
   return {
@@ -15,7 +23,13 @@ function buildAccessContextEnvelope(overrides = {}) {
     tenant_ref: 'navly:tenant:sample-retail',
     primary_scope_ref: 'navly:scope:store:sample-store-001',
     granted_scope_refs: ['navly:scope:store:sample-store-001'],
-    granted_capability_ids: ['navly.store.member_insight'],
+    granted_capability_ids: [
+      'navly.store.member_insight',
+      'navly.store.daily_overview',
+      'navly.store.staff_board',
+      'navly.store.finance_summary',
+      'navly.system.capability_explanation',
+    ],
     issued_at: FIXED_NOW,
     expires_at: '2026-04-06T09:00:00.000Z',
     ...overrides,
@@ -47,7 +61,14 @@ function buildRuntimeRequestEnvelope(overrides = {}) {
   };
 }
 
-function buildAccessDecision({ request, status = 'allow', reasonCodes = [], obligationCodes = [] }) {
+function buildAccessDecision({
+  request,
+  status = 'allow',
+  reasonCodes = [],
+  restrictionCodes = [],
+  obligationCodes = [],
+  targetScopeRef = null,
+}) {
   return {
     decision_ref: `navly:decision:capability-${status}-001`,
     request_id: request.request_id,
@@ -56,16 +77,23 @@ function buildAccessDecision({ request, status = 'allow', reasonCodes = [], obli
     actor_ref: 'navly:actor:sample-store-manager',
     session_ref: 'navly:session:sample-session',
     target_capability_id: request.requested_capability_id,
-    target_scope_ref: request.requested_scope_ref,
+    target_scope_ref: targetScopeRef ?? request.requested_scope_ref,
     reason_codes: reasonCodes,
-    restriction_codes: [],
+    restriction_codes: restrictionCodes,
     obligation_codes: obligationCodes,
     decided_at: FIXED_NOW,
     expires_at: '2026-04-06T09:00:00.000Z',
   };
 }
 
-function createAuthKernelClient({ decisionStatus = 'allow', reasonCodes = [], obligationCodes = [] } = {}) {
+function createAuthKernelClient({
+  decisionStatus = 'allow',
+  reasonCodes = [],
+  restrictionCodes = [],
+  obligationCodes = [],
+  effectiveAccessContext = null,
+  targetScopeRef = null,
+} = {}) {
   const calls = [];
 
   return {
@@ -77,14 +105,113 @@ function createAuthKernelClient({ decisionStatus = 'allow', reasonCodes = [], ob
           request,
           status: decisionStatus,
           reasonCodes,
+          restrictionCodes,
           obligationCodes,
+          targetScopeRef,
         }),
+        access_context_envelope: effectiveAccessContext,
       };
     },
   };
 }
 
-function createDataPlatformClient({ readinessStatus = 'ready', readinessReasonCodes = [], serviceStatus = 'served', serviceReasonCodes = [] } = {}) {
+function buildServedServiceObject(capabilityId, serviceObjectId, targetScopeRef, targetBusinessDate) {
+  switch (serviceObjectId) {
+    case 'navly.service.store.daily_overview':
+      return {
+        capability_id: capabilityId,
+        service_object_id: serviceObjectId,
+        target_scope_ref: targetScopeRef,
+        target_business_date: targetBusinessDate,
+        business_day_boundary_policy: {
+          business_day_boundary_local_time: '03:00:00',
+          timezone: 'Asia/Shanghai',
+        },
+        published_service_object_ids: [
+          'navly.service.store.member_insight',
+          'navly.service.store.staff_board',
+          'navly.service.store.finance_summary',
+        ],
+        member_insight: { customer_count: 1 },
+        staff_board: { staff_count: 2 },
+        finance_summary: { account_trade_count: 1 },
+      };
+    case 'navly.service.store.staff_board':
+      return {
+        capability_id: capabilityId,
+        service_object_id: serviceObjectId,
+        target_scope_ref: targetScopeRef,
+        target_business_date: targetBusinessDate,
+        staff_count: 2,
+        on_duty_count: 1,
+      };
+    case 'navly.service.store.finance_summary':
+      return {
+        capability_id: capabilityId,
+        service_object_id: serviceObjectId,
+        target_scope_ref: targetScopeRef,
+        target_business_date: targetBusinessDate,
+        recharge_bill_count: 1,
+        account_trade_count: 1,
+      };
+    default:
+      return {
+        capability_id: capabilityId,
+        service_object_id: serviceObjectId,
+        target_scope_ref: targetScopeRef,
+        target_business_date: targetBusinessDate,
+        summary: 'store member insight',
+        customer_count: 11,
+      };
+  }
+}
+
+function buildExplanationServiceObject({
+  capabilityId,
+  targetScopeRef,
+  targetBusinessDate,
+  readinessStatus,
+  reasonCodes,
+  serviceStatus,
+}) {
+  return {
+    capability_id: capabilityId,
+    service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
+    target_scope_ref: targetScopeRef,
+    target_business_date: targetBusinessDate,
+    latest_usable_business_date: targetBusinessDate,
+    readiness_status: readinessStatus,
+    theme_service_status: serviceStatus,
+    reason_codes: reasonCodes,
+    blocking_dependencies: [],
+    explanation_fragments: [
+      {
+        fragment_kind: 'readiness_status',
+        value: readinessStatus,
+      },
+      ...reasonCodes.map((reasonCode) => ({
+        fragment_kind: 'reason_code',
+        value: reasonCode,
+      })),
+    ],
+    recommended_fallback_action: readinessStatus === 'ready'
+      ? 'consume_theme_service'
+      : 'inspect_trace_refs',
+    next_recheck_hint: readinessStatus === 'ready'
+      ? 'recheck_not_required'
+      : 'recheck_after_manual_investigation',
+  };
+}
+
+function createDataPlatformClient({
+  readinessStatus = 'ready',
+  readinessReasonCodes = [],
+  serviceStatus = 'served',
+  serviceReasonCodes = [],
+  latestUsableBusinessDate = '2026-04-05',
+  explanationServiceStatus = 'served',
+  explanationReasonCodes = null,
+} = {}) {
   const readinessCalls = [];
   const serviceCalls = [];
 
@@ -100,7 +227,7 @@ function createDataPlatformClient({ readinessStatus = 'ready', readinessReasonCo
         readiness_status: readinessStatus,
         evaluated_scope_ref: query.target_scope_ref,
         requested_business_date: query.target_business_date,
-        latest_usable_business_date: '2026-04-05',
+        latest_usable_business_date: latestUsableBusinessDate,
         reason_codes: readinessReasonCodes,
         blocking_dependencies: [],
         state_trace_refs: ['navly:state-trace:readiness:sample'],
@@ -110,16 +237,55 @@ function createDataPlatformClient({ readinessStatus = 'ready', readinessReasonCo
     },
     async queryThemeService(query) {
       serviceCalls.push(query);
+      if (query.service_object_id === EXPLANATION_SERVICE_OBJECT_ID) {
+        const reasonCodes = explanationReasonCodes ?? readinessReasonCodes;
+        return {
+          request_id: query.request_id,
+          trace_ref: query.trace_ref,
+          capability_id: query.capability_id,
+          service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
+          service_status: explanationServiceStatus,
+          service_object: explanationServiceStatus === 'served'
+            ? buildExplanationServiceObject({
+              capabilityId: query.capability_id,
+              targetScopeRef: query.target_scope_ref,
+              targetBusinessDate: query.target_business_date,
+              readinessStatus,
+              reasonCodes,
+              serviceStatus,
+            })
+            : {},
+          data_window: {
+            from: query.target_business_date,
+            to: query.target_business_date,
+          },
+          explanation_object: {
+            capability_id: query.capability_id,
+            explanation_scope: readinessStatus === 'ready' ? 'service' : 'readiness',
+            reason_codes: reasonCodes,
+            state_trace_refs: ['navly:state-trace:explanation:sample'],
+            run_trace_refs: ['navly:run-trace:explanation:sample'],
+          },
+          state_trace_refs: ['navly:state-trace:explanation:sample'],
+          run_trace_refs: ['navly:run-trace:explanation:sample'],
+          served_at: FIXED_NOW,
+        };
+      }
+
       return {
         request_id: query.request_id,
         trace_ref: query.trace_ref,
         capability_id: query.capability_id,
         service_object_id: query.service_object_id,
         service_status: serviceStatus,
-        service_object: {
-          summary: 'store member insight',
-          customer_count: 11,
-        },
+        service_object: serviceStatus === 'served'
+          ? buildServedServiceObject(
+            query.capability_id,
+            query.service_object_id,
+            query.target_scope_ref,
+            query.target_business_date,
+          )
+          : {},
         data_window: {
           from: query.target_business_date,
           to: query.target_business_date,
@@ -196,6 +362,70 @@ test('happy path without route or dependency warnings preserves empty reason_cod
   assert.deepEqual(result.runtime_result_envelope.reason_codes, []);
 });
 
+test('daily_overview explicit route closes through the shared guarded execution path', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = createDataPlatformClient();
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      user_input_text: '请给我今天的门店日报',
+      requested_capability_id: 'navly.store.daily_overview',
+      requested_service_object_id: 'navly.service.store.daily_overview',
+    }),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.capability_route_result.selected_capability_id, 'navly.store.daily_overview');
+  assert.equal(result.runtime_result_envelope.selected_service_object_id, 'navly.service.store.daily_overview');
+  assert.equal(result.runtime_result_envelope.result_status, 'answered');
+  assert.equal(dataPlatformClient.serviceCalls[0].service_object_id, 'navly.service.store.daily_overview');
+});
+
+test('staff_board token route closes through the shared guarded execution path', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = createDataPlatformClient();
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      user_input_text: '员工看板',
+      requested_capability_id: null,
+      requested_service_object_id: null,
+    }),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.capability_route_result.selected_capability_id, 'navly.store.staff_board');
+  assert.equal(result.runtime_result_envelope.selected_service_object_id, 'navly.service.store.staff_board');
+  assert.equal(result.runtime_result_envelope.result_status, 'answered');
+});
+
+test('finance_summary can explicitly request the capability_explanation companion service', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = createDataPlatformClient();
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      user_input_text: '解释一下财务汇总',
+      requested_capability_id: 'navly.store.finance_summary',
+      requested_service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
+    }),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.capability_route_result.selected_capability_id, 'navly.store.finance_summary');
+  assert.equal(result.capability_route_result.selected_service_object_id, EXPLANATION_SERVICE_OBJECT_ID);
+  assert.equal(result.runtime_result_envelope.result_status, 'answered');
+  assert.equal(result.runtime_result_envelope.selected_service_object_id, EXPLANATION_SERVICE_OBJECT_ID);
+  assert.equal(result.runtime_result_envelope.answer_fragments[0].service_object.readiness_status, 'ready');
+  assert.equal(dataPlatformClient.serviceCalls[0].service_object_id, EXPLANATION_SERVICE_OBJECT_ID);
+});
+
 test('unresolved route returns fallback without dependency calls', async () => {
   const authKernelClient = createAuthKernelClient();
   const dataPlatformClient = createDataPlatformClient();
@@ -236,7 +466,7 @@ test('match token resolution ignores entries that do not opt into token matching
         match_tokens: ['会员洞察'],
         capability_id: 'navly.store.member_insight',
         default_service_object_id: 'navly.service.store.member_insight',
-        supported_service_object_ids: ['navly.service.store.member_insight'],
+        supported_service_object_ids: ['navly.service.store.member_insight', EXPLANATION_SERVICE_OBJECT_ID],
         status: 'implemented_milestone_b',
       },
     ],
@@ -245,7 +475,7 @@ test('match token resolution ignores entries that do not opt into token matching
       reason_code: 'runtime.route.unresolved',
       next_action: 'request_capability_clarification',
       fallback_capability_id: 'navly.system.capability_explanation',
-      fallback_service_object_id: 'navly.service.system.capability_explanation',
+      fallback_service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
     },
   };
 
@@ -310,7 +540,44 @@ test('access escalation returns escalated and does not call readiness/service', 
   assert.equal(dataPlatformClient.serviceCalls.length, 0);
 });
 
-test('readiness pending returns fallback and skips theme service query', async () => {
+test('access restricted keeps the narrowed scope and preserves restriction metadata', async () => {
+  const restrictedAccessContext = buildAccessContextEnvelope({
+    primary_scope_ref: 'navly:scope:store:sample-store-002',
+    granted_scope_refs: ['navly:scope:store:sample-store-002'],
+  });
+  const authKernelClient = createAuthKernelClient({
+    decisionStatus: 'restricted',
+    reasonCodes: ['scope_resolution_required'],
+    restrictionCodes: ['scope_limited'],
+    obligationCodes: ['request_scope_confirmation'],
+    effectiveAccessContext: restrictedAccessContext,
+    targetScopeRef: 'navly:scope:store:sample-store-002',
+  });
+  const dataPlatformClient = createDataPlatformClient();
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      access_context_envelope: buildAccessContextEnvelope({
+        granted_scope_refs: [
+          'navly:scope:store:sample-store-001',
+          'navly:scope:store:sample-store-002',
+        ],
+      }),
+      target_scope_hint: 'navly:scope:store:sample-store-002',
+    }),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.runtime_dependency_outcome.access_decision_status, 'restricted');
+  assert.deepEqual(result.runtime_dependency_outcome.restriction_codes, ['scope_limited']);
+  assert.equal(result.runtime_result_envelope.result_status, 'answered');
+  assert.equal(result.runtime_dependency_outcome.readiness_query.target_scope_ref, 'navly:scope:store:sample-store-002');
+  assert.equal(result.runtime_result_envelope.delivery_hints.access_decision_status, 'restricted');
+});
+
+test('readiness pending returns fallback and consumes the capability_explanation companion service', async () => {
   const authKernelClient = createAuthKernelClient();
   const dataPlatformClient = createDataPlatformClient({
     readinessStatus: 'pending',
@@ -318,7 +585,10 @@ test('readiness pending returns fallback and skips theme service query', async (
   });
 
   const result = await runMilestoneBGuardedExecutionChain({
-    runtimeRequestEnvelope: buildRuntimeRequestEnvelope(),
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      requested_capability_id: 'navly.store.finance_summary',
+      requested_service_object_id: capabilityServiceBinding['navly.store.finance_summary'],
+    }),
     authKernelClient,
     dataPlatformClient,
     now: FIXED_NOW,
@@ -327,8 +597,55 @@ test('readiness pending returns fallback and skips theme service query', async (
   assert.equal(result.runtime_dependency_outcome.dependency_stage, 'readiness_blocked');
   assert.equal(result.runtime_result_envelope.result_status, 'fallback');
   assert.ok(result.runtime_result_envelope.reason_codes.includes('source_window_not_open'));
+  assert.equal(result.runtime_dependency_outcome.explanation_service_response.service_object_id, EXPLANATION_SERVICE_OBJECT_ID);
+  assert.equal(result.runtime_result_envelope.explanation_fragments[0].fragment_type, 'capability_explanation_service');
   assert.equal(dataPlatformClient.readinessCalls.length, 1);
-  assert.equal(dataPlatformClient.serviceCalls.length, 0);
+  assert.equal(dataPlatformClient.serviceCalls.length, 1);
+  assert.equal(dataPlatformClient.serviceCalls[0].service_object_id, EXPLANATION_SERVICE_OBJECT_ID);
+});
+
+test('readiness failed returns fallback with explanation_object companion output', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = createDataPlatformClient({
+    readinessStatus: 'failed',
+    readinessReasonCodes: ['upstream_error'],
+  });
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      requested_capability_id: 'navly.store.finance_summary',
+      requested_service_object_id: capabilityServiceBinding['navly.store.finance_summary'],
+    }),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.runtime_dependency_outcome.readiness_response.readiness_status, 'failed');
+  assert.equal(result.runtime_result_envelope.result_status, 'fallback');
+  assert.equal(result.runtime_result_envelope.explanation_fragments[0].explanation_object.reason_codes[0], 'upstream_error');
+});
+
+test('readiness unsupported_scope still produces a structured explanation fragment', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = createDataPlatformClient({
+    readinessStatus: 'unsupported_scope',
+    readinessReasonCodes: ['capability_scope_not_supported'],
+  });
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      requested_capability_id: 'navly.store.staff_board',
+      requested_service_object_id: capabilityServiceBinding['navly.store.staff_board'],
+    }),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.runtime_dependency_outcome.readiness_response.readiness_status, 'unsupported_scope');
+  assert.equal(result.runtime_result_envelope.result_status, 'fallback');
+  assert.equal(result.runtime_result_envelope.explanation_fragments[0].fragment_type, 'capability_explanation_service');
 });
 
 test('theme service scope mismatch returns fallback with service reason codes', async () => {
@@ -348,6 +665,7 @@ test('theme service scope mismatch returns fallback with service reason codes', 
   assert.equal(result.runtime_dependency_outcome.dependency_stage, 'service_not_served');
   assert.equal(result.runtime_result_envelope.result_status, 'fallback');
   assert.ok(result.runtime_result_envelope.reason_codes.includes('scope_out_of_contract'));
+  assert.equal(result.runtime_result_envelope.explanation_fragments[0].fragment_type, 'capability_explanation_object');
   assert.equal(dataPlatformClient.readinessCalls.length, 1);
   assert.equal(dataPlatformClient.serviceCalls.length, 1);
 });
