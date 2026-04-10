@@ -9,6 +9,11 @@
 - `access-chain-backbone.mjs`
 - `decision-trace-view-backbone.mjs`
 
+## canonical entrypoint
+
+- `runAuthKernelAccessChain` 是 serving 层当前唯一 canonical access-chain entrypoint
+- `runMilestoneBAccessChain` 仅保留为 deprecated compatibility alias，供尚未迁移的 runtime / bridge 调用方过渡
+
 ## 当前约束
 
 - 这里不拥有 public `access_context_envelope` schema 主定义权

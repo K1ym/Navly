@@ -149,14 +149,38 @@ export function buildDownstreamOutcomeLinkage({
     throw new Error('downstream outcome linkage capability must match the issued session grant');
   }
 
-  const targetScopeRef = assertMatchesSharedPattern(
-    'target_scope_ref',
-    downstreamOutcome.target_scope_ref ?? sessionGrantSnapshot.target_scope_ref,
-    sharedPatterns.scopeRef,
-  );
-  if (targetScopeRef !== sessionGrantSnapshot.target_scope_ref) {
+  const eventPayloadTargetScopeRef =
+    eventPayload.target_scope_ref == null
+      ? null
+      : assertMatchesSharedPattern('event_payload.target_scope_ref', eventPayload.target_scope_ref, sharedPatterns.scopeRef);
+  if (
+    eventPayloadTargetScopeRef != null &&
+    eventPayloadTargetScopeRef !== sessionGrantSnapshot.target_scope_ref
+  ) {
+    throw new Error('downstream outcome linkage event_payload.target_scope_ref must match the issued session grant scope');
+  }
+
+  const downstreamOutcomeTargetScopeRef =
+    downstreamOutcome.target_scope_ref == null
+      ? null
+      : assertMatchesSharedPattern('target_scope_ref', downstreamOutcome.target_scope_ref, sharedPatterns.scopeRef);
+  if (
+    eventPayloadTargetScopeRef != null &&
+    downstreamOutcomeTargetScopeRef != null &&
+    downstreamOutcomeTargetScopeRef !== eventPayloadTargetScopeRef
+  ) {
+    throw new Error('downstream outcome linkage scope must not drift between event payload and envelope');
+  }
+  if (
+    downstreamOutcomeTargetScopeRef != null &&
+    downstreamOutcomeTargetScopeRef !== sessionGrantSnapshot.target_scope_ref
+  ) {
     throw new Error('downstream outcome linkage scope must match the issued session grant');
   }
+  const targetScopeRef =
+    eventPayloadTargetScopeRef ??
+    downstreamOutcomeTargetScopeRef ??
+    sessionGrantSnapshot.target_scope_ref;
 
   const downstreamEventRef = assertNonEmptyString(
     'downstream_event_ref',

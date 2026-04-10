@@ -22,24 +22,36 @@ function sampleBaseIngress(peerAliasValue, extras = {}) {
   };
 }
 
-function sampleRuntimeOutcome({ requestId, traceRef, decisionRef, capabilityId, sessionGrantSnapshotRef }) {
+function sampleRuntimeOutcome({
+  requestId,
+  traceRef,
+  decisionRef,
+  capabilityId,
+  sessionGrantSnapshotRef,
+  targetScopeRef,
+} = {}) {
+  const eventPayload = {
+    event_id: `runtime-outcome-${requestId}`,
+    request_id: requestId,
+    trace_ref: traceRef,
+    runtime_trace_ref: `navly:runtime-trace:${requestId}`,
+    decision_ref: decisionRef,
+    selected_capability_id: capabilityId,
+    result_status: 'answered',
+    occurred_at: '2026-04-10T10:00:00.000Z',
+    extensions: {
+      route_result_status: 'answered',
+    },
+  };
+  if (targetScopeRef != null) {
+    eventPayload.target_scope_ref = targetScopeRef;
+  }
+
   return {
     downstream_system: 'runtime',
     event_kind: 'runtime_outcome_event',
     session_grant_snapshot_ref: sessionGrantSnapshotRef,
-    event_payload: {
-      event_id: `runtime-outcome-${requestId}`,
-      request_id: requestId,
-      trace_ref: traceRef,
-      runtime_trace_ref: `navly:runtime-trace:${requestId}`,
-      decision_ref: decisionRef,
-      selected_capability_id: capabilityId,
-      result_status: 'answered',
-      occurred_at: '2026-04-10T10:00:00.000Z',
-      extensions: {
-        route_result_status: 'answered',
-      },
-    },
+    event_payload: eventPayload,
   };
 }
 
@@ -97,6 +109,7 @@ test('downstream runtime outcome links back into governance chain when refs matc
       decisionRef: baseResult.access_decision.decision_ref,
       capabilityId: baseResult.session_grant_snapshot.target_capability_id,
       sessionGrantSnapshotRef: baseResult.session_grant_snapshot.session_grant_snapshot_ref,
+      targetScopeRef: baseResult.session_grant_snapshot.target_scope_ref,
     }),
     now: '2026-04-10T09:10:00.000Z',
   });
@@ -107,6 +120,56 @@ test('downstream runtime outcome links back into governance chain when refs matc
   assert.equal(result.audit_event_ledger.event_count, 7);
   assert.equal(result.audit_event_ledger.events.at(-1).event_kind, 'downstream_outcome_linkage');
   assert.equal(result.decision_trace_view.downstream_outcome_status, 'answered');
+});
+
+test('downstream outcome linkage fails closed when event payload scope drifts from issued grant', () => {
+  const result = runAuthKernelAccessChain({
+    rawIngressEvidence: sampleBaseIngress('sample_manager_single_scope'),
+    requestedCapabilityId: 'navly.store.daily_overview',
+    now: '2026-04-10T09:12:00.000Z',
+  });
+
+  assert.throws(
+    () =>
+      buildDownstreamOutcomeLinkage({
+        downstreamOutcome: sampleRuntimeOutcome({
+          requestId: result.ingress_evidence.request_id,
+          traceRef: result.ingress_evidence.trace_ref,
+          decisionRef: result.access_decision.decision_ref,
+          capabilityId: result.session_grant_snapshot.target_capability_id,
+          sessionGrantSnapshotRef: result.session_grant_snapshot.session_grant_snapshot_ref,
+          targetScopeRef: 'navly:scope:store:sample-store-002',
+        }),
+        accessDecision: result.access_decision,
+        sessionGrantSnapshot: result.session_grant_snapshot,
+        now: '2026-04-10T10:12:00.000Z',
+      }),
+    /event_payload\.target_scope_ref must match the issued session grant scope/,
+  );
+});
+
+test('downstream outcome linkage accepts matching event payload scope', () => {
+  const result = runAuthKernelAccessChain({
+    rawIngressEvidence: sampleBaseIngress('sample_manager_single_scope'),
+    requestedCapabilityId: 'navly.store.daily_overview',
+    now: '2026-04-10T09:13:00.000Z',
+  });
+
+  const linkage = buildDownstreamOutcomeLinkage({
+    downstreamOutcome: sampleRuntimeOutcome({
+      requestId: result.ingress_evidence.request_id,
+      traceRef: result.ingress_evidence.trace_ref,
+      decisionRef: result.access_decision.decision_ref,
+      capabilityId: result.session_grant_snapshot.target_capability_id,
+      sessionGrantSnapshotRef: result.session_grant_snapshot.session_grant_snapshot_ref,
+      targetScopeRef: result.session_grant_snapshot.target_scope_ref,
+    }),
+    accessDecision: result.access_decision,
+    sessionGrantSnapshot: result.session_grant_snapshot,
+    now: '2026-04-10T10:13:00.000Z',
+  });
+
+  assert.equal(linkage.target_scope_ref, result.session_grant_snapshot.target_scope_ref);
 });
 
 test('downstream outcome linkage fails closed when session grant ref is missing', () => {

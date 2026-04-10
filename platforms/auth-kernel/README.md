@@ -50,6 +50,11 @@ host evidence
   -> decision_trace_view
 ```
 
+canonical entrypoint:
+
+- `serving/access-chain-backbone.mjs` 的 canonical API 是 `runAuthKernelAccessChain`
+- `runMilestoneBAccessChain` 只作为临时兼容 alias 保留给尚未迁移的 runtime / bridge caller，不再视为同级 canonical 名称
+
 ## 当前 backbone 文件
 
 - `contracts/shared-contract-alignment.mjs`

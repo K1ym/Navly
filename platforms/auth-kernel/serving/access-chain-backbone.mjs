@@ -107,4 +107,10 @@ export function runAuthKernelAccessChain({
   };
 }
 
-export const runMilestoneBAccessChain = runAuthKernelAccessChain;
+/**
+ * @deprecated Use runAuthKernelAccessChain. This alias remains temporarily for
+ * runtime/bridge callers that have not yet migrated.
+ */
+export function runMilestoneBAccessChain(options) {
+  return runAuthKernelAccessChain(options);
+}
