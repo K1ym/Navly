@@ -1,0 +1,97 @@
+{
+  "registry_name": "capability_dependency_registry",
+  "status": "phase_1_contract_frozen",
+  "governance_scope": "data-platform-only",
+  "entries": [
+    {
+      "capability_id": "navly.store.member_insight",
+      "default_service_object_id": "navly.service.store.member_insight",
+      "dependency_status": "phase_1_contract_frozen",
+      "dependency_kind": "input_data",
+      "required_endpoint_contract_ids": [
+        "qinqin.member.get_customers_list.v1_1",
+        "qinqin.member.get_consume_bill_list.v1_2"
+      ],
+      "required_canonical_datasets": [
+        "customer",
+        "customer_card",
+        "consume_bill",
+        "consume_bill_payment",
+        "consume_bill_info"
+      ],
+      "required_service_object_ids": [],
+      "truth_source_docs": [
+        "docs/api/qinqin/endpoint-manifest.md",
+        "docs/specs/navly-v1/data-platform/2026-04-06-navly-v1-data-platform-phase-1.md"
+      ],
+      "notes": "Formal dependency entry for the member insight slice. Readiness/service truth must derive from these governed endpoint and canonical dataset dependencies."
+    },
+    {
+      "capability_id": "navly.store.daily_overview",
+      "default_service_object_id": "navly.service.store.daily_overview",
+      "dependency_status": "phase_1_contract_frozen",
+      "dependency_kind": "projection",
+      "required_endpoint_contract_ids": [],
+      "required_canonical_datasets": [],
+      "required_service_object_ids": [
+        "navly.service.store.member_insight",
+        "navly.service.store.staff_board",
+        "navly.service.store.finance_summary"
+      ],
+      "truth_source_docs": [
+        "docs/specs/navly-v1/data-platform/2026-04-06-navly-v1-data-platform-phase-1.md",
+        "docs/specs/navly-v1/data-platform/2026-04-06-navly-v1-data-platform-implementation-plan.md"
+      ],
+      "notes": "Formal aggregate dependency entry for daily overview. The aggregate must consume published owner surfaces instead of reintroducing slice-local dependency truth."
+    },
+    {
+      "capability_id": "navly.store.staff_board",
+      "default_service_object_id": "navly.service.store.staff_board",
+      "dependency_status": "phase_1_contract_frozen",
+      "dependency_kind": "input_data",
+      "required_endpoint_contract_ids": [
+        "qinqin.staff.get_person_list.v1_5",
+        "qinqin.staff.get_tech_up_clock_list.v1_6",
+        "qinqin.staff.get_tech_market_list.v1_7"
+      ],
+      "required_canonical_datasets": [
+        "staff",
+        "staff_item",
+        "tech_shift_item",
+        "tech_shift_summary",
+        "sales_commission"
+      ],
+      "required_service_object_ids": [],
+      "truth_source_docs": [
+        "docs/api/qinqin/endpoint-manifest.md",
+        "docs/specs/navly-v1/data-platform/2026-04-06-navly-v1-data-platform-phase-1.md"
+      ],
+      "notes": "Formal dependency entry for the staff board slice. Local field-landing-derived dependency expansion is no longer authoritative."
+    },
+    {
+      "capability_id": "navly.store.finance_summary",
+      "default_service_object_id": "navly.service.store.finance_summary",
+      "dependency_status": "phase_1_contract_frozen",
+      "dependency_kind": "input_data",
+      "required_endpoint_contract_ids": [
+        "qinqin.member.get_recharge_bill_list.v1_3",
+        "qinqin.member.get_user_trade_list.v1_4"
+      ],
+      "required_canonical_datasets": [
+        "recharge_bill",
+        "recharge_bill_payment",
+        "recharge_bill_sales",
+        "recharge_bill_ticket",
+        "account_trade"
+      ],
+      "required_service_object_ids": [],
+      "truth_source_docs": [
+        "docs/api/qinqin/endpoint-manifest.md",
+        "docs/specs/navly-v1/data-platform/2026-04-06-navly-v1-data-platform-phase-1.md"
+      ],
+      "notes": "Formal dependency entry for the finance summary slice. The former slice-local dependency boundary constant is replaced by this governed registry object."
+    }
+  ],
+  "shared_contract_owner_path": "shared/contracts",
+  "notes": "This registry freezes the Phase-1 capability dependency matrix as a governed data-platform object. Readiness and serving consumers must load it instead of preserving slice-local placeholders or derived dependency definitions."
+}

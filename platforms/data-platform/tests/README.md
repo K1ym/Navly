@@ -21,5 +21,6 @@
 - staff board vertical slice / canonical landing / latest-state semantics
 - source empty / auth / sign / schema / transport taxonomy regression
 - Qinqin v1.1 contract governance registry completeness
+- capability dependency registry contract, docs, and consumer linkage
 - field catalog / landing policy / variance register consistency
 - member insight owner-side readiness / theme service surface

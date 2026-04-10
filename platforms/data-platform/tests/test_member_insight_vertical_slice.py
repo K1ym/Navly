@@ -130,6 +130,14 @@ class MemberInsightVerticalSliceTest(unittest.TestCase):
             self.assertEqual(result['transport_kind'], 'fixture')
             self.assertEqual(result['capability_id'], 'navly.store.member_insight')
             self.assertEqual(result['service_object_id'], 'navly.service.store.member_insight')
+            self.assertEqual(result['dependency_entry']['dependency_status'], 'phase_1_contract_frozen')
+            self.assertEqual(
+                result['dependency_entry']['required_endpoint_contract_ids'],
+                [
+                    'qinqin.member.get_customers_list.v1_1',
+                    'qinqin.member.get_consume_bill_list.v1_2',
+                ],
+            )
             self.assertEqual(result['historical_run_truth']['ingestion_run']['transport_kind'], 'fixture')
             self.assertEqual(len(result['historical_run_truth']['endpoint_runs']), 2)
             self.assertEqual(len(result['raw_replay']['raw_response_pages']), 2)

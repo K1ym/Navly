@@ -1,0 +1,26 @@
+{
+  "contract_name": "capability_dependency_entry",
+  "owner": "data-platform",
+  "status": "phase_1_contract_frozen",
+  "fields": [
+    "capability_id",
+    "default_service_object_id",
+    "dependency_status",
+    "dependency_kind",
+    "required_endpoint_contract_ids",
+    "required_canonical_datasets",
+    "required_service_object_ids",
+    "truth_source_docs",
+    "notes"
+  ],
+  "allowed_values": {
+    "dependency_kind": [
+      "input_data",
+      "projection"
+    ],
+    "dependency_status": [
+      "phase_1_contract_frozen"
+    ]
+  },
+  "notes": "input_data entries describe governed endpoint + canonical dataset dependencies for a capability. projection entries describe governed service-object dependencies for an aggregate capability. Empty lists must be explicit for non-applicable dependency vectors."
+}
