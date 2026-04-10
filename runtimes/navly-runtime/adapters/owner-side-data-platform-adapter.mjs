@@ -58,7 +58,10 @@ result = build_member_insight_owner_surface(
     app_secret=args["app_secret"],
     transport=transport,
 )
-print(json.dumps(result, ensure_ascii=False))`;
+print(json.dumps({
+    "readiness_response": result["readiness_response"],
+    "theme_service_response": result["theme_service_response"],
+}, ensure_ascii=False))`;
 
 function asNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
@@ -122,7 +125,7 @@ function resolveDataContext(query, adapterOptions) {
     live_base_url: liveBaseUrl,
     live_authorization: liveAuthorization,
     live_token: liveToken,
-    live_timeout_ms: Number.isFinite(liveTimeoutMs) ? liveTimeoutMs : 15000,
+    live_timeout_ms: (Number.isFinite(liveTimeoutMs) && liveTimeoutMs > 0) ? liveTimeoutMs : 15000,
   };
 }
 
