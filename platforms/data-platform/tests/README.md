@@ -22,4 +22,5 @@
 - source empty / auth / sign / schema / transport taxonomy regression
 - Qinqin v1.1 contract governance registry completeness
 - field catalog / landing policy / variance register consistency
+- commission setting quality / schema-alignment / backfill / completeness surface
 - member insight owner-side readiness / theme service surface

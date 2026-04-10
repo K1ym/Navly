@@ -19,6 +19,7 @@
       "parameter_name_drift",
       "path_resolution_constraint",
       "response_shape_drift",
+      "response_empty_semantics",
       "auth_header_requirement",
       "documented_field_name_drift"
     ]

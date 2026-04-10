@@ -8,6 +8,10 @@
   - 为 `navly.store.member_insight` 产出 formal `capability_readiness_response`
   - 复用 latest-state、state traces、run traces
   - 区分 `ready / pending / failed / unsupported_scope`
+- `commission_setting_completeness.py`
+  - 为 `GetTechCommissionSetList` 产出 endpoint-scoped `commission_setting_completeness_state`
+  - 消费 latest state / backfill progress / quality snapshots
+  - 不把 completeness truth 混写成 service truth
 
 当前边界：
 
