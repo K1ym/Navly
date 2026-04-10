@@ -270,6 +270,7 @@ class QinqinContractGovernanceTest(unittest.TestCase):
             'qinqin.response.person-list-retdata-root-shape-drift',
             'qinqin.response.tech-market-retdata-root-shape-drift',
             'qinqin.auth.tech-commission-set-runtime-headers-required',
+            'qinqin.response.tech-commission-set-source-empty-governed',
             'qinqin.field.consume-bill-payment-source-typo',
         }
         self.assertEqual(set(self.variance_entries.keys()), expected_variance_ids)
@@ -281,6 +282,14 @@ class QinqinContractGovernanceTest(unittest.TestCase):
         self.assertEqual(
             self.variance_entries['qinqin.auth.tech-commission-set-runtime-headers-required']['variance_kind'],
             'auth_header_requirement',
+        )
+        self.assertEqual(
+            self.variance_entries['qinqin.response.tech-commission-set-source-empty-governed']['variance_kind'],
+            'response_empty_semantics',
+        )
+        self.assertIn(
+            'qinqin.response.tech-commission-set-source-empty-governed',
+            self.endpoint_bindings['qinqin.staff.get_tech_commission_set_list.v1_8']['variance_ids'],
         )
         self.assertEqual(
             self.variance_entries['qinqin.response.user-trade-retdata-root-shape-drift']['canonical_form'],
