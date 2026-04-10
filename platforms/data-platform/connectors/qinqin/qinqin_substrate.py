@@ -43,6 +43,20 @@ class EndpointContract:
 
 
 @dataclass(frozen=True)
+class EndpointGovernanceBinding:
+    endpoint_contract_id: str
+    auth_profile_id: str
+    operational_window_profile_id: str
+    signature_rule_id: str
+    required_parameter_keys: list[str]
+    optional_parameter_keys: list[str]
+    field_catalog_entry_id: str
+    landing_policy_ids: list[str]
+    response_payload_shape: str
+    variance_ids: list[str]
+
+
+@dataclass(frozen=True)
 class TransportError:
     taxonomy: str
     code: str
@@ -61,9 +75,11 @@ class TransportConfigError(ValueError):
 class SeedBackedQinqinRegistry:
     def __init__(self, data_platform_root: Path = DATA_PLATFORM_ROOT) -> None:
         self.data_platform_root = data_platform_root
-        self._endpoint_contracts = _load_json(
+        endpoint_contract_registry = _load_json(
             data_platform_root / 'directory' / 'endpoint-contracts.seed.json'
-        )['entries']
+        )
+        self._endpoint_contracts = endpoint_contract_registry['entries']
+        self._endpoint_governance_bindings = endpoint_contract_registry['endpoint_governance_bindings']
         self._parameters = _load_json(
             data_platform_root / 'directory' / 'endpoint-parameter-canonicalization.seed.json'
         )['entries']
@@ -79,6 +95,24 @@ class SeedBackedQinqinRegistry:
             if entry['parameter_key'] == parameter_key:
                 return entry.get('preferred_wire_name') or entry['known_wire_variants'][0]
         raise KeyError(f'Unknown parameter_key: {parameter_key}')
+
+    def parameter_entry(self, parameter_key: str) -> dict[str, Any]:
+        for entry in self._parameters:
+            if entry['parameter_key'] == parameter_key:
+                return entry
+        raise KeyError(f'Unknown parameter_key: {parameter_key}')
+
+    def parameter_request_location(self, parameter_key: str) -> str:
+        return str(self.parameter_entry(parameter_key).get('request_location') or 'body')
+
+    def endpoint_governance_binding(self, endpoint_contract_id: str) -> EndpointGovernanceBinding:
+        for entry in self._endpoint_governance_bindings:
+            if entry['endpoint_contract_id'] == endpoint_contract_id:
+                return EndpointGovernanceBinding(**entry)
+        raise KeyError(f'Unknown endpoint_contract_id governance binding: {endpoint_contract_id}')
+
+    def endpoint_response_payload_shape(self, endpoint_contract_id: str) -> str:
+        return self.endpoint_governance_binding(endpoint_contract_id).response_payload_shape
 
 
 def load_seed_backed_qinqin_registry(data_platform_root: Path = DATA_PLATFORM_ROOT) -> SeedBackedQinqinRegistry:
@@ -98,25 +132,70 @@ def compute_signature(unsigned_payload: Mapping[str, Any], app_secret: str) -> s
     return hashlib.md5(signature_source.encode('utf-8')).hexdigest().lower()
 
 
+def _body_parameter_keys(
+    *,
+    binding: EndpointGovernanceBinding,
+    registry: SeedBackedQinqinRegistry,
+) -> list[str]:
+    return [
+        parameter_key
+        for parameter_key in [*binding.required_parameter_keys, *binding.optional_parameter_keys]
+        if parameter_key != 'sign' and registry.parameter_request_location(parameter_key) == 'body'
+    ]
+
+
+def _request_body_payload(
+    *,
+    endpoint_contract_id: str,
+    binding: EndpointGovernanceBinding,
+    registry: SeedBackedQinqinRegistry,
+    parameter_values: Mapping[str, Any],
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {}
+    for parameter_key in _body_parameter_keys(binding=binding, registry=registry):
+        value = parameter_values.get(parameter_key)
+        if value is None:
+            if parameter_key in binding.required_parameter_keys:
+                raise ValueError(
+                    f'Missing required parameter {parameter_key} for {endpoint_contract_id}.'
+                )
+            continue
+        payload[registry.preferred_wire_name(parameter_key)] = value
+    return payload
+
+
 def build_signed_request(
     endpoint_contract_id: str,
     org_id: str,
-    start_time: str,
-    end_time: str,
-    page_index: int,
-    page_size: int,
+    start_time: str | None,
+    end_time: str | None,
     app_secret: str,
+    page_index: int | None = None,
+    page_size: int | None = None,
+    member_card_id: str | None = None,
+    trade_type: int | None = None,
     data_platform_root: Path = DATA_PLATFORM_ROOT,
+    **parameter_values: Any,
 ) -> dict[str, Any]:
     registry = load_seed_backed_qinqin_registry(data_platform_root=data_platform_root)
     contract = registry.endpoint_contract(endpoint_contract_id)
-    payload = {
-        registry.preferred_wire_name('org_id'): org_id,
-        registry.preferred_wire_name('start_time'): start_time,
-        registry.preferred_wire_name('end_time'): end_time,
-        registry.preferred_wire_name('page_index'): page_index,
-        registry.preferred_wire_name('page_size'): page_size,
+    binding = registry.endpoint_governance_binding(endpoint_contract_id)
+    resolved_parameter_values = {
+        'org_id': org_id,
+        'start_time': start_time,
+        'end_time': end_time,
+        'page_index': page_index,
+        'page_size': page_size,
+        'member_card_id': member_card_id,
+        'trade_type': trade_type,
+        **parameter_values,
     }
+    payload = _request_body_payload(
+        endpoint_contract_id=endpoint_contract_id,
+        binding=binding,
+        registry=registry,
+        parameter_values=resolved_parameter_values,
+    )
     payload[registry.preferred_wire_name('sign')] = compute_signature(payload, app_secret)
     return {
         'endpoint_contract_id': endpoint_contract_id,
@@ -381,7 +460,8 @@ class FixtureQinqinTransport:
     def fetch_page(self, endpoint_contract_id: str, request_payload: Mapping[str, Any]) -> dict[str, Any]:
         contract = self._registry.endpoint_contract(endpoint_contract_id)
         page_index_wire = self._registry.preferred_wire_name('page_index')
-        page_index = int(request_payload[page_index_wire])
+        raw_page_index = request_payload.get(page_index_wire)
+        page_index = int(raw_page_index) if raw_page_index is not None else 1
         endpoint_pages = self._fixture_pages_by_endpoint.get(endpoint_contract_id, [])
         if 1 <= page_index <= len(endpoint_pages):
             response_envelope = copy.deepcopy(endpoint_pages[page_index - 1])
@@ -582,6 +662,7 @@ class LiveQinqinTransport:
 __all__ = [
     'DEFAULT_LIVE_TIMEOUT_MS',
     'EndpointContract',
+    'EndpointGovernanceBinding',
     'FixtureQinqinTransport',
     'LiveQinqinTransport',
     'SeedBackedQinqinRegistry',
