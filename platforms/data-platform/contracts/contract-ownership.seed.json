@@ -15,6 +15,7 @@
     "capability_readiness_response",
     "theme_service_query",
     "theme_service_response",
+    "capability_explanation_object",
     "trace_ref",
     "data_access_audit_event"
   ],

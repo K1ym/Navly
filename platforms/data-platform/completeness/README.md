@@ -12,6 +12,13 @@
   - 为 `GetTechCommissionSetList` 产出 endpoint-scoped `commission_setting_completeness_state`
   - 消费 latest state / backfill progress / quality snapshots
   - 不把 completeness truth 混写成 service truth
+- `finance_summary_readiness_surface.py`
+  - 为 `navly.store.finance_summary` 复用 prerequisite state 与 endpoint latest-state 输出 readiness truth
+- `staff_board_readiness_surface.py`
+  - 为 `navly.store.staff_board` 把 vertical-slice backbone state 收敛成 readiness truth
+- `daily_overview_readiness_surface.py`
+  - 为 `navly.store.daily_overview` 聚合 member / staff / finance owner surfaces
+  - 明确把 aggregate 依赖表达成 projection-level blocking dependencies
 
 当前边界：
 

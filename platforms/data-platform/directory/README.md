@@ -15,9 +15,9 @@
 
 当前 capability 相关对象状态：
 
-- capability registry seed
-- capability service binding seed
-- capability dependency registry 已进入 formal registry
+- capability registry：phase-1 owner surface 已发布
+- capability service binding registry：phase-1 default binding 已发布
+- capability dependency registry：已进入 formal registry
 
 维护约束：
 
