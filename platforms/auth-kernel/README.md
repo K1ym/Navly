@@ -1,11 +1,11 @@
 # Navly_v1 auth-kernel
 
-状态：milestone-b-backbone
-用途：在 `platforms/auth-kernel/` 下推进 phase-1 Milestone B：actor resolution backbone、binding backbone、Gate 0 closure 与 capability access skeleton。
+状态：milestone-d-backbone
+用途：在 `platforms/auth-kernel/` 下推进 phase-1 从 binding/decision 到 serving/governance 的闭环，实现 machine-readable、fail-closed 的权限主链路。
 
 ## 当前范围
 
-本目录当前实现到 Milestone B：
+本目录当前实现到 Milestone D：
 
 - milestone A 目录骨架与 C0 seed
 - actor resolution backbone
@@ -13,8 +13,10 @@
 - binding_snapshot generation
 - Gate 0 closure
 - capability access decision skeleton
+- session_grant_snapshot closure
 - access_context_envelope owner-side consumption mapping
-- milestone A / B 自检脚本与最小测试
+- audit_event_ledger / decision_trace_view / downstream outcome linkage skeleton
+- milestone A / B 自检脚本与 phase-1 backbone tests
 
 本轮**不**实现：
 
@@ -42,7 +44,10 @@ host evidence
   -> binding_snapshot
   -> Gate 0
   -> capability access decision
+  -> session_grant_snapshot
   -> access_context_envelope
+  -> audit_event_ledger
+  -> decision_trace_view
 ```
 
 ## 当前 backbone 文件
@@ -53,8 +58,12 @@ host evidence
 - `bindings/binding-backbone.mjs`
 - `decision/gate0-backbone.mjs`
 - `decision/capability-access-decision-backbone.mjs`
+- `decision/session-grant-snapshot-backbone.mjs`
+- `governance/audit-event-ledger-backbone.mjs`
+- `governance/downstream-outcome-linkage-backbone.mjs`
 - `serving/access-context-envelope-backbone.mjs`
 - `serving/access-chain-backbone.mjs`
+- `serving/decision-trace-view-backbone.mjs`
 
 ## 自检
 
@@ -72,6 +81,7 @@ host evidence
   - `escalation`
 - `capability_id` 必须保持 namespaced canonical 风格
 - 没有 `decision_ref` 就必须 fail closed
+- 没有 `session_grant_snapshot_ref` 或 linkage 不匹配时，下游 outcome 不能挂回治理链
 - conversation binding 只能锚定/收窄/挂起，不能扩权
 
 ## 参考文档
