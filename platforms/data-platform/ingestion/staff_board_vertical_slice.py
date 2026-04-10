@@ -45,10 +45,17 @@ def _load_json(path: Path) -> dict[str, Any]:
 def _load_staff_board_dependency_entry(data_platform_root: Path = DATA_PLATFORM_ROOT) -> dict[str, Any]:
     capability_registry = _load_json(data_platform_root / 'directory' / 'capability-registry.seed.json')
     capability_entry = next(
-        entry
-        for entry in capability_registry['entries']
-        if entry['capability_id'] == VERTICAL_SLICE_CAPABILITY_ID
+        (
+            entry
+            for entry in capability_registry['entries']
+            if entry['capability_id'] == VERTICAL_SLICE_CAPABILITY_ID
+        ),
+        None,
     )
+    if capability_entry is None:
+        raise ValueError(
+            f'Missing capability registry entry for {VERTICAL_SLICE_CAPABILITY_ID} in {data_platform_root / "directory" / "capability-registry.seed.json"}.'
+        )
     field_landing = _load_json(data_platform_root / 'directory' / 'field-landing-policy.seed.json')
     endpoint_order = [
         entry['endpoint_contract_id']
@@ -236,6 +243,13 @@ def _canonical_input_by_endpoint(
     }
 
 
+def _pagination_total(response_envelope: dict[str, Any], default_total: int) -> int:
+    ret_data = response_envelope.get('RetData')
+    if isinstance(ret_data, dict):
+        return int(ret_data.get('Total', default_total) or 0)
+    return default_total
+
+
 def run_staff_board_vertical_slice(
     *,
     org_id: str,
@@ -405,7 +419,7 @@ def run_staff_board_vertical_slice(
                 continue
 
             if uses_pagination:
-                total = int(response_envelope.get('RetData', {}).get('Total', response_record_count) or 0)
+                total = _pagination_total(response_envelope, response_record_count)
                 current_page_size = int(request_envelope['payload'][registry.preferred_wire_name('page_size')])
                 if total > page_index * current_page_size:
                     page_index += 1

@@ -11,7 +11,7 @@ if str(DATA_PLATFORM_ROOT) not in sys.path:
     sys.path.insert(0, str(DATA_PLATFORM_ROOT))
 
 from connectors.qinqin.qinqin_substrate import FixtureQinqinTransport, build_signed_request  # noqa: E402
-from ingestion.staff_board_vertical_slice import run_staff_board_vertical_slice  # noqa: E402
+from ingestion.staff_board_vertical_slice import _load_staff_board_dependency_entry, _pagination_total, run_staff_board_vertical_slice  # noqa: E402
 
 
 class RecordingFixtureTransport:
@@ -89,6 +89,22 @@ class StaffBoardVerticalSliceTest(unittest.TestCase):
         self.assertEqual(sorted(clock_request['payload'].keys()), ['Code', 'Etime', 'OrgId', 'Sign', 'Stime'])
         self.assertEqual(clock_request['payload']['Code'], '018')
 
+    def test_build_signed_request_accepts_registry_defined_extra_body_params(self) -> None:
+        request = build_signed_request(
+            endpoint_contract_id='qinqin.member.get_user_trade_list.v1_4',
+            org_id='demo-org-001',
+            start_time='2026-03-20 09:00:00',
+            end_time='2026-03-24 09:00:00',
+            app_secret='test-secret',
+            extra_params={
+                'member_card_id': 'card_001',
+                'trade_type': 2,
+            },
+        )
+        self.assertEqual(request['payload']['Id'], 'card_001')
+        self.assertEqual(request['payload']['Type'], 2)
+        self.assertIn('Sign', request['payload'])
+
     def test_vertical_slice_lands_staff_workforce_canonical_and_latest_state(self) -> None:
         transport = FixtureQinqinTransport(self._fixture_bundle())
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -153,6 +169,29 @@ class StaffBoardVerticalSliceTest(unittest.TestCase):
         self.assertEqual(
             result['latest_state_artifacts']['vertical_slice_backbone_state']['backbone_status'],
             'backbone_ready',
+        )
+
+    def test_missing_capability_registry_entry_raises_descriptive_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            directory = root / 'directory'
+            directory.mkdir(parents=True, exist_ok=True)
+            (directory / 'capability-registry.seed.json').write_text(json.dumps({
+                'entries': [],
+            }), encoding='utf-8')
+            (directory / 'field-landing-policy.seed.json').write_text(json.dumps({
+                'entries': [],
+            }), encoding='utf-8')
+            (directory / 'endpoint-contracts.seed.json').write_text(json.dumps({
+                'entries': [],
+            }), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'Missing capability registry entry'):
+                _load_staff_board_dependency_entry(data_platform_root=root)
+
+    def test_pagination_total_ignores_non_object_retdata(self) -> None:
+        self.assertEqual(
+            _pagination_total({'RetData': []}, 7),
+            7,
         )
 
     def test_clock_source_empty_does_not_land_summary_rows(self) -> None:

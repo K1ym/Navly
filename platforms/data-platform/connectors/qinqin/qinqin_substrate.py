@@ -4,7 +4,8 @@ import copy
 import hashlib
 import json
 import socket
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 from urllib.error import HTTPError, URLError
@@ -24,6 +25,15 @@ SENSITIVE_HEADER_NAMES = {
 
 def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding='utf-8'))
+
+
+def _build_dataclass_instance(dataclass_type: type[Any], payload: Mapping[str, Any]) -> Any:
+    allowed_field_names = {field.name for field in fields(dataclass_type)}
+    return dataclass_type(**{
+        key: value
+        for key, value in payload.items()
+        if key in allowed_field_names
+    })
 
 
 @dataclass(frozen=True)
@@ -101,10 +111,13 @@ class SeedBackedQinqinRegistry:
         entry = self._endpoint_contracts_by_id.get(endpoint_contract_id)
         if entry is None:
             raise KeyError(f'Unknown endpoint_contract_id: {endpoint_contract_id}')
-        return EndpointContract(**entry)
+        return _build_dataclass_instance(EndpointContract, entry)
 
     def endpoint_binding(self, endpoint_contract_id: str) -> EndpointGovernanceBinding:
-        return self.endpoint_governance_binding(endpoint_contract_id)
+        entry = self._endpoint_bindings_by_id.get(endpoint_contract_id)
+        if entry is None:
+            raise KeyError(f'Unknown endpoint binding for endpoint_contract_id: {endpoint_contract_id}')
+        return _build_dataclass_instance(EndpointGovernanceBinding, entry)
 
     def parameter_entry(self, parameter_key: str) -> dict[str, Any]:
         entry = self._parameters_by_key.get(parameter_key)
@@ -138,12 +151,13 @@ class SeedBackedQinqinRegistry:
         entry = self._endpoint_bindings_by_id.get(endpoint_contract_id)
         if entry is None:
             raise KeyError(f'Unknown endpoint_contract_id governance binding: {endpoint_contract_id}')
-        return EndpointGovernanceBinding(**entry)
+        return _build_dataclass_instance(EndpointGovernanceBinding, entry)
 
     def endpoint_response_payload_shape(self, endpoint_contract_id: str) -> str:
         return self.endpoint_governance_binding(endpoint_contract_id).response_payload_shape
 
 
+@lru_cache(maxsize=None)
 def load_seed_backed_qinqin_registry(data_platform_root: Path = DATA_PLATFORM_ROOT) -> SeedBackedQinqinRegistry:
     return SeedBackedQinqinRegistry(data_platform_root=data_platform_root)
 
