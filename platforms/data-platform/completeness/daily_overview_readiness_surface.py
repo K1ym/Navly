@@ -112,7 +112,7 @@ def build_daily_overview_readiness_response(
                 'dependency_kind': 'projection',
                 'dependency_ref': entry['service_object_id'],
                 'blocking_reason_code': (
-                    normalize_reason_codes(entry['owner_surface']['readiness_response'].get('reason_codes', []))[0]
+                    entry['owner_surface']['readiness_response'].get('reason_codes', [])[0]
                     if entry['owner_surface']['readiness_response'].get('reason_codes')
                     else 'projection_not_available'
                 ),
