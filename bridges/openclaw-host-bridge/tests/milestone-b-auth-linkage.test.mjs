@@ -7,8 +7,16 @@ import { assembleIngressIdentityEnvelope } from '../auth-linkage/ingress-identit
 import { enforceGate0Result } from '../auth-linkage/gate0-enforcement-backbone.mjs';
 import { buildAuthorizedSessionLink } from '../auth-linkage/authorized-session-link-backbone.mjs';
 import { buildRuntimeRequestEnvelope } from '../runtime-handoff/runtime-request-envelope-backbone.mjs';
+import { buildPublishedToolRuntimeRequestEnvelope } from '../runtime-handoff/published-tool-runtime-handoff-backbone.mjs';
 import { buildHostDispatchResult } from '../dispatch/host-dispatch-handoff-backbone.mjs';
 import { runOpenClawHostMilestoneBBackbone } from '../adapters/openclaw/openclaw-host-handoff-backbone.mjs';
+import {
+  buildCapabilityToolPublicationManifest,
+  buildCapabilityToolPublicationRefresh,
+  buildCapabilityToolPublicationWarmup,
+} from '../tool-publication/capability-tool-publication-backbone.mjs';
+
+const EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
 
 function buildRawHostIngress(overrides = {}) {
   return {
@@ -133,6 +141,134 @@ test('milestone B backbone assembles ingress identity, authorized session link, 
   assert.ok(pipeline.runtime_request_envelope);
   assert.ok(pipeline.authorized_session_link);
   assert.ok(pipeline.host_trace_events.length >= 5);
+});
+
+test('phase-1 capability tool publication manifest is capability-first and does not leak source internals', () => {
+  const manifest = buildCapabilityToolPublicationManifest({
+    publicationVersion: 'asp38-test-manifest',
+  });
+
+  const hostVisibleCapabilityIds = manifest.tools
+    .filter((entry) => entry.visibility_scope === 'host_visible')
+    .map((entry) => entry.capability_id);
+
+  assert.ok(hostVisibleCapabilityIds.includes('navly.store.daily_overview'));
+  assert.ok(hostVisibleCapabilityIds.includes('navly.store.staff_board'));
+  assert.ok(hostVisibleCapabilityIds.includes('navly.store.finance_summary'));
+  assert.ok(hostVisibleCapabilityIds.includes('navly.system.capability_explanation'));
+  assert.ok(manifest.tools.every((entry) => entry.input_schema_ref === 'shared/contracts/interaction/runtime_request_envelope.schema.json'));
+
+  const publicationSurfaceText = JSON.stringify(manifest).toLowerCase();
+  assert.equal(publicationSurfaceText.includes('qinqin'), false);
+  assert.equal(publicationSurfaceText.includes('sql'), false);
+  assert.equal(publicationSurfaceText.includes('table_name'), false);
+  assert.equal(publicationSurfaceText.includes('endpoint_contract'), false);
+});
+
+test('phase-1 capability tool publication warmup and refresh stay local and capability oriented', () => {
+  const manifest = buildCapabilityToolPublicationManifest({
+    publicationVersion: 'asp38-test-refresh',
+  });
+  const warmup = buildCapabilityToolPublicationWarmup({
+    toolPublicationManifest: manifest,
+  });
+  const refresh = buildCapabilityToolPublicationRefresh({
+    previousManifest: {
+      ...manifest,
+      tools: manifest.tools.slice(0, 2),
+    },
+    nextManifest: manifest,
+  });
+
+  assert.equal(warmup.object_name, 'tool_publication_warmup');
+  assert.ok(warmup.tool_names.includes('navly_store_daily_overview'));
+  assert.equal(refresh.object_name, 'tool_publication_refresh_result');
+  assert.equal(refresh.refresh_status, 'refreshed');
+  assert.ok(refresh.added_tool_names.includes('navly_store_finance_summary'));
+});
+
+test('published capability tool can build a canonical runtime_request_envelope for the explanation companion path', () => {
+  const rawHostIngress = buildRawHostIngress({
+    request_id: 'asp38-tool-request-001',
+    host_event_kind: 'tool_invocation',
+    requested_capability_id: null,
+    requested_service_object_id: null,
+  });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: 'navly.store.finance_summary',
+  });
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const manifest = buildCapabilityToolPublicationManifest({
+    publicationVersion: 'asp38-test-runtime-handoff',
+  });
+  const financeTool = manifest.tools.find((entry) => entry.capability_id === 'navly.store.finance_summary');
+
+  const runtimeRequestEnvelope = buildPublishedToolRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope: accessChain.access_context_envelope,
+    publicationEntry: financeTool,
+    requestedServiceObjectId: EXPLANATION_SERVICE_OBJECT_ID,
+  });
+
+  assert.equal(runtimeRequestEnvelope.requested_capability_id, 'navly.store.finance_summary');
+  assert.equal(runtimeRequestEnvelope.requested_service_object_id, EXPLANATION_SERVICE_OBJECT_ID);
+  assert.equal(runtimeRequestEnvelope.structured_input_slots.publication_tool_name, financeTool.tool_name);
+  assert.equal(runtimeRequestEnvelope.delivery_hint.gate0_decision_ref, accessChain.gate0_result.decision_ref);
+  assert.equal(JSON.stringify(runtimeRequestEnvelope).toLowerCase().includes('endpoint_contract'), false);
+});
+
+test('published capability tool handoff fails closed when the requested service binding is not published', () => {
+  const rawHostIngress = buildRawHostIngress({
+    request_id: 'asp38-tool-request-invalid-binding',
+    host_event_kind: 'tool_invocation',
+    requested_capability_id: null,
+    requested_service_object_id: null,
+  });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: 'navly.store.finance_summary',
+  });
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const manifest = buildCapabilityToolPublicationManifest({
+    publicationVersion: 'asp38-test-runtime-handoff-invalid',
+  });
+  const financeTool = manifest.tools.find((entry) => entry.capability_id === 'navly.store.finance_summary');
+
+  const runtimeRequestEnvelope = buildPublishedToolRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope: accessChain.access_context_envelope,
+    publicationEntry: financeTool,
+    requestedServiceObjectId: 'navly.service.store.member_insight',
+  });
+
+  assert.equal(runtimeRequestEnvelope, null);
 });
 
 test('milestone B backbone fail-closes denied gate0 path into host rejection dispatch without runtime request', () => {
