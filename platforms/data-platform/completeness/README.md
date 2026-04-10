@@ -8,6 +8,13 @@
   - 为 `navly.store.member_insight` 产出 formal `capability_readiness_response`
   - 复用 latest-state、state traces、run traces
   - 区分 `ready / pending / failed / unsupported_scope`
+- `finance_summary_readiness_surface.py`
+  - 为 `navly.store.finance_summary` 复用 prerequisite state 与 endpoint latest-state 输出 readiness truth
+- `staff_board_readiness_surface.py`
+  - 为 `navly.store.staff_board` 把 vertical-slice backbone state 收敛成 readiness truth
+- `daily_overview_readiness_surface.py`
+  - 为 `navly.store.daily_overview` 聚合 member / staff / finance owner surfaces
+  - 明确把 aggregate 依赖表达成 projection-level blocking dependencies
 
 当前边界：
 
