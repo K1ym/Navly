@@ -11,9 +11,8 @@
 
 本 registry 用来表达 **business date 是如何从本地时间戳切出来的**，属于 data-platform 的受治理真相。
 
-它明确**不是 runtime config**，也不是：
+它明确**不是 runtime config**，也不是以下局部约定：
 
-- runtime config
 - 调度器本地常量
 - bridge / ingestion / completeness 私有约定
 

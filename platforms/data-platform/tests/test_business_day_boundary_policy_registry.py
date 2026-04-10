@@ -13,6 +13,13 @@ def _load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding='utf-8'))
 
 
+NON_RESOLVABLE_POLICY_STATUSES = {'policy_draft', 'policy_deprecated'}
+
+
+def _is_resolvable_policy(entry: dict) -> bool:
+    return entry['policy_status'] not in NON_RESOLVABLE_POLICY_STATUSES
+
+
 def _resolve_policy(
     entries: list[dict],
     resolution_hierarchy: list[str],
@@ -23,13 +30,19 @@ def _resolve_policy(
     matches_by_selector: dict[str, list[dict]] = {selector: [] for selector in resolution_hierarchy}
 
     for entry in entries:
+        if not _is_resolvable_policy(entry):
+            continue
+
         selector_kind = entry['selector_kind']
+        if selector_kind not in matches_by_selector:
+            continue
+
         if selector_kind == 'store_ref' and store_ref and entry['store_ref'] == store_ref:
-            matches_by_selector['store_ref'].append(entry)
+            matches_by_selector[selector_kind].append(entry)
         elif selector_kind == 'org_ref' and org_ref and entry['org_ref'] == org_ref:
-            matches_by_selector['org_ref'].append(entry)
+            matches_by_selector[selector_kind].append(entry)
         elif selector_kind == 'global_default':
-            matches_by_selector['global_default'].append(entry)
+            matches_by_selector[selector_kind].append(entry)
 
     for selector_kind in resolution_hierarchy:
         matches = matches_by_selector[selector_kind]
@@ -80,8 +93,9 @@ class BusinessDayBoundaryPolicyRegistryTest(unittest.TestCase):
         expected_fields = set(self.contract['fields'])
         allowed_selector_kinds = set(self.contract['allowed_values']['selector_kind'])
         allowed_policy_status = set(self.contract['allowed_values']['policy_status'])
+        usable_global_defaults: list[dict] = []
 
-        self.assertEqual(len(self.registry['entries']), 1)
+        self.assertGreaterEqual(len(self.registry['entries']), 1)
 
         for entry in self.registry['entries']:
             self.assertEqual(set(entry.keys()), expected_fields)
@@ -95,18 +109,21 @@ class BusinessDayBoundaryPolicyRegistryTest(unittest.TestCase):
             if entry['selector_kind'] == 'global_default':
                 self.assertIsNone(entry['org_ref'])
                 self.assertIsNone(entry['store_ref'])
+                if _is_resolvable_policy(entry):
+                    usable_global_defaults.append(entry)
             elif entry['selector_kind'] == 'org_ref':
                 self.assertTrue(entry['org_ref'])
                 self.assertIsNone(entry['store_ref'])
             elif entry['selector_kind'] == 'store_ref':
                 self.assertTrue(entry['store_ref'])
 
+        self.assertEqual(len(usable_global_defaults), 1)
         self.assertEqual(
-            self.registry['entries'][0]['business_day_boundary_local_time'],
+            usable_global_defaults[0]['business_day_boundary_local_time'],
             '03:00:00',
         )
         self.assertEqual(
-            self.registry['entries'][0]['timezone'],
+            usable_global_defaults[0]['timezone'],
             'Asia/Shanghai',
         )
 
@@ -124,7 +141,11 @@ class BusinessDayBoundaryPolicyRegistryTest(unittest.TestCase):
         self.assertIn('Asia/Shanghai', self.spec_text)
 
     def test_resolution_hierarchy_prefers_store_then_org_then_global_default(self) -> None:
-        global_default = self.registry['entries'][0]
+        global_default = next(
+            entry
+            for entry in self.registry['entries']
+            if entry['selector_kind'] == 'global_default' and _is_resolvable_policy(entry)
+        )
         synthetic_org_override = {
             **global_default,
             'policy_id': 'synthetic.org.override',
@@ -171,6 +192,63 @@ class BusinessDayBoundaryPolicyRegistryTest(unittest.TestCase):
             store_ref='navly:scope:store:other-store',
         )
         self.assertEqual(matched_global['policy_id'], 'navly.business_day_boundary.global_default')
+
+    def test_resolution_helper_ignores_non_hierarchy_and_non_resolvable_entries(self) -> None:
+        global_default = next(
+            entry
+            for entry in self.registry['entries']
+            if entry['selector_kind'] == 'global_default' and _is_resolvable_policy(entry)
+        )
+        synthetic_org_draft = {
+            **global_default,
+            'policy_id': 'synthetic.org.draft',
+            'selector_kind': 'org_ref',
+            'org_ref': 'navly:scope:org:demo-org-001',
+            'business_day_boundary_local_time': '04:00:00',
+            'policy_status': 'policy_draft',
+            'notes': 'Synthetic org draft should not participate in resolution.',
+        }
+        synthetic_org_deprecated = {
+            **global_default,
+            'policy_id': 'synthetic.org.deprecated',
+            'selector_kind': 'org_ref',
+            'org_ref': 'navly:scope:org:demo-org-001',
+            'business_day_boundary_local_time': '05:00:00',
+            'policy_status': 'policy_deprecated',
+            'notes': 'Synthetic org deprecated policy should not participate in resolution.',
+        }
+        synthetic_org_override = {
+            **global_default,
+            'policy_id': 'synthetic.org.override',
+            'selector_kind': 'org_ref',
+            'org_ref': 'navly:scope:org:demo-org-001',
+            'business_day_boundary_local_time': '06:00:00',
+            'notes': 'Synthetic org override should remain selectable.',
+        }
+        synthetic_store_override = {
+            **global_default,
+            'policy_id': 'synthetic.store.override',
+            'selector_kind': 'store_ref',
+            'org_ref': 'navly:scope:org:demo-org-001',
+            'store_ref': 'navly:scope:store:demo-store-001',
+            'business_day_boundary_local_time': '07:00:00',
+            'notes': 'Synthetic store override should be ignored if store_ref is not in the hierarchy.',
+        }
+
+        matched_policy = _resolve_policy(
+            [
+                global_default,
+                synthetic_org_draft,
+                synthetic_org_deprecated,
+                synthetic_org_override,
+                synthetic_store_override,
+            ],
+            ['org_ref', 'global_default'],
+            org_ref='navly:scope:org:demo-org-001',
+            store_ref='navly:scope:store:demo-store-001',
+        )
+
+        self.assertEqual(matched_policy['policy_id'], 'synthetic.org.override')
 
 
 if __name__ == '__main__':
