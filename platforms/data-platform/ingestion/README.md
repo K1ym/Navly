@@ -20,6 +20,10 @@
     - `schema`
     - `transport`
   - 只把 `completed` / `source_empty` 端点送入 finance canonical landing
+- `staff_board_vertical_slice.py`
+  - 把 `GetPersonList` / `GetTechUpClockList` / `GetTechMarketList` 串成 replayable runs
+  - 失败分类细分到 `source_empty` / `source_auth_error` / `source_sign_error` / `source_schema_error` / `transport_*`
+  - latest usable endpoint states 与 staff_board backbone state 分离输出
 
 当前范围：
 
@@ -27,3 +31,6 @@
 - `GetConsumeBillList`
 - `GetRechargeBillList`
 - `GetUserTradeList`
+- `GetPersonList`
+- `GetTechUpClockList`
+- `GetTechMarketList`
