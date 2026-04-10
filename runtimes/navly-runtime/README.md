@@ -15,6 +15,7 @@
 - capability readiness query wiring（消费 readiness truth）
 - theme service query wiring（消费 service truth）
 - owner-side auth/data adapter closure（可消费真实 owner surface）
+  - `member_insight` 默认不再消费内部 summary/backbone shape，而是消费 data-platform formal owner-side readiness / theme service surface
 - `runtime_result_envelope` 主路径闭合（answered / fallback / escalated / rejected / runtime_error）
 - `runtime_outcome_event` 对齐输出
 - Milestone A/B 自检脚本与最小链路测试

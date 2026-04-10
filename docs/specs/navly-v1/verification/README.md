@@ -37,6 +37,8 @@
 
 ## 文档清单
 
+- `2026-04-09-navly-v1-first-usable-alpha-smoke-and-status-board.md`
+  - 定义 first usable alpha 的 smoke baseline、当前状态板与它和 full phase-1 的边界
 - `2026-04-06-navly-v1-verification-boundaries.md`
   - 定义 verification 的边界对象、真相归属、边界污染识别规则、P0 边界验收线
 - `2026-04-06-navly-v1-e2e-acceptance.md`
@@ -87,10 +89,11 @@
 6. `../data-platform/README.md`
 7. `../auth-kernel/README.md`
 8. `2026-04-06-navly-v1-verification-boundaries.md`
-9. `2026-04-06-navly-v1-e2e-acceptance.md`
-10. `2026-04-06-navly-v1-docs-and-contract-consistency.md`
-11. `2026-04-06-navly-v1-phase-1-regression-baseline.md`
-12. `2026-04-06-navly-v1-phase-1-verification-checklist.md`
+9. `2026-04-09-navly-v1-first-usable-alpha-smoke-and-status-board.md`
+10. `2026-04-06-navly-v1-e2e-acceptance.md`
+11. `2026-04-06-navly-v1-docs-and-contract-consistency.md`
+12. `2026-04-06-navly-v1-phase-1-regression-baseline.md`
+13. `2026-04-06-navly-v1-phase-1-verification-checklist.md`
 
 ---
 
