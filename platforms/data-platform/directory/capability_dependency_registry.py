@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -12,6 +13,7 @@ def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding='utf-8'))
 
 
+@lru_cache(maxsize=None)
 def load_capability_dependency_registry(
     data_platform_root: Path = DATA_PLATFORM_ROOT,
 ) -> dict[str, Any]:

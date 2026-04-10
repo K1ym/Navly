@@ -106,6 +106,9 @@ def run_member_insight_vertical_slice(
     data_platform_root: Path = DATA_PLATFORM_ROOT,
 ) -> dict[str, Any]:
     dependency_entry = _load_member_insight_dependency_entry(data_platform_root=data_platform_root)
+    required_endpoint_contract_ids = dependency_entry['required_endpoint_contract_ids']
+    if not required_endpoint_contract_ids:
+        raise ValueError(f'No endpoints defined for capability {VERTICAL_SLICE_CAPABILITY_ID}')
     service_object_id = dependency_entry['default_service_object_id']
     registry = load_seed_backed_qinqin_registry(data_platform_root=data_platform_root)
     resolved_transport_kind = _transport_kind(transport)
@@ -124,7 +127,7 @@ def run_member_insight_vertical_slice(
     raw_pages_by_endpoint: dict[str, list[dict[str, Any]]] = {}
     completed_endpoint_runs: list[dict[str, Any]] = []
 
-    for endpoint_contract_id in dependency_entry.get('required_endpoint_contract_ids', []):
+    for endpoint_contract_id in required_endpoint_contract_ids:
         endpoint_run = artifact_store.start_endpoint_run(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,
