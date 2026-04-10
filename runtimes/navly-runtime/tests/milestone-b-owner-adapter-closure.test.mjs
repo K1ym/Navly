@@ -329,3 +329,36 @@ test('owner-side data adapter removes rejected promise entries so next attempt c
   assert.equal(readinessResponse.readiness_status, 'ready');
   assert.equal(runCount, 2);
 });
+
+test('owner-side data adapter normalizes non-positive live timeout to the default value', async () => {
+  let capturedInput = null;
+  const adapter = createOwnerSideDataPlatformAdapter({
+    liveTimeoutMs: 0,
+    runMemberInsightOwnerSurfaceImpl: async ({ input }) => {
+      capturedInput = input;
+      return buildOwnerSurfaceResult({
+        requestId: input.request_id,
+        traceRef: input.trace_ref,
+        targetScopeRef: input.target_scope_ref,
+        businessDate: input.requested_business_date,
+      });
+    },
+  });
+
+  await adapter.queryCapabilityReadiness({
+    ...buildReadinessQuery({ businessDate: '2026-03-25' }),
+    extensions: {
+      runtime_trace_ref: 'navly:runtime-trace:cache-sample',
+      selected_service_object_id: 'navly.service.store.member_insight',
+      data_adapter_context: {
+        org_id: 'demo-org-001',
+        app_secret: 'test-secret',
+        transport_kind: 'live',
+        live_base_url: 'http://127.0.0.1:8080',
+        live_timeout_ms: 0,
+      },
+    },
+  });
+
+  assert.equal(capturedInput.live_timeout_ms, 15000);
+});
