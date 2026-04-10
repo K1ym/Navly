@@ -136,16 +136,12 @@ python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'
 当前 first usable alpha 的 smoke baseline 见：
 
 - `docs/specs/navly-v1/verification/2026-04-09-navly-v1-first-usable-alpha-smoke-and-status-board.md`
+- `scripts/validate-first-usable-alpha-smoke.sh`
 
-当前最小命令集是：
+当前推荐直接运行：
 
 ```bash
-python3 -m unittest platforms/data-platform/tests/test_qinqin_contract_governance.py
-python3 -m unittest platforms/data-platform/tests/test_member_insight_vertical_slice.py
-python3 -m unittest platforms/data-platform/tests/test_member_insight_owner_surface.py
-bash platforms/auth-kernel/scripts/validate-milestone-b.sh
-bash runtimes/navly-runtime/scripts/validate-milestone-b.sh
-bash bridges/openclaw-host-bridge/scripts/validate-milestone-b.sh
+bash scripts/validate-first-usable-alpha-smoke.sh
 ```
 
 ### Run the current data-platform sample slice

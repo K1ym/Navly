@@ -56,20 +56,15 @@ first usable alpha 不是 “某条 demo 路径能跑一次”。
 
 ### 3.3 验证
 
-必须通过以下 smoke baseline：
+必须通过以下 smoke baseline 脚本：
 
 ```bash
-python3 -m unittest platforms/data-platform/tests/test_qinqin_contract_governance.py
-python3 -m unittest platforms/data-platform/tests/test_member_insight_vertical_slice.py
-python3 -m unittest platforms/data-platform/tests/test_member_insight_owner_surface.py
-bash platforms/auth-kernel/scripts/validate-milestone-b.sh
-bash runtimes/navly-runtime/scripts/validate-milestone-b.sh
-bash bridges/openclaw-host-bridge/scripts/validate-milestone-b.sh
+bash scripts/validate-first-usable-alpha-smoke.sh
 ```
 
 说明：
 
-- 这是当前 first usable alpha 的最小 smoke baseline
+- `scripts/validate-first-usable-alpha-smoke.sh` 是当前 alpha smoke baseline 的单一命令源
 - 它验证的是最小可用链路，不代表 full phase-1 全面完成
 
 ---
