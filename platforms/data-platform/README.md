@@ -22,6 +22,11 @@
   - 当前最小 canonical outputs：`customer`、`customer_card`、`consume_bill`、`consume_bill_payment`、`consume_bill_info`
 - latest usable state / historical run separation backbone
   - latest usable endpoint state 已与 historical run truth 分离承载
+- commission-setting state / quality governance slice
+  - `GetTechCommissionSetList` 的 `field_coverage_snapshot`
+  - `schema_alignment_snapshot`
+  - business-day-aware `backfill_progress_state`
+  - endpoint-scoped `commission_setting_completeness_state`
 - vertical slice orchestration backbone
   - `navly.store.member_insight`
   - `navly.service.store.member_insight`

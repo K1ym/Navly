@@ -381,7 +381,8 @@
       "variance_ids": [
         "qinqin.param.org-id-name-drift",
         "qinqin.path.tech-commission-set-legacy-path-required",
-        "qinqin.auth.tech-commission-set-runtime-headers-required"
+        "qinqin.auth.tech-commission-set-runtime-headers-required",
+        "qinqin.response.tech-commission-set-source-empty-governed"
       ]
     }
   ]

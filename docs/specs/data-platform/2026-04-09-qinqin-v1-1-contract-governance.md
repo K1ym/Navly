@@ -120,6 +120,7 @@
 - parameter name drift
 - live path constraint
 - response shape drift
+- response empty semantics
 - auth header requirement
 - documented field name drift
 
@@ -152,5 +153,6 @@
 1. `endpoint-contracts.seed.json` 中 8 个正式端点可完整追溯到 parameter / field / landing / variance 对象
 2. `endpoint-field-catalog.seed.json` 不再存在 `placeholder_only`
 3. `1.8` 的 runtime auth headers 已显式建模
-4. `1.4` / `1.5` / `1.7` 的 `RetData` root shape drift 已进入 variance register
-5. 相关测试能校验 registry 与 `docs/api/qinqin/**` 的一致性
+4. `1.8` 的 source-empty semantics 已进入 variance register
+5. `1.4` / `1.5` / `1.7` 的 `RetData` root shape drift 已进入 variance register
+6. 相关测试能校验 registry 与 `docs/api/qinqin/**` 的一致性
