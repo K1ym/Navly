@@ -46,10 +46,15 @@ def _blocking_dependencies(vertical_slice_result: dict[str, Any]) -> list[dict[s
         if state['availability_status'] in {'available', 'source_empty'}:
             continue
         endpoint_run = endpoint_runs_by_id.get(state['endpoint_contract_id'], {})
+        blocking_reason_code = (
+            'dependency_failed'
+            if endpoint_run.get('endpoint_status') == 'failed'
+            else 'missing_dependency'
+        )
         blocking.append({
             'dependency_kind': 'input_data',
             'dependency_ref': state['endpoint_contract_id'],
-            'blocking_reason_code': 'missing_dependency',
+            'blocking_reason_code': blocking_reason_code,
             'state_trace_refs': [state['state_trace_ref']],
             'run_trace_refs': [endpoint_run['endpoint_run_trace_ref']] if endpoint_run.get('endpoint_run_trace_ref') else [],
         })
@@ -92,11 +97,18 @@ def build_member_insight_readiness_response(
         for state in latest_states
         if state.get('latest_usable_business_date')
     ])
-    latest_usable_business_date = latest_usable_dates[0] if latest_usable_dates else target_business_date
+    latest_usable_business_date = min(latest_usable_dates) if latest_usable_dates else target_business_date
+    has_failed_dependency = any(
+        endpoint_run.get('endpoint_status') == 'failed'
+        for endpoint_run in vertical_slice_result['historical_run_truth']['endpoint_runs']
+    )
 
     if backbone_state['backbone_status'] == 'backbone_ready':
         readiness_status = 'ready'
         reason_codes: list[str] = []
+    elif has_failed_dependency:
+        readiness_status = 'failed'
+        reason_codes = ['dependency_failed']
     else:
         readiness_status = 'pending'
         reason_codes = ['missing_dependency']

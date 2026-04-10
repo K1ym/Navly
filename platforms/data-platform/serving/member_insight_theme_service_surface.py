@@ -10,17 +10,18 @@ MEMBER_INSIGHT_SERVICE_OBJECT_ID = 'navly.service.store.member_insight'
 
 def _explanation_object(
     *,
+    capability_id: str,
     reason_codes: list[str],
     state_trace_refs: list[str],
     run_trace_refs: list[str],
     latest_usable_business_date: str,
 ) -> dict[str, Any]:
     return {
-        'capability_id': VERTICAL_SLICE_CAPABILITY_ID,
+        'capability_id': capability_id,
         'explanation_scope': 'service',
         'reason_codes': reason_codes,
         'summary_tokens': [
-            'member_insight',
+            capability_id,
             'not_ready',
             latest_usable_business_date,
         ],
@@ -85,6 +86,7 @@ def build_member_insight_theme_service_response(
                 'to': target_business_date,
             },
             'explanation_object': _explanation_object(
+                capability_id=requested_capability_id,
                 reason_codes=['scope_out_of_contract'],
                 state_trace_refs=[],
                 run_trace_refs=[],
@@ -111,6 +113,7 @@ def build_member_insight_theme_service_response(
                 'to': latest_usable_business_date,
             },
             'explanation_object': _explanation_object(
+                capability_id=VERTICAL_SLICE_CAPABILITY_ID,
                 reason_codes=list(readiness_response.get('reason_codes', [])),
                 state_trace_refs=state_trace_refs,
                 run_trace_refs=run_trace_refs,
