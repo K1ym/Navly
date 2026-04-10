@@ -11,6 +11,13 @@
 - replay artifact 写出
 - CLI runner artifact tree
 - member insight vertical slice / replay / artifact tree
+- finance summary vertical slice / replay / canonical / prerequisite state
+- finance terminal outcome taxonomy:
+  - source empty
+  - auth
+  - sign
+  - schema
+  - transport
 - Qinqin v1.1 contract governance registry completeness
 - field catalog / landing policy / variance register consistency
 - member insight owner-side readiness / theme service surface

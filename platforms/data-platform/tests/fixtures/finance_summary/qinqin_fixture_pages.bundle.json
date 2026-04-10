@@ -1,0 +1,88 @@
+{
+  "qinqin.member.get_recharge_bill_list.v1_3": [
+    {
+      "Code": 200,
+      "Msg": "操作成功",
+      "RetData": {
+        "Total": 1,
+        "Data": [
+          {
+            "Id": "recharge_001",
+            "SnNo": "BK2603230010",
+            "CardId": "card_001",
+            "Type": "2",
+            "MemberName": "示例用户A",
+            "MemberPhone": "13900000000",
+            "CardNo": "4000000001",
+            "Category": 1,
+            "CardTypeName": "会员VIP",
+            "CardTypeId": "card_type_001",
+            "Pay": 2000.0,
+            "Total": 2200.0,
+            "Reality": 2000.0,
+            "Donate": 200.0,
+            "TicketEquity": "",
+            "CouponNum": 0,
+            "SysId": 1,
+            "OptId": "opt_001",
+            "OptCode": "admin",
+            "OptName": "示例操作员",
+            "OptTime": "2026-03-23 10:27:15",
+            "CorsOrgName": "演示门店",
+            "IsAnti": false,
+            "Integral": 0,
+            "ChainTradeId": "",
+            "ChainNoAnti": 0,
+            "IsNotAllowAnti": false,
+            "Payments": [
+              {
+                "PrimaryId": "trade_001",
+                "Id": "payment_001",
+                "Name": "现金",
+                "Amount": 2000.0
+              }
+            ],
+            "Sales": [
+              {
+                "SalesId": "sales_001",
+                "SalesName": "示例推荐人"
+              }
+            ],
+            "Tickets": [
+              {
+                "TicketId": "ticket_001",
+                "TicketName": "体验券",
+                "Qty": 1
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "qinqin.member.get_user_trade_list.v1_4": [
+    {
+      "Code": 200,
+      "Msg": "操作成功",
+      "RetData": [
+        {
+          "OptTime": "2026-03-23 17:12:05",
+          "TradeNo": "BK2603230003",
+          "CardOptType": 2,
+          "OrgName": "演示门店",
+          "OrgId": "demo-org-001",
+          "ChangeBalance": 2000.0,
+          "ChangeReality": 2000.0,
+          "ChangeDonate": 200.0,
+          "EndBalance": 2200.0,
+          "EndReality": 2000.0,
+          "EndDonate": 200.0,
+          "ChangeIntegral": 0,
+          "EndIntegral": 0,
+          "IsAnti": false,
+          "PaymentType": 1
+        }
+      ]
+    }
+  ]
+}
