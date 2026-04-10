@@ -3,15 +3,18 @@ from __future__ import annotations
 import json
 import sys
 import tempfile
+import threading
 import unittest
+from contextlib import contextmanager
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
 if str(DATA_PLATFORM_ROOT) not in sys.path:
     sys.path.insert(0, str(DATA_PLATFORM_ROOT))
 
-from connectors.qinqin.qinqin_substrate import FixtureQinqinTransport, build_signed_request  # noqa: E402
-from ingestion.finance_summary_vertical_slice import run_finance_summary_vertical_slice  # noqa: E402
+from connectors.qinqin.qinqin_substrate import FixtureQinqinTransport, LiveQinqinTransport, build_signed_request  # noqa: E402
+from ingestion.finance_summary_vertical_slice import _normalized_page_payload, run_finance_summary_vertical_slice  # noqa: E402
 
 
 class _TimeoutOnEndpointTransport:
@@ -25,6 +28,53 @@ class _TimeoutOnEndpointTransport:
         if endpoint_contract_id == self._endpoint_contract_id:
             raise TimeoutError('timed out while talking to qinqin')
         return self._delegate.fetch_page(endpoint_contract_id, request_payload)
+
+
+class _QinqinTestServer(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def __init__(self, server_address: tuple[str, int], responses_by_path: dict[str, object]) -> None:
+        super().__init__(server_address, _QinqinTestRequestHandler)
+        self.responses_by_path = responses_by_path
+
+
+class _QinqinTestRequestHandler(BaseHTTPRequestHandler):
+    server: _QinqinTestServer
+
+    def do_POST(self) -> None:  # noqa: N802
+        response_entry = self.server.responses_by_path.get(self.path)
+        if response_entry is None:
+            status_code = 404
+            response_payload: object = {'error': 'not found'}
+        elif isinstance(response_entry, tuple):
+            status_code, response_payload = response_entry
+        else:
+            status_code = 200
+            response_payload = response_entry
+
+        response_body = json.dumps(response_payload, ensure_ascii=False).encode('utf-8')
+        self.send_response(status_code)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Content-Length', str(len(response_body)))
+        self.end_headers()
+        self.wfile.write(response_body)
+
+    def log_message(self, format: str, *args: object) -> None:
+        return
+
+
+@contextmanager
+def _serve_qinqin_responses(responses_by_path: dict[str, object]):
+    server = _QinqinTestServer(('127.0.0.1', 0), responses_by_path)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        host, port = server.server_address
+        yield f'http://{host}:{port}'
+    finally:
+        server.shutdown()
+        thread.join()
+        server.server_close()
 
 
 class FinanceSummaryVerticalSliceTest(unittest.TestCase):
@@ -69,6 +119,42 @@ class FinanceSummaryVerticalSliceTest(unittest.TestCase):
             sorted(trade_request['payload'].keys()),
             sorted(['OrgId', 'Stime', 'Etime', 'Id', 'Type', 'Sign']),
         )
+
+    def test_build_signed_request_ignores_required_runtime_header_parameters(self) -> None:
+        request = build_signed_request(
+            endpoint_contract_id='qinqin.staff.get_tech_commission_set_list.v1_8',
+            org_id='demo-org-001',
+            start_time='2026-03-20 09:00:00',
+            end_time='2026-03-24 09:00:00',
+            app_secret='test-secret',
+        )
+        self.assertEqual(
+            sorted(request['payload'].keys()),
+            sorted(['OrgId', 'Sign']),
+        )
+        self.assertTrue(request['payload']['Sign'])
+
+    def test_normalized_page_payload_dispatches_by_finance_endpoint(self) -> None:
+        fixture_bundle = self._fixture_bundle()
+        recharge_payload = _normalized_page_payload(
+            endpoint_contract_id='qinqin.member.get_recharge_bill_list.v1_3',
+            response_envelope=fixture_bundle['qinqin.member.get_recharge_bill_list.v1_3'][0],
+        )
+        trade_payload = _normalized_page_payload(
+            endpoint_contract_id='qinqin.member.get_user_trade_list.v1_4',
+            response_envelope=fixture_bundle['qinqin.member.get_user_trade_list.v1_4'][0],
+        )
+
+        self.assertEqual(recharge_payload['total'], 1)
+        self.assertEqual(len(recharge_payload['rows']), 1)
+        self.assertEqual(trade_payload['total'], 1)
+        self.assertEqual(len(trade_payload['rows']), 1)
+
+        with self.assertRaises(KeyError):
+            _normalized_page_payload(
+                endpoint_contract_id='qinqin.staff.get_person_list.v1_5',
+                response_envelope={'Code': 200, 'Msg': '操作成功', 'RetData': []},
+            )
 
     def test_finance_summary_vertical_slice_success_path(self) -> None:
         transport = FixtureQinqinTransport(self._fixture_bundle())
@@ -131,6 +217,70 @@ class FinanceSummaryVerticalSliceTest(unittest.TestCase):
             'ready',
         )
         self.assertEqual(len(result['canonical_artifacts']['account_trade']), 0)
+
+    def test_finance_summary_live_404_no_data_is_source_empty_not_transport_failure(self) -> None:
+        fixture_bundle = self._fixture_bundle()
+        responses_by_path = {
+            '/api/thirdparty/GetRechargeBillList': fixture_bundle['qinqin.member.get_recharge_bill_list.v1_3'][0],
+            '/api/thirdparty/GetUserTradeList': (
+                404,
+                {
+                    'Code': 404,
+                    'Msg': '暂无数据',
+                    'RetData': [],
+                },
+            ),
+        }
+        with _serve_qinqin_responses(responses_by_path) as base_url:
+            transport = LiveQinqinTransport(base_url=base_url, timeout_ms=3000)
+            result = run_finance_summary_vertical_slice(
+                transport=transport,
+                **self._base_run_kwargs(),
+            )
+
+        account_trade_endpoint = [
+            item for item in result['historical_run_truth']['endpoint_runs']
+            if item['endpoint_contract_id'] == 'qinqin.member.get_user_trade_list.v1_4'
+        ][0]
+
+        self.assertEqual(account_trade_endpoint['endpoint_status'], 'source_empty')
+        self.assertEqual(account_trade_endpoint['terminal_outcome_category'], 'source_empty')
+        self.assertIsNone(account_trade_endpoint['error_taxonomy'])
+        self.assertEqual(result['historical_run_truth']['ingestion_run']['run_status'], 'completed')
+
+    def test_finance_summary_source_empty_after_prior_pages_finishes_completed(self) -> None:
+        fixture_bundle = self._fixture_bundle()
+        recharge_row = fixture_bundle['qinqin.member.get_recharge_bill_list.v1_3'][0]['RetData']['Data'][0]
+        fixture_bundle['qinqin.member.get_recharge_bill_list.v1_3'] = [
+            {
+                'Code': 200,
+                'Msg': '操作成功',
+                'RetData': {
+                    'Total': 2,
+                    'Data': [recharge_row],
+                },
+            },
+            {
+                'Code': 404,
+                'Msg': '暂无数据',
+            },
+        ]
+        transport = FixtureQinqinTransport(fixture_bundle)
+        result = run_finance_summary_vertical_slice(
+            transport=transport,
+            page_size=1,
+            **self._base_run_kwargs(),
+        )
+
+        recharge_endpoint = [
+            item for item in result['historical_run_truth']['endpoint_runs']
+            if item['endpoint_contract_id'] == 'qinqin.member.get_recharge_bill_list.v1_3'
+        ][0]
+
+        self.assertEqual(recharge_endpoint['endpoint_status'], 'completed')
+        self.assertEqual(recharge_endpoint['record_count'], 1)
+        self.assertEqual(recharge_endpoint['terminal_outcome_category'], 'success')
+        self.assertEqual(len(result['canonical_artifacts']['recharge_bill']), 1)
 
     def test_finance_summary_classifies_sign_auth_schema_and_transport(self) -> None:
         scenarios = [

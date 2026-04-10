@@ -96,6 +96,15 @@ class SeedBackedQinqinRegistry:
                 return entry.get('preferred_wire_name') or entry['known_wire_variants'][0]
         raise KeyError(f'Unknown parameter_key: {parameter_key}')
 
+    def parameter_entry(self, parameter_key: str) -> dict[str, Any]:
+        for entry in self._parameters:
+            if entry['parameter_key'] == parameter_key:
+                return entry
+        raise KeyError(f'Unknown parameter_key: {parameter_key}')
+
+    def parameter_request_location(self, parameter_key: str) -> str:
+        return str(self.parameter_entry(parameter_key).get('request_location') or 'body')
+
     def endpoint_governance_binding(self, endpoint_contract_id: str) -> EndpointGovernanceBinding:
         for entry in self._endpoint_governance_bindings:
             if entry['endpoint_contract_id'] == endpoint_contract_id:
@@ -123,35 +132,28 @@ def compute_signature(unsigned_payload: Mapping[str, Any], app_secret: str) -> s
     return hashlib.md5(signature_source.encode('utf-8')).hexdigest().lower()
 
 
-def build_signed_request(
+def _body_parameter_keys(
+    *,
+    binding: EndpointGovernanceBinding,
+    registry: SeedBackedQinqinRegistry,
+) -> list[str]:
+    return [
+        parameter_key
+        for parameter_key in [*binding.required_parameter_keys, *binding.optional_parameter_keys]
+        if parameter_key != 'sign' and registry.parameter_request_location(parameter_key) == 'body'
+    ]
+
+
+def _request_body_payload(
+    *,
     endpoint_contract_id: str,
-    org_id: str,
-    start_time: str,
-    end_time: str,
-    app_secret: str,
-    page_index: int | None = None,
-    page_size: int | None = None,
-    member_card_id: str | None = None,
-    trade_type: int | None = None,
-    data_platform_root: Path = DATA_PLATFORM_ROOT,
+    binding: EndpointGovernanceBinding,
+    registry: SeedBackedQinqinRegistry,
+    parameter_values: Mapping[str, Any],
 ) -> dict[str, Any]:
-    registry = load_seed_backed_qinqin_registry(data_platform_root=data_platform_root)
-    contract = registry.endpoint_contract(endpoint_contract_id)
-    binding = registry.endpoint_governance_binding(endpoint_contract_id)
-    value_by_parameter_key = {
-        'org_id': org_id,
-        'start_time': start_time,
-        'end_time': end_time,
-        'page_index': page_index,
-        'page_size': page_size,
-        'member_card_id': member_card_id,
-        'trade_type': trade_type,
-    }
     payload: dict[str, Any] = {}
-    for parameter_key in [*binding.required_parameter_keys, *binding.optional_parameter_keys]:
-        if parameter_key == 'sign':
-            continue
-        value = value_by_parameter_key.get(parameter_key)
+    for parameter_key in _body_parameter_keys(binding=binding, registry=registry):
+        value = parameter_values.get(parameter_key)
         if value is None:
             if parameter_key in binding.required_parameter_keys:
                 raise ValueError(
@@ -159,6 +161,41 @@ def build_signed_request(
                 )
             continue
         payload[registry.preferred_wire_name(parameter_key)] = value
+    return payload
+
+
+def build_signed_request(
+    endpoint_contract_id: str,
+    org_id: str,
+    start_time: str | None,
+    end_time: str | None,
+    app_secret: str,
+    page_index: int | None = None,
+    page_size: int | None = None,
+    member_card_id: str | None = None,
+    trade_type: int | None = None,
+    data_platform_root: Path = DATA_PLATFORM_ROOT,
+    **parameter_values: Any,
+) -> dict[str, Any]:
+    registry = load_seed_backed_qinqin_registry(data_platform_root=data_platform_root)
+    contract = registry.endpoint_contract(endpoint_contract_id)
+    binding = registry.endpoint_governance_binding(endpoint_contract_id)
+    resolved_parameter_values = {
+        'org_id': org_id,
+        'start_time': start_time,
+        'end_time': end_time,
+        'page_index': page_index,
+        'page_size': page_size,
+        'member_card_id': member_card_id,
+        'trade_type': trade_type,
+        **parameter_values,
+    }
+    payload = _request_body_payload(
+        endpoint_contract_id=endpoint_contract_id,
+        binding=binding,
+        registry=registry,
+        parameter_values=resolved_parameter_values,
+    )
     payload[registry.preferred_wire_name('sign')] = compute_signature(payload, app_secret)
     return {
         'endpoint_contract_id': endpoint_contract_id,

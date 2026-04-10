@@ -150,36 +150,63 @@ def _schema_error(endpoint_contract_id: str, exc: SourceSchemaError) -> dict[str
     }
 
 
+def _normalize_total_and_data_payload(response_envelope: dict[str, Any]) -> dict[str, Any]:
+    ret_data = response_envelope.get('RetData')
+    if not isinstance(ret_data, dict):
+        raise SourceSchemaError('RetData must be an object with Total and Data.')
+    rows = ret_data.get('Data')
+    if not isinstance(rows, list):
+        raise SourceSchemaError('RetData.Data must be an array.')
+    total_raw = ret_data.get('Total', len(rows))
+    try:
+        total = int(total_raw or 0)
+    except (TypeError, ValueError) as exc:
+        raise SourceSchemaError('RetData.Total must be numeric.') from exc
+    return {
+        'rows': rows,
+        'total': total,
+    }
+
+
+def _normalize_array_record_list_payload(response_envelope: dict[str, Any]) -> dict[str, Any]:
+    ret_data = response_envelope.get('RetData')
+    if not isinstance(ret_data, list):
+        raise SourceSchemaError('RetData must be an array record list.')
+    return {
+        'rows': ret_data,
+        'total': len(ret_data),
+    }
+
+
+FINANCE_PAGE_PAYLOAD_NORMALIZERS = {
+    RECHARGE_ENDPOINT_ID: _normalize_total_and_data_payload,
+    ACCOUNT_TRADE_ENDPOINT_ID: _normalize_array_record_list_payload,
+}
+
+
 def _normalized_page_payload(
     *,
     endpoint_contract_id: str,
     response_envelope: dict[str, Any],
 ) -> dict[str, Any]:
-    if endpoint_contract_id == RECHARGE_ENDPOINT_ID:
-        ret_data = response_envelope.get('RetData')
-        if not isinstance(ret_data, dict):
-            raise SourceSchemaError('RetData must be an object with Total and Data.')
-        rows = ret_data.get('Data')
-        if not isinstance(rows, list):
-            raise SourceSchemaError('RetData.Data must be an array.')
-        total_raw = ret_data.get('Total', len(rows))
-        try:
-            total = int(total_raw or 0)
-        except (TypeError, ValueError) as exc:
-            raise SourceSchemaError('RetData.Total must be numeric.') from exc
+    normalizer = FINANCE_PAGE_PAYLOAD_NORMALIZERS.get(endpoint_contract_id)
+    if normalizer is None:
+        raise KeyError(f'Unsupported finance endpoint_contract_id: {endpoint_contract_id}')
+    return normalizer(response_envelope)
+
+
+def _empty_terminal_result(accumulated_records: int) -> dict[str, Any]:
+    if accumulated_records == 0:
         return {
-            'rows': rows,
-            'total': total,
+            'endpoint_status': 'source_empty',
+            'record_count': 0,
+            'terminal_outcome_category': 'source_empty',
         }
-    if endpoint_contract_id == ACCOUNT_TRADE_ENDPOINT_ID:
-        ret_data = response_envelope.get('RetData')
-        if not isinstance(ret_data, list):
-            raise SourceSchemaError('RetData must be an array record list.')
-        return {
-            'rows': ret_data,
-            'total': len(ret_data),
-        }
-    raise KeyError(f'Unsupported finance endpoint_contract_id: {endpoint_contract_id}')
+    return {
+        'endpoint_status': 'completed',
+        'record_count': accumulated_records,
+        'terminal_outcome_category': 'success',
+    }
 
 
 def _endpoint_uses_pagination(endpoint_contract_id: str, registry: Any) -> bool:
@@ -314,6 +341,21 @@ def run_finance_summary_vertical_slice(
             )
             raw_pages_by_endpoint[endpoint_contract_id].append(raw_page_record)
 
+            if _source_empty_response(response_envelope):
+                terminal_result = _empty_terminal_result(accumulated_records)
+                completed_endpoint_runs.append(
+                    artifact_store.finalize_endpoint_run(
+                        endpoint_run_id=endpoint_run['endpoint_run_id'],
+                        endpoint_status=terminal_result['endpoint_status'],
+                        page_count=page_index,
+                        record_count=terminal_result['record_count'],
+                        terminal_outcome_category=terminal_result['terminal_outcome_category'],
+                        terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
+                    )
+                )
+                finalized = True
+                continue
+
             if transport_error:
                 completed_endpoint_runs.append(
                     artifact_store.finalize_endpoint_run(
@@ -326,20 +368,6 @@ def run_finance_summary_vertical_slice(
                         error_code=transport_error.get('code'),
                         error_message=transport_error.get('message'),
                         retryable=transport_error.get('retryable'),
-                        terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
-                    )
-                )
-                finalized = True
-                continue
-
-            if _source_empty_response(response_envelope):
-                completed_endpoint_runs.append(
-                    artifact_store.finalize_endpoint_run(
-                        endpoint_run_id=endpoint_run['endpoint_run_id'],
-                        endpoint_status='source_empty',
-                        page_count=page_index,
-                        record_count=0,
-                        terminal_outcome_category='source_empty',
                         terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
                     )
                 )
@@ -384,14 +412,14 @@ def run_finance_summary_vertical_slice(
                 continue
 
             if response_record_count == 0:
-                endpoint_status = 'source_empty' if accumulated_records == 0 else 'completed'
+                terminal_result = _empty_terminal_result(accumulated_records)
                 completed_endpoint_runs.append(
                     artifact_store.finalize_endpoint_run(
                         endpoint_run_id=endpoint_run['endpoint_run_id'],
-                        endpoint_status=endpoint_status,
+                        endpoint_status=terminal_result['endpoint_status'],
                         page_count=page_index,
-                        record_count=accumulated_records,
-                        terminal_outcome_category='source_empty' if endpoint_status == 'source_empty' else 'success',
+                        record_count=terminal_result['record_count'],
+                        terminal_outcome_category=terminal_result['terminal_outcome_category'],
                         terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
                     )
                 )
