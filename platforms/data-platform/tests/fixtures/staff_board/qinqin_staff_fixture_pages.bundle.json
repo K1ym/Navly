@@ -1,0 +1,213 @@
+{
+  "qinqin.staff.get_person_list.v1_5": [
+    {
+      "Code": 200,
+      "Msg": "操作成功",
+      "RetData": [
+        {
+          "Id": "staff_001",
+          "Code": "018",
+          "OrgId": "demo-org-001",
+          "Name": "王娟",
+          "DeptName": "技师部",
+          "ClassName": "中班",
+          "IsJob": true,
+          "Phone": "13900000001",
+          "PersonState": 1,
+          "PersonStateName": "空闲",
+          "ItemList": [
+            {
+              "ItemId": "item_001",
+              "PersonId": "staff_001",
+              "ItemCode": "8004",
+              "ItemName": "精品足道",
+              "ItemCategory": 1,
+              "ItemTypeId": "type_001",
+              "ItemTypeName": "足浴类",
+              "JobType": 1
+            },
+            {
+              "ItemId": "item_002",
+              "PersonId": "staff_001",
+              "ItemCode": "8005",
+              "ItemName": "肩颈舒缓",
+              "ItemCategory": 2,
+              "ItemTypeId": "type_002",
+              "ItemTypeName": "附项类",
+              "JobType": 1
+            }
+          ]
+        },
+        {
+          "Id": "staff_002",
+          "Code": "021",
+          "OrgId": "demo-org-001",
+          "Name": "李敏",
+          "DeptName": "技师部",
+          "ClassName": "早班",
+          "IsJob": true,
+          "Phone": "13900000002",
+          "PersonState": 2,
+          "PersonStateName": "上钟",
+          "ItemList": [
+            {
+              "ItemId": "item_003",
+              "PersonId": "staff_002",
+              "ItemCode": "8010",
+              "ItemName": "精油护理",
+              "ItemCategory": 1,
+              "ItemTypeId": "type_003",
+              "ItemTypeName": "SPA类",
+              "JobType": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "qinqin.staff.get_tech_up_clock_list.v1_6": [
+    {
+      "Code": 200,
+      "Msg": "操作成功",
+      "RetData": {
+        "Items": [
+          {
+            "ItemName": "精品足道",
+            "ItemCategory": 1,
+            "PersonCode": "018",
+            "PersonName": "王娟",
+            "HandCardCode": "10002",
+            "ClockType": 1,
+            "AddClockType": 0,
+            "Count": 1,
+            "Turnover": 199,
+            "Income": 199,
+            "BasicComm": 80,
+            "OverComm": 0,
+            "AddClockTypeComm": 0,
+            "CTime": "2026-03-23 10:00:00",
+            "Duration": 60,
+            "WaitTime": "2026-03-23 10:05:00",
+            "STime": "2026-03-23 10:10:00",
+            "ETime": "2026-03-23 11:10:00",
+            "SettleTime": "2026-03-23 11:20:00",
+            "SettleNo": "XF2603230001",
+            "Comm": 80,
+            "AddClockDesc": "",
+            "IsAddWork": false
+          },
+          {
+            "ItemName": "精油护理",
+            "ItemCategory": 1,
+            "PersonCode": "021",
+            "PersonName": "李敏",
+            "HandCardCode": "10008",
+            "ClockType": 2,
+            "AddClockType": 0,
+            "Count": 1,
+            "Turnover": 268,
+            "Income": 250,
+            "BasicComm": 90,
+            "OverComm": 0,
+            "AddClockTypeComm": 0,
+            "CTime": "2026-03-23 12:00:00",
+            "Duration": 80,
+            "WaitTime": "2026-03-23 12:05:00",
+            "STime": "2026-03-23 12:10:00",
+            "ETime": "2026-03-23 13:30:00",
+            "SettleTime": "2026-03-23 13:40:00",
+            "SettleNo": "XF2603230002",
+            "Comm": 90,
+            "AddClockDesc": "",
+            "IsAddWork": false
+          }
+        ],
+        "Main": {
+          "Total": 2,
+          "Wheel": 1,
+          "Point": 1,
+          "Add": 0,
+          "Buy": 0,
+          "Call": 0
+        },
+        "Extra": {
+          "Total": 1,
+          "Wheel": 1,
+          "Point": 0,
+          "Add": 0,
+          "Buy": 0,
+          "Call": 0
+        },
+        "TotalClock": 3
+      }
+    }
+  ],
+  "qinqin.staff.get_tech_market_list.v1_7": [
+    {
+      "Code": 200,
+      "Msg": "操作成功",
+      "RetData": [
+        {
+          "Id": "sales_001",
+          "RoomCode": "A01",
+          "HandCardCode": "10002",
+          "PersonCode": "018",
+          "PersonName": "王娟",
+          "Sex": 0,
+          "CTime": "2026-03-23 11:00:00",
+          "SettleTime": "2026-03-23 11:20:00",
+          "SettleNo": "XF2603230001",
+          "ItemTypeName": "茶饮类",
+          "OrderAreaId": "oa_001",
+          "OrderAreaName": "洗浴区",
+          "SalesName": "前台A",
+          "SalesCode": "admin",
+          "PostId": "post_001",
+          "ItemName": "生椰拿铁",
+          "ItemId": "drink_001",
+          "ItemCode": "3006",
+          "Count": 1,
+          "Price": 12,
+          "Discount": 0,
+          "ShoppromoAmount": 0,
+          "AfterDisc": 12,
+          "FavourShare": 0,
+          "ClockType": 1,
+          "ItemCategory": 3,
+          "Commission": 2,
+          "IsDonate": false
+        },
+        {
+          "Id": "sales_002",
+          "RoomCode": "B02",
+          "HandCardCode": "10008",
+          "PersonCode": "021",
+          "PersonName": "李敏",
+          "Sex": 0,
+          "CTime": "2026-03-23 13:00:00",
+          "SettleTime": "2026-03-23 13:40:00",
+          "SettleNo": "XF2603230002",
+          "ItemTypeName": "商品类",
+          "OrderAreaId": "oa_002",
+          "OrderAreaName": "休息区",
+          "SalesName": "前台B",
+          "SalesCode": "cashier_01",
+          "PostId": "post_002",
+          "ItemName": "精油套装",
+          "ItemId": "goods_001",
+          "ItemCode": "4008",
+          "Count": 1,
+          "Price": 88,
+          "Discount": 8,
+          "ShoppromoAmount": 0,
+          "AfterDisc": 80,
+          "FavourShare": 0,
+          "ClockType": 2,
+          "ItemCategory": 3,
+          "Commission": 5,
+          "IsDonate": false
+        }
+      ]
+    }
+  ]
+}

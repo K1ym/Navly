@@ -80,36 +80,65 @@ class SeedBackedQinqinRegistry:
         )
         self._endpoint_contracts = endpoint_contract_registry['entries']
         self._endpoint_governance_bindings = endpoint_contract_registry['endpoint_governance_bindings']
+        self._endpoint_bindings = self._endpoint_governance_bindings
         self._parameters = _load_json(
             data_platform_root / 'directory' / 'endpoint-parameter-canonicalization.seed.json'
         )['entries']
+        self._endpoint_contracts_by_id = {
+            entry['endpoint_contract_id']: entry
+            for entry in self._endpoint_contracts
+        }
+        self._endpoint_bindings_by_id = {
+            entry['endpoint_contract_id']: entry
+            for entry in self._endpoint_bindings
+        }
+        self._parameters_by_key = {
+            entry['parameter_key']: entry
+            for entry in self._parameters
+        }
 
     def endpoint_contract(self, endpoint_contract_id: str) -> EndpointContract:
-        for entry in self._endpoint_contracts:
-            if entry['endpoint_contract_id'] == endpoint_contract_id:
-                return EndpointContract(**entry)
-        raise KeyError(f'Unknown endpoint_contract_id: {endpoint_contract_id}')
+        entry = self._endpoint_contracts_by_id.get(endpoint_contract_id)
+        if entry is None:
+            raise KeyError(f'Unknown endpoint_contract_id: {endpoint_contract_id}')
+        return EndpointContract(**entry)
 
-    def preferred_wire_name(self, parameter_key: str) -> str:
-        for entry in self._parameters:
-            if entry['parameter_key'] == parameter_key:
-                return entry.get('preferred_wire_name') or entry['known_wire_variants'][0]
-        raise KeyError(f'Unknown parameter_key: {parameter_key}')
+    def endpoint_binding(self, endpoint_contract_id: str) -> EndpointGovernanceBinding:
+        return self.endpoint_governance_binding(endpoint_contract_id)
 
     def parameter_entry(self, parameter_key: str) -> dict[str, Any]:
-        for entry in self._parameters:
-            if entry['parameter_key'] == parameter_key:
-                return entry
-        raise KeyError(f'Unknown parameter_key: {parameter_key}')
+        entry = self._parameters_by_key.get(parameter_key)
+        if entry is None:
+            raise KeyError(f'Unknown parameter_key: {parameter_key}')
+        return entry
+
+    def preferred_wire_name(self, parameter_key: str) -> str:
+        entry = self.parameter_entry(parameter_key)
+        return entry.get('preferred_wire_name') or entry['known_wire_variants'][0]
+
+    def body_parameter_keys(self, endpoint_contract_id: str) -> list[str]:
+        binding = self.endpoint_governance_binding(endpoint_contract_id)
+        return [
+            key
+            for key in [*binding.required_parameter_keys, *binding.optional_parameter_keys]
+            if key != 'sign' and self.parameter_request_location(key) == 'body'
+        ]
+
+    def uses_pagination(self, endpoint_contract_id: str) -> bool:
+        body_keys = set(self.body_parameter_keys(endpoint_contract_id))
+        return 'page_index' in body_keys or 'page_size' in body_keys
+
+    def response_payload_shape(self, endpoint_contract_id: str) -> str:
+        return self.endpoint_response_payload_shape(endpoint_contract_id)
 
     def parameter_request_location(self, parameter_key: str) -> str:
         return str(self.parameter_entry(parameter_key).get('request_location') or 'body')
 
     def endpoint_governance_binding(self, endpoint_contract_id: str) -> EndpointGovernanceBinding:
-        for entry in self._endpoint_governance_bindings:
-            if entry['endpoint_contract_id'] == endpoint_contract_id:
-                return EndpointGovernanceBinding(**entry)
-        raise KeyError(f'Unknown endpoint_contract_id governance binding: {endpoint_contract_id}')
+        entry = self._endpoint_bindings_by_id.get(endpoint_contract_id)
+        if entry is None:
+            raise KeyError(f'Unknown endpoint_contract_id governance binding: {endpoint_contract_id}')
+        return EndpointGovernanceBinding(**entry)
 
     def endpoint_response_payload_shape(self, endpoint_contract_id: str) -> str:
         return self.endpoint_governance_binding(endpoint_contract_id).response_payload_shape
@@ -174,6 +203,8 @@ def build_signed_request(
     page_size: int | None = None,
     member_card_id: str | None = None,
     trade_type: int | None = None,
+    staff_code: str | None = None,
+    extra_params: Mapping[str, Any] | None = None,
     data_platform_root: Path = DATA_PLATFORM_ROOT,
     **parameter_values: Any,
 ) -> dict[str, Any]:
@@ -188,8 +219,11 @@ def build_signed_request(
         'page_size': page_size,
         'member_card_id': member_card_id,
         'trade_type': trade_type,
+        'staff_code': staff_code,
         **parameter_values,
     }
+    if extra_params:
+        resolved_parameter_values.update(extra_params)
     payload = _request_body_payload(
         endpoint_contract_id=endpoint_contract_id,
         binding=binding,
@@ -202,6 +236,27 @@ def build_signed_request(
         'method': contract.method,
         'path': contract.path,
         'payload': payload,
+    }
+
+
+def _empty_response_envelope(response_payload_shape: str, *, page_count_hint: int = 0) -> dict[str, Any]:
+    if response_payload_shape == 'object_with_total_and_data_array':
+        ret_data: Any = {'Total': page_count_hint, 'Data': []}
+    elif response_payload_shape in {'array_record_list', 'array_record_list_with_nested_detail_array'}:
+        ret_data = []
+    elif response_payload_shape == 'object_with_items_and_summary_blocks':
+        ret_data = {
+            'Items': [],
+            'Main': {},
+            'Extra': {},
+            'TotalClock': 0,
+        }
+    else:
+        ret_data = {}
+    return {
+        'Code': 200,
+        'Msg': '操作成功',
+        'RetData': ret_data,
     }
 
 
@@ -466,7 +521,10 @@ class FixtureQinqinTransport:
         if 1 <= page_index <= len(endpoint_pages):
             response_envelope = copy.deepcopy(endpoint_pages[page_index - 1])
         else:
-            response_envelope = {'Code': 200, 'Msg': '操作成功', 'RetData': {'Total': len(endpoint_pages), 'Data': []}}
+            response_envelope = _empty_response_envelope(
+                self._registry.endpoint_response_payload_shape(endpoint_contract_id),
+                page_count_hint=len(endpoint_pages),
+            )
         return _build_transport_page_result(
             transport_kind=self.transport_kind,
             transport_outcome='response_received',
