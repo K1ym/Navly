@@ -1,0 +1,29 @@
+{
+  "contract_name": "business_day_boundary_policy_entry",
+  "owner": "data-platform",
+  "status": "phase_1_contract_frozen",
+  "fields": [
+    "policy_id",
+    "selector_kind",
+    "org_ref",
+    "store_ref",
+    "timezone",
+    "business_day_boundary_local_time",
+    "policy_status",
+    "truth_source_docs",
+    "notes"
+  ],
+  "allowed_values": {
+    "selector_kind": [
+      "global_default",
+      "org_ref",
+      "store_ref"
+    ],
+    "policy_status": [
+      "policy_frozen",
+      "policy_draft",
+      "policy_deprecated"
+    ]
+  },
+  "notes": "global_default entries must leave org_ref and store_ref null. org_ref entries require org_ref and keep store_ref null. store_ref entries require store_ref and may additionally carry parent org_ref for audit traceability. Registry root defines the boundary_interpretation and resolution_hierarchy."
+}

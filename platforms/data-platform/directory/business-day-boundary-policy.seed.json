@@ -1,0 +1,28 @@
+{
+  "registry_name": "business_day_boundary_policy_registry",
+  "status": "phase_1_contract_frozen",
+  "governance_scope": "data-platform-only",
+  "resolution_hierarchy": [
+    "store_ref",
+    "org_ref",
+    "global_default"
+  ],
+  "boundary_interpretation": "business_date = local_calendar_date when local_time >= business_day_boundary_local_time; otherwise previous_local_calendar_date",
+  "entries": [
+    {
+      "policy_id": "navly.business_day_boundary.global_default",
+      "selector_kind": "global_default",
+      "org_ref": null,
+      "store_ref": null,
+      "timezone": "Asia/Shanghai",
+      "business_day_boundary_local_time": "03:00:00",
+      "policy_status": "policy_frozen",
+      "truth_source_docs": [
+        "docs/api/qinqin/auth-and-signing.md",
+        "docs/api/qinqin/endpoint-manifest.md"
+      ],
+      "notes": "Phase-1 default business-day boundary policy. The 03:00 boundary is an explicit data-platform governance decision inferred from the formal Qinqin access window opening at 03:00 and the documented 03:10 daily sync start."
+    }
+  ],
+  "notes": "This registry is a governed data-platform object, not runtime config. Future org_ref or store_ref overrides must be added here and follow the declared resolution_hierarchy."
+}
