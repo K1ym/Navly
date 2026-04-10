@@ -12,3 +12,7 @@
   - latest observed run 与 latest usable state 分离表达
   - `availability_status` 区分 `available` / `source_empty` / `unavailable`
   - prerequisite state 为 `finance_summary` 提供 blocking dependency 视图
+- `commission_setting_sync_state.py`
+  - 为 `GetTechCommissionSetList` 产出 latest usable endpoint state
+  - 产出 business-day-policy-aware `backfill_progress_state`
+  - 明确区分 currentness 与历史 backfill completeness

@@ -251,6 +251,24 @@
       "resolution_rule": "apply auth profile qinqin.v1_1.signature_body_plus_runtime_headers."
     },
     {
+      "variance_id": "qinqin.response.tech-commission-set-source-empty-governed",
+      "variance_kind": "response_empty_semantics",
+      "source_system_id": "qinqin.v1_1",
+      "endpoint_contract_id": "qinqin.staff.get_tech_commission_set_list.v1_8",
+      "canonical_form": "404_no_data_or_empty_array=source_empty_zero_row_full_replace",
+      "observed_variants": [
+        "404 暂无数据",
+        "RetData=[]"
+      ],
+      "evidence_docs": [
+        "docs/api/qinqin/staff/1.8-staff-base-commission.md",
+        "docs/api/qinqin/endpoint-manifest.md"
+      ],
+      "resolution_status": "frozen_for_phase_1",
+      "notes": "Commission-setting endpoint may legitimately publish zero rows for a business day; this is current zero-row state, not auth or schema failure.",
+      "resolution_rule": "treat 404/no-data and empty-array outcomes as source_empty, preserve latest-state currentness for the target business date, and publish zero-row coverage/backfill semantics through governed L2 objects."
+    },
+    {
       "variance_id": "qinqin.field.consume-bill-payment-source-typo",
       "variance_kind": "documented_field_name_drift",
       "source_system_id": "qinqin.v1_1",

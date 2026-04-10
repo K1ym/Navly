@@ -33,3 +33,4 @@
 
 - 2026-03-31 live 实测确认：除 `GetCustomersList` 外，其余 7 个接口必须继续使用文档页中的旧名 path；若改成 `GetConsumptionList/GetRechargeList/GetAccountList/GetStaffList/GetTechClockList/GetSalesCommissionList/GetStaffBaseCommissionList` 会返回 `404`。
 - `1.8` 的额外运行时鉴权 header 已进入正式 parameter / auth profile registry，不再允许在 bridge 或 auth 代码里隐式补齐。
+- `1.8 GetTechCommissionSetList` 的 `404 / 暂无数据` 已冻结为 `source_empty` 的零行全量覆盖语义；latest-state、backfill、quality 解释必须消费 L2 governed objects，而不是 runtime fallback。
