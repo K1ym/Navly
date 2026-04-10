@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { runMilestoneBAccessChain } from '../serving/access-chain-backbone.mjs';
+import { runAuthKernelAccessChain } from '../serving/access-chain-backbone.mjs';
 import {
   applyScopeSelectionToBindingSnapshot,
   buildBindingSnapshot,
@@ -28,7 +28,7 @@ function sampleBaseIngress(peerAliasValue, extras = {}) {
 }
 
 test('single-scope manager closes actor -> binding -> Gate 0 -> access -> envelope', () => {
-  const result = runMilestoneBAccessChain({
+  const result = runAuthKernelAccessChain({
     rawIngressEvidence: sampleBaseIngress('sample_manager_single_scope'),
     requestedCapabilityId: 'navly.store.finance_summary',
   });
@@ -42,7 +42,7 @@ test('single-scope manager closes actor -> binding -> Gate 0 -> access -> envelo
 });
 
 test('multi-scope manager without scope selection stays restricted at Gate 0 and does not issue envelope', () => {
-  const result = runMilestoneBAccessChain({
+  const result = runAuthKernelAccessChain({
     rawIngressEvidence: sampleBaseIngress('sample_manager_multi_scope'),
     requestedCapabilityId: 'navly.store.daily_overview',
   });
@@ -56,7 +56,7 @@ test('multi-scope manager without scope selection stays restricted at Gate 0 and
 });
 
 test('multi-scope manager can close capability access after explicit in-scope selection', () => {
-  const result = runMilestoneBAccessChain({
+  const result = runAuthKernelAccessChain({
     rawIngressEvidence: sampleBaseIngress('sample_manager_multi_scope'),
     requestedCapabilityId: 'navly.store.daily_overview',
     requestedScopeRef: 'navly:scope:store:sample-store-002',
@@ -71,7 +71,7 @@ test('multi-scope manager can close capability access after explicit in-scope se
 });
 
 test('inactive actor is denied at Gate 0', () => {
-  const result = runMilestoneBAccessChain({
+  const result = runAuthKernelAccessChain({
     rawIngressEvidence: sampleBaseIngress('sample_inactive_staff'),
     requestedCapabilityId: 'navly.store.daily_overview',
   });
@@ -82,7 +82,7 @@ test('inactive actor is denied at Gate 0', () => {
 });
 
 test('unknown actor is denied at Gate 0 and cannot produce envelope', () => {
-  const result = runMilestoneBAccessChain({
+  const result = runAuthKernelAccessChain({
     rawIngressEvidence: sampleBaseIngress('unknown_alias_value'),
     requestedCapabilityId: 'navly.store.daily_overview',
   });
@@ -94,7 +94,7 @@ test('unknown actor is denied at Gate 0 and cannot produce envelope', () => {
 });
 
 test('Gate 0 deny cannot be reopened by capability stage even when requestedScopeRef becomes valid later', () => {
-  const result = runMilestoneBAccessChain({
+  const result = runAuthKernelAccessChain({
     rawIngressEvidence: sampleBaseIngress('sample_manager_multi_scope', {
       target_scope_hint: 'navly:scope:store:not-granted',
     }),
@@ -135,7 +135,7 @@ test('capability access fails closed without decision_ref', () => {
 });
 
 test('store staff is denied when requesting capability outside grant profile', () => {
-  const result = runMilestoneBAccessChain({
+  const result = runAuthKernelAccessChain({
     rawIngressEvidence: sampleBaseIngress('sample_store_staff'),
     requestedCapabilityId: 'navly.store.finance_summary',
   });
@@ -179,7 +179,7 @@ test('tenant mismatch bindings are excluded and fail closed before granted scope
 
 test('Gate 0 preserves tenant_mismatch instead of collapsing it into binding_missing', () => {
   const bindingBackbone = loadBindingBackbone();
-  const result = runMilestoneBAccessChain({
+  const result = runAuthKernelAccessChain({
     rawIngressEvidence: sampleBaseIngress('sample_manager_single_scope'),
     requestedCapabilityId: 'navly.store.daily_overview',
     bindingBackbone: {
