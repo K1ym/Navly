@@ -5,6 +5,31 @@ import {
   validateRuntimeResultEnvelopeShape,
 } from '../adapters/openclaw/bridge-shared-alignment.mjs';
 
+function classifyRuntimeFailureDomain(runtimeResultEnvelope) {
+  const reasonCodes = Array.isArray(runtimeResultEnvelope?.reason_codes) ? runtimeResultEnvelope.reason_codes : [];
+  if (reasonCodes.some((code) => code.startsWith('runtime.dependency.auth') || code.startsWith('runtime.access'))) {
+    return 'auth';
+  }
+  if (
+    reasonCodes.some((code) => code.startsWith('runtime.dependency.readiness'))
+    || reasonCodes.some((code) => code.startsWith('runtime.dependency.service'))
+    || reasonCodes.some((code) => code.startsWith('runtime.readiness.'))
+    || reasonCodes.some((code) => code.startsWith('runtime.service.'))
+  ) {
+    return 'data';
+  }
+  if (reasonCodes.some((code) => code.startsWith('runtime.route.'))) {
+    return 'runtime';
+  }
+  if (runtimeResultEnvelope?.result_status === 'rejected' || runtimeResultEnvelope?.result_status === 'escalated') {
+    return 'auth';
+  }
+  if (runtimeResultEnvelope?.result_status === 'runtime_error') {
+    return 'runtime';
+  }
+  return null;
+}
+
 function buildGate0ReplyBlocks(gate0Enforcement) {
   switch (gate0Enforcement.enforcement_status) {
     case 'host_escalation':
@@ -34,6 +59,21 @@ function buildRuntimeGuardReplyBlocks(reasonCode) {
   }];
 }
 
+function buildRuntimeDispatchStatus(runtimeResultEnvelope) {
+  switch (runtimeResultEnvelope.result_status) {
+    case 'fallback':
+      return 'ready_for_runtime_fallback_dispatch';
+    case 'escalated':
+      return 'ready_for_runtime_escalation_dispatch';
+    case 'rejected':
+      return 'ready_for_runtime_rejection_dispatch';
+    case 'runtime_error':
+      return 'ready_for_runtime_error_dispatch';
+    default:
+      return 'ready_for_runtime_dispatch';
+  }
+}
+
 function resolveRuntimeResultMismatchReason({
   ingress,
   runtimeRequestEnvelope,
@@ -61,10 +101,38 @@ function resolveRuntimeResultMismatchReason({
 }
 
 function buildDispatchMode({ runtimeResultEnvelope, hostIngressEnvelope }) {
+  if (hostIngressEnvelope.host_event_kind === 'session_resume') {
+    return 'session_resume';
+  }
+
   return runtimeResultEnvelope?.delivery_hints?.dispatch_mode
     ?? runtimeResultEnvelope?.delivery_hints?.host_delivery_context?.dispatch_mode
     ?? hostIngressEnvelope.host_delivery_context?.dispatch_mode
     ?? 'direct_reply';
+}
+
+function buildRuntimeReplyBlocks(runtimeResultEnvelope) {
+  if (Array.isArray(runtimeResultEnvelope.answer_fragments) && runtimeResultEnvelope.answer_fragments.length > 0) {
+    return runtimeResultEnvelope.answer_fragments;
+  }
+  return runtimeResultEnvelope.explanation_fragments ?? [];
+}
+
+function resolveFailureDomain({
+  gate0Enforcement,
+  dispatchStatus,
+  runtimeResultEnvelope,
+}) {
+  if (dispatchStatus === 'blocked_missing_runtime_request' || dispatchStatus === 'blocked_runtime_result_mismatch') {
+    return 'host';
+  }
+  if (!gate0Enforcement.should_handoff_to_runtime) {
+    return 'auth';
+  }
+  if (!runtimeResultEnvelope) {
+    return 'host';
+  }
+  return classifyRuntimeFailureDomain(runtimeResultEnvelope);
 }
 
 export function buildHostDispatchResult({
@@ -73,6 +141,7 @@ export function buildHostDispatchResult({
   authorizedSessionLink = null,
   runtimeRequestEnvelope = null,
   runtimeResultEnvelope = null,
+  runtimeOutcomeEvent = null,
   now = new Date().toISOString(),
 }) {
   const ingress = ensureObject('hostIngressEnvelope', hostIngressEnvelope);
@@ -108,16 +177,21 @@ export function buildHostDispatchResult({
         replyBlocks = buildRuntimeGuardReplyBlocks(runtimeMismatchReason);
       } else {
         acceptedRuntimeResultEnvelope = runtimeResultEnvelope;
-        dispatchStatus = 'ready_for_runtime_dispatch';
+        dispatchStatus = buildRuntimeDispatchStatus(runtimeResultEnvelope);
         runtimeTraceRef = runtimeResultEnvelope.runtime_trace_ref;
         traceRefs = uniqueStrings([
           ...traceRefs,
           runtimeResultEnvelope.runtime_trace_ref,
           ...(runtimeResultEnvelope.trace_refs ?? []),
         ]);
-        replyBlocks = runtimeResultEnvelope.answer_fragments.length
-          ? runtimeResultEnvelope.answer_fragments
-          : runtimeResultEnvelope.explanation_fragments ?? [];
+        if (runtimeOutcomeEvent) {
+          traceRefs = uniqueStrings([
+            ...traceRefs,
+            runtimeOutcomeEvent.trace_ref,
+            runtimeOutcomeEvent.runtime_trace_ref,
+          ]);
+        }
+        replyBlocks = buildRuntimeReplyBlocks(runtimeResultEnvelope);
       }
     }
   } else if (enforcement.enforcement_status === 'host_escalation') {
@@ -125,6 +199,12 @@ export function buildHostDispatchResult({
   } else if (enforcement.enforcement_status === 'host_scope_confirmation') {
     dispatchStatus = 'ready_for_scope_confirmation';
   }
+
+  const failureDomain = resolveFailureDomain({
+    gate0Enforcement: enforcement,
+    dispatchStatus,
+    runtimeResultEnvelope: acceptedRuntimeResultEnvelope,
+  });
 
   return {
     object_name: 'host_dispatch_result',
@@ -142,9 +222,14 @@ export function buildHostDispatchResult({
     runtime_trace_ref: acceptedRuntimeResultEnvelope ? runtimeTraceRef : null,
     dispatch_status: dispatchStatus,
     dispatch_mode: buildDispatchMode({ runtimeResultEnvelope: acceptedRuntimeResultEnvelope, hostIngressEnvelope: ingress }),
+    dispatch_flow: ingress.host_event_kind === 'session_resume' ? 'session_resume' : ingress.message_mode,
+    failure_domain: failureDomain,
     reply_blocks: replyBlocks,
     delivery_target: runtimeRequestEnvelope?.delivery_hint?.host_delivery_context ?? ingress.host_delivery_context,
     trace_refs: traceRefs,
+    outcome_event_refs: runtimeOutcomeEvent
+      ? uniqueStrings([runtimeOutcomeEvent.event_id, runtimeOutcomeEvent.trace_ref, runtimeOutcomeEvent.runtime_trace_ref])
+      : [],
     prepared_at: now,
   };
 }

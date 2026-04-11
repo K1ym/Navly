@@ -8,6 +8,7 @@ import { enforceGate0Result } from '../auth-linkage/gate0-enforcement-backbone.m
 import { buildAuthorizedSessionLink } from '../auth-linkage/authorized-session-link-backbone.mjs';
 import { buildRuntimeRequestEnvelope } from '../runtime-handoff/runtime-request-envelope-backbone.mjs';
 import { buildHostDispatchResult } from '../dispatch/host-dispatch-handoff-backbone.mjs';
+import { createMilestoneBTraceBundle } from '../diagnostics/host-trace-backbone.mjs';
 import { runOpenClawHostMilestoneBBackbone } from '../adapters/openclaw/openclaw-host-handoff-backbone.mjs';
 
 function buildRawHostIngress(overrides = {}) {
@@ -65,6 +66,27 @@ function buildRuntimeResultEnvelope(requestId, traceRef) {
     delivery_hints: {
       dispatch_mode: 'direct_reply',
     },
+  };
+}
+
+function buildRuntimeOutcomeEvent(requestId, traceRef, overrides = {}) {
+  return {
+    event_id: 'navly:runtime-outcome-event:bridge-test-001',
+    request_id: requestId,
+    trace_ref: traceRef,
+    runtime_trace_ref: 'navly:runtime-trace:bridge-test-001',
+    decision_ref: 'navly:decision:capability-allow-001',
+    selected_capability_id: 'navly.store.member_insight',
+    selected_service_object_id: 'navly.service.store.member_insight',
+    result_status: 'answered',
+    reason_codes: [],
+    trace_refs: [
+      traceRef,
+      'navly:state-trace:readiness:member-insight-ready',
+      'navly:run-trace:ingestion:member-insight-run',
+    ],
+    occurred_at: '2026-04-06T08:00:00.000Z',
+    ...overrides,
   };
 }
 
@@ -133,6 +155,159 @@ test('milestone B backbone assembles ingress identity, authorized session link, 
   assert.ok(pipeline.runtime_request_envelope);
   assert.ok(pipeline.authorized_session_link);
   assert.ok(pipeline.host_trace_events.length >= 5);
+});
+
+test('session_resume ingress keeps the authorized session link governed and resume-aware', () => {
+  const rawHostIngress = buildRawHostIngress({
+    request_id: 'asp39-session-resume-001',
+    host_event_kind: 'session_resume',
+    requested_capability_id: 'navly.store.daily_overview',
+    host_delivery_context: {
+      dispatch_mode: 'session_resume',
+      target_ref: 'openclaw:session:main:sample',
+    },
+  });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+
+  assert.equal(hostIngressEnvelope.host_delivery_context.dispatch_mode, 'session_resume');
+  assert.equal(authorizedSessionLink.linkage_mode, 'session_resume');
+  assert.equal(authorizedSessionLink.session_ref, accessChain.access_context_envelope.session_ref);
+});
+
+test('host dispatch formalizes runtime/data failure attribution and outcome linkage', () => {
+  const rawHostIngress = buildRawHostIngress({ request_id: 'asp39-runtime-error-001' });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeResultEnvelope = {
+    ...buildRuntimeResultEnvelope(hostIngressEnvelope.request_id, hostIngressEnvelope.trace_ref),
+    result_status: 'runtime_error',
+    answer_fragments: [],
+    explanation_fragments: [
+      {
+        kind: 'runtime_error',
+        text: '数据侧 readiness 失败',
+      },
+    ],
+    reason_codes: ['runtime.dependency.readiness_error'],
+  };
+  const runtimeOutcomeEvent = buildRuntimeOutcomeEvent(
+    hostIngressEnvelope.request_id,
+    hostIngressEnvelope.trace_ref,
+    {
+      result_status: 'runtime_error',
+      reason_codes: ['runtime.dependency.readiness_error'],
+    },
+  );
+
+  const hostDispatchResult = buildHostDispatchResult({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    runtimeRequestEnvelope,
+    runtimeResultEnvelope,
+    runtimeOutcomeEvent,
+  });
+
+  assert.equal(hostDispatchResult.dispatch_status, 'ready_for_runtime_error_dispatch');
+  assert.equal(hostDispatchResult.failure_domain, 'data');
+  assert.ok(hostDispatchResult.outcome_event_refs.includes(runtimeOutcomeEvent.event_id));
+  assert.ok(hostDispatchResult.trace_refs.includes(runtimeOutcomeEvent.trace_ref));
+});
+
+test('host trace bundle links runtime_outcome_event and shared trace refs end to end', () => {
+  const rawHostIngress = buildRawHostIngress({
+    request_id: 'asp39-trace-link-001',
+    host_event_kind: 'session_resume',
+    host_delivery_context: {
+      dispatch_mode: 'session_resume',
+      target_ref: 'openclaw:session:main:sample',
+    },
+  });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeResultEnvelope = buildRuntimeResultEnvelope(hostIngressEnvelope.request_id, hostIngressEnvelope.trace_ref);
+  const runtimeOutcomeEvent = buildRuntimeOutcomeEvent(hostIngressEnvelope.request_id, hostIngressEnvelope.trace_ref);
+  const hostDispatchResult = buildHostDispatchResult({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    runtimeRequestEnvelope,
+    runtimeResultEnvelope,
+    runtimeOutcomeEvent,
+  });
+
+  const traceEvents = createMilestoneBTraceBundle({
+    hostIngressEnvelope,
+    ingressIdentityEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    runtimeRequestEnvelope,
+    hostDispatchResult,
+    runtimeResultEnvelope,
+    runtimeOutcomeEvent,
+  });
+
+  assert.ok(traceEvents.some((event) => event.stage === 'session_resume_linked'));
+  assert.ok(traceEvents.some((event) => event.stage === 'runtime_outcome_event_linked'));
+  assert.equal(
+    traceEvents.find((event) => event.stage === 'host_dispatch_handoff_prepared').details.failure_domain,
+    null,
+  );
 });
 
 test('milestone B backbone fail-closes denied gate0 path into host rejection dispatch without runtime request', () => {
