@@ -104,11 +104,24 @@ function buildDispatchMode({ runtimeResultEnvelope, hostIngressEnvelope }) {
   if (hostIngressEnvelope.host_event_kind === 'session_resume') {
     return 'session_resume';
   }
+  if (hostIngressEnvelope.host_event_kind === 'tool_call') {
+    return 'tool_call';
+  }
 
   return runtimeResultEnvelope?.delivery_hints?.dispatch_mode
     ?? runtimeResultEnvelope?.delivery_hints?.host_delivery_context?.dispatch_mode
     ?? hostIngressEnvelope.host_delivery_context?.dispatch_mode
     ?? 'direct_reply';
+}
+
+function buildDispatchFlow(hostIngressEnvelope) {
+  if (hostIngressEnvelope.host_event_kind === 'session_resume') {
+    return 'session_resume';
+  }
+  if (hostIngressEnvelope.host_event_kind === 'tool_call') {
+    return 'tool_call';
+  }
+  return hostIngressEnvelope.message_mode;
 }
 
 function buildRuntimeReplyBlocks(runtimeResultEnvelope) {
@@ -189,6 +202,7 @@ export function buildHostDispatchResult({
             ...traceRefs,
             runtimeOutcomeEvent.trace_ref,
             runtimeOutcomeEvent.runtime_trace_ref,
+            ...(runtimeOutcomeEvent.trace_refs ?? []),
           ]);
         }
         replyBlocks = buildRuntimeReplyBlocks(runtimeResultEnvelope);
@@ -222,13 +236,13 @@ export function buildHostDispatchResult({
     runtime_trace_ref: acceptedRuntimeResultEnvelope ? runtimeTraceRef : null,
     dispatch_status: dispatchStatus,
     dispatch_mode: buildDispatchMode({ runtimeResultEnvelope: acceptedRuntimeResultEnvelope, hostIngressEnvelope: ingress }),
-    dispatch_flow: ingress.host_event_kind === 'session_resume' ? 'session_resume' : ingress.message_mode,
+    dispatch_flow: buildDispatchFlow(ingress),
     failure_domain: failureDomain,
     reply_blocks: replyBlocks,
     delivery_target: runtimeRequestEnvelope?.delivery_hint?.host_delivery_context ?? ingress.host_delivery_context,
     trace_refs: traceRefs,
     outcome_event_refs: runtimeOutcomeEvent
-      ? uniqueStrings([runtimeOutcomeEvent.event_id, runtimeOutcomeEvent.trace_ref, runtimeOutcomeEvent.runtime_trace_ref])
+      ? [runtimeOutcomeEvent.event_id]
       : [],
     prepared_at: now,
   };

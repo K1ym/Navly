@@ -247,6 +247,53 @@ test('host dispatch formalizes runtime/data failure attribution and outcome link
   assert.equal(hostDispatchResult.failure_domain, 'data');
   assert.ok(hostDispatchResult.outcome_event_refs.includes(runtimeOutcomeEvent.event_id));
   assert.ok(hostDispatchResult.trace_refs.includes(runtimeOutcomeEvent.trace_ref));
+  assert.ok(hostDispatchResult.trace_refs.includes('navly:run-trace:ingestion:member-insight-run'));
+});
+
+test('tool_call ingress keeps dispatch mode and flow aligned with the host event kind', () => {
+  const rawHostIngress = buildRawHostIngress({
+    request_id: 'asp39-tool-call-001',
+    host_event_kind: 'tool_call',
+    host_delivery_context: {
+      dispatch_mode: 'tool_call',
+      target_ref: 'openclaw:conversation:direct:sample',
+    },
+  });
+  const hostIngressEnvelope = normalizeOpenClawHostIngress({ rawHostIngress });
+  const ingressIdentityEnvelope = assembleIngressIdentityEnvelope({ hostIngressEnvelope });
+  const accessChain = runMilestoneBAccessChain({
+    rawIngressEvidence: ingressIdentityEnvelope,
+    requestedCapabilityId: hostIngressEnvelope.requested_capability_id,
+  });
+  const gate0Enforcement = enforceGate0Result({
+    hostIngressEnvelope,
+    gate0Result: accessChain.gate0_result,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const authorizedSessionLink = buildAuthorizedSessionLink({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeRequestEnvelope = buildRuntimeRequestEnvelope({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    accessContextEnvelope: accessChain.access_context_envelope,
+  });
+  const runtimeResultEnvelope = buildRuntimeResultEnvelope(hostIngressEnvelope.request_id, hostIngressEnvelope.trace_ref);
+
+  const hostDispatchResult = buildHostDispatchResult({
+    hostIngressEnvelope,
+    gate0Enforcement,
+    authorizedSessionLink,
+    runtimeRequestEnvelope,
+    runtimeResultEnvelope,
+  });
+
+  assert.equal(authorizedSessionLink.linkage_mode, 'tool_call');
+  assert.equal(hostDispatchResult.dispatch_mode, 'tool_call');
+  assert.equal(hostDispatchResult.dispatch_flow, 'tool_call');
 });
 
 test('host trace bundle links runtime_outcome_event and shared trace refs end to end', () => {
