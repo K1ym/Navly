@@ -6,6 +6,14 @@
 
 ---
 
+> [!IMPORTANT]
+> This document is a **historical alpha gate snapshot** dated 2026-04-09.
+> 当前 authoritative current-state answer 已迁移到：
+> - `docs/specs/navly-v1/verification/2026-04-11-navly-v1-full-phase-1-acceptance-suite-and-completion-board.md`
+> - `bash scripts/validate-full-phase1-acceptance-suite.sh`
+
+---
+
 ## 1. 文档目的
 
 本文档回答：

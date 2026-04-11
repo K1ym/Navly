@@ -21,6 +21,10 @@
     - `sign`
     - `schema`
     - `transport`
+- full phase-1 acceptance suite doc consistency
+  - authoritative acceptance suite
+  - completion board
+  - go/no-go answer
 - finance terminal outcome taxonomy:
   - source empty
   - auth
