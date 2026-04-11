@@ -154,7 +154,7 @@ python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'
 当前推荐直接运行：
 
 ```bash
-bash scripts/validate-first-usable-alpha-smoke.sh
+bash scripts/validate-full-phase1-acceptance-suite.sh
 ```
 
 ### Run the current data-platform sample slice
