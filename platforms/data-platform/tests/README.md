@@ -12,6 +12,15 @@
 - CLI runner artifact tree
 - member insight vertical slice / replay / artifact tree
 - finance summary vertical slice / replay / canonical / prerequisite state
+- remaining phase-1 live transport validation matrix
+  - `recharge` / `account_trade` / `person` / `clock` / `market` / `commission`
+  - `fixture-only` vs `live-validated`
+  - expected classification path:
+    - `source_empty`
+    - `auth`
+    - `sign`
+    - `schema`
+    - `transport`
 - finance terminal outcome taxonomy:
   - source empty
   - auth
