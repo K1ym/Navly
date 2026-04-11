@@ -39,6 +39,8 @@
 
 - `2026-04-09-navly-v1-first-usable-alpha-smoke-and-status-board.md`
   - 定义 first usable alpha 的 smoke baseline、当前状态板与它和 full phase-1 的边界
+- `2026-04-11-navly-v1-phase-1-remaining-qinqin-live-transport-validation-matrix.md`
+  - 冻结剩余 Qinqin Phase-1 direct endpoint 的 live transport validation matrix、`fixture-only` / `live-validated` 状态词汇与 classification matrix
 - `2026-04-06-navly-v1-verification-boundaries.md`
   - 定义 verification 的边界对象、真相归属、边界污染识别规则、P0 边界验收线
 - `2026-04-06-navly-v1-e2e-acceptance.md`
