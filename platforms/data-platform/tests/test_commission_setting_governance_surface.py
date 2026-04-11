@@ -110,6 +110,7 @@ class CommissionSettingGovernanceSurfaceTest(unittest.TestCase):
         schema_alignment = surface['quality_artifacts']['schema_alignment_snapshot']
         backfill = surface['latest_state_artifacts']['backfill_progress_state']
         completeness = surface['completeness_artifacts']['commission_setting_completeness_state']
+        canonical = surface['canonical_artifacts']
 
         self.assertEqual(coverage['coverage_status'], 'covered')
         self.assertEqual(coverage['coverage_ratio'], 1.0)
@@ -117,6 +118,9 @@ class CommissionSettingGovernanceSurfaceTest(unittest.TestCase):
         self.assertEqual(backfill['currentness_status'], 'current')
         self.assertEqual(backfill['backfill_progress_status'], 'complete')
         self.assertEqual(completeness['completeness_status'], 'complete')
+        self.assertEqual(len(canonical['commission_setting']), 1)
+        self.assertEqual(len(canonical['commission_setting_detail']), 1)
+        self.assertEqual(canonical['commission_setting'][0]['item_name'], '至尊足道')
         self.assertEqual(surface['quality_artifacts']['quality_issues'], [])
 
     def test_source_empty_is_current_zero_row_state(self) -> None:
@@ -139,6 +143,7 @@ class CommissionSettingGovernanceSurfaceTest(unittest.TestCase):
         backfill = surface['latest_state_artifacts']['backfill_progress_state']
         completeness = surface['completeness_artifacts']['commission_setting_completeness_state']
         issue_codes = [issue['issue_code'] for issue in surface['quality_artifacts']['quality_issues']]
+        canonical = surface['canonical_artifacts']
 
         self.assertEqual(coverage['coverage_status'], 'source_empty_governed')
         self.assertEqual(coverage['dataset_row_counts']['commission_setting'], 0)
@@ -147,6 +152,8 @@ class CommissionSettingGovernanceSurfaceTest(unittest.TestCase):
         self.assertEqual(backfill['backfill_progress_status'], 'complete')
         self.assertEqual(completeness['completeness_status'], 'complete')
         self.assertEqual(completeness['reason_codes'], ['source_empty_current'])
+        self.assertEqual(canonical['commission_setting'], [])
+        self.assertEqual(canonical['commission_setting_detail'], [])
         self.assertIn('source_empty_current_day_full_replace', issue_codes)
 
     def test_auth_failure_points_to_runtime_header_variance(self) -> None:

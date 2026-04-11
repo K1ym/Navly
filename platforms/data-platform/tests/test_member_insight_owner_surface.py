@@ -48,6 +48,8 @@ class MemberInsightOwnerSurfaceTest(unittest.TestCase):
         self.assertEqual(readiness['readiness_status'], 'ready')
         self.assertEqual(service['service_status'], 'served')
         self.assertEqual(service['service_object']['customer_count'], 1)
+        self.assertEqual(service['service_object']['customer_ticket_count'], 0)
+        self.assertEqual(service['service_object']['customer_coupon_count'], 0)
         self.assertEqual(service['service_object']['consume_bill_count'], 1)
         self.assertTrue(readiness['state_trace_refs'])
         self.assertTrue(readiness['run_trace_refs'])

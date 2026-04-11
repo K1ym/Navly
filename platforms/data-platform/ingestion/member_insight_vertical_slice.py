@@ -287,6 +287,8 @@ def run_member_insight_vertical_slice(
         'raw-replay/transport-replay-artifacts.json': artifact_store.transport_replay_artifacts,
         'canonical/customer.json': canonical_artifacts.get('customer', []),
         'canonical/customer_card.json': canonical_artifacts.get('customer_card', []),
+        'canonical/customer_ticket.json': canonical_artifacts.get('customer_ticket', []),
+        'canonical/customer_coupon.json': canonical_artifacts.get('customer_coupon', []),
         'canonical/consume_bill.json': canonical_artifacts.get('consume_bill', []),
         'canonical/consume_bill_payment.json': canonical_artifacts.get('consume_bill_payment', []),
         'canonical/consume_bill_info.json': canonical_artifacts.get('consume_bill_info', []),

@@ -19,10 +19,11 @@
 - first canonical landing（member insight vertical slice）
   - `GetCustomersList`
   - `GetConsumeBillList`
-  - 当前最小 canonical outputs：`customer`、`customer_card`、`consume_bill`、`consume_bill_payment`、`consume_bill_info`
+  - 当前最小 canonical outputs：`customer`、`customer_card`、`customer_ticket`、`customer_coupon`、`consume_bill`、`consume_bill_payment`、`consume_bill_info`
 - latest usable state / historical run separation backbone
   - latest usable endpoint state 已与 historical run truth 分离承载
 - commission-setting state / quality governance slice
+  - endpoint-scoped canonical outputs：`commission_setting`、`commission_setting_detail`
   - `GetTechCommissionSetList` 的 `field_coverage_snapshot`
   - `schema_alignment_snapshot`
   - business-day-aware `backfill_progress_state`
@@ -57,10 +58,20 @@
   - `contracts/capability-dependency-entry.contract.seed.json`
   - `directory/capability-dependency-registry.seed.json`
   - `directory/capability_dependency_registry.py`
+- nightly sync planner policy
+  - `contracts/nightly-sync-policy-entry.contract.seed.json`
+  - `directory/nightly-sync-policy.seed.json`
+  - `directory/nightly_sync_policy_registry.py`
+  - `ingestion/nightly_sync_planner.py`
+- nightly sync cursor state
+  - `contracts/nightly-sync-cursor-state-entry.contract.seed.json`
+  - `sync-state/nightly_sync_cursor_state.py`
 
 当前**未完成**：
 
 - live connector / real HTTP transport / 完整错误分类治理
+- production scheduler / Temporal execution plane
+- persisted nightly sync cursor ledger storage
 - 全量 endpoint 铺开
 - PostgreSQL / dbt / 持久化模型落地
 - 完整 latest state / quality / readiness / projection runtime 逻辑
@@ -106,5 +117,5 @@
 ## 重要说明
 
 - 当前已不再只是 milestone A skeleton / seed only
-- 当前状态更准确地说是：**milestone B backbone 已建立，但 phase-1 远未完成**
-- 现阶段不能把本目录描述成“完整 ingestion / readiness / serving / persistence 已完成”
+- 当前状态更准确地说是：**phase-1 acceptance 已闭合，但 productionized scheduler / persistence / long-running execution plane 仍未完成**
+- 现阶段不能把本目录描述成“完整 production night-run / persistence / adaptive backfill engine 已完成”

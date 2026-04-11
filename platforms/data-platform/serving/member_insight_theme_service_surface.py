@@ -52,6 +52,8 @@ def _service_object(
         'available_endpoint_contract_ids': list(backbone_state.get('available_endpoint_contract_ids', [])),
         'customer_count': len(canonical_artifacts.get('customer', [])),
         'customer_card_count': len(canonical_artifacts.get('customer_card', [])),
+        'customer_ticket_count': len(canonical_artifacts.get('customer_ticket', [])),
+        'customer_coupon_count': len(canonical_artifacts.get('customer_coupon', [])),
         'consume_bill_count': len(canonical_artifacts.get('consume_bill', [])),
         'consume_bill_payment_count': len(canonical_artifacts.get('consume_bill_payment', [])),
         'consume_bill_info_count': len(canonical_artifacts.get('consume_bill_info', [])),

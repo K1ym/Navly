@@ -36,6 +36,8 @@
 - Qinqin v1.1 contract governance registry completeness
 - capability dependency registry contract, docs, and consumer linkage
 - field catalog / landing policy / variance register consistency
+- nightly sync policy registry and currentness/backfill planner semantics
+- nightly sync cursor state semantics
 - commission setting quality / schema-alignment / backfill / completeness surface
 - member insight owner-side readiness / theme service surface
 - finance summary owner-side readiness / theme service surface

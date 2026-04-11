@@ -12,6 +12,7 @@ from quality.commission_setting_quality import (
     build_commission_setting_quality_issues,
     build_commission_setting_schema_alignment_snapshot,
 )
+from warehouse.commission_setting_canonical import build_commission_setting_canonical_artifacts
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
 
@@ -49,6 +50,11 @@ def build_commission_setting_governance_surface(
     store_ref: str | None = None,
     data_platform_root: Path = DATA_PLATFORM_ROOT,
 ) -> dict[str, Any]:
+    canonical_artifacts = build_commission_setting_canonical_artifacts(
+        response_envelopes,
+        org_id=endpoint_run['org_id'],
+        requested_business_date=requested_business_date,
+    )
     sync_state_module = _load_commission_setting_sync_state_module()
     latest_usable_endpoint_state = sync_state_module.build_commission_setting_latest_usable_endpoint_state(
         endpoint_run=endpoint_run,
@@ -95,6 +101,7 @@ def build_commission_setting_governance_surface(
     return {
         'endpoint_contract_id': latest_usable_endpoint_state['endpoint_contract_id'],
         'requested_business_date': requested_business_date,
+        'canonical_artifacts': canonical_artifacts,
         'latest_state_artifacts': {
             'latest_usable_endpoint_state': latest_usable_endpoint_state,
             'backfill_progress_state': backfill_progress_state,

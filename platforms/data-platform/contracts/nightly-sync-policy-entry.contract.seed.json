@@ -1,0 +1,20 @@
+{
+  "contract_name": "nightly_sync_policy_entry",
+  "owner": "data-platform",
+  "status": "phase_1_policy_frozen",
+  "fields": [
+    "sync_policy_id",
+    "source_system_id",
+    "timezone",
+    "activation_local_time",
+    "formal_access_window_start_local_time",
+    "formal_access_window_end_exclusive_local_time",
+    "currentness_priority",
+    "backfill_fill_direction",
+    "carry_forward_cursor",
+    "default_page_size",
+    "increment_strategy_policies",
+    "notes"
+  ],
+  "notes": "Nightly sync policy freezes the governed activation window plus currentness/backfill planning semantics for a source system."
+}
