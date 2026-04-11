@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS nightly_sync_cursor_ledger_entries (
@@ -34,12 +36,47 @@ ON nightly_sync_cursor_ledger_entries (
 """
 
 
+@dataclass(frozen=True)
+class LedgerStoreTarget:
+    backend: str
+    dsn: str | None
+    path: Path | None
+
+
+def _resolve_target(db_target: str | Path) -> LedgerStoreTarget:
+    if isinstance(db_target, Path):
+        return LedgerStoreTarget(backend='sqlite', dsn=None, path=db_target)
+
+    raw = str(db_target)
+    if raw.startswith('postgresql://') or raw.startswith('postgres://'):
+        return LedgerStoreTarget(backend='postgres', dsn=raw, path=None)
+    if raw.startswith('sqlite:///'):
+        return LedgerStoreTarget(backend='sqlite', dsn=None, path=Path(raw.removeprefix('sqlite:///')))
+    return LedgerStoreTarget(backend='sqlite', dsn=None, path=Path(raw))
+
+
 class NightlySyncCursorLedgerStore:
-    def __init__(self, db_path: str | Path) -> None:
-        self.db_path = Path(db_path)
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self._connection = sqlite3.connect(self.db_path)
-        self._connection.row_factory = sqlite3.Row
+    def __init__(self, db_target: str | Path) -> None:
+        self.target = _resolve_target(db_target)
+        if self.target.backend == 'sqlite':
+            assert self.target.path is not None
+            self.db_path = self.target.path
+            self.db_path.parent.mkdir(parents=True, exist_ok=True)
+            self._connection = sqlite3.connect(self.db_path)
+            self._connection.row_factory = sqlite3.Row
+            self._backend = 'sqlite'
+        else:
+            try:
+                import psycopg
+                from psycopg.rows import dict_row
+            except ImportError as exc:
+                raise RuntimeError(
+                    'PostgreSQL ledger store requires psycopg. Install platforms/data-platform/requirements-runtime.txt.'
+                ) from exc
+            assert self.target.dsn is not None
+            self.db_path = None
+            self._connection = psycopg.connect(self.target.dsn, row_factory=dict_row)
+            self._backend = 'postgres'
 
     def close(self) -> None:
         self._connection.close()
@@ -181,4 +218,4 @@ class NightlySyncCursorLedgerStore:
         }
 
 
-__all__ = ['NightlySyncCursorLedgerStore']
+__all__ = ['LedgerStoreTarget', 'NightlySyncCursorLedgerStore']
