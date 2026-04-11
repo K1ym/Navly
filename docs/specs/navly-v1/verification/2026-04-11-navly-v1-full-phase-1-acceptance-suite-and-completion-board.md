@@ -26,11 +26,11 @@ bash scripts/validate-full-phase1-acceptance-suite.sh
 
 该 acceptance suite 当前冻结 3 步：
 
-| Step | Command | Covers | Status |
-| --- | --- | --- | --- |
-| `alpha_smoke` | `bash scripts/validate-first-usable-alpha-smoke.sh` | `D e2e acceptance` | `green` |
-| `remaining_live_transport` | `bash scripts/validate-remaining-phase1-live-transport.sh` | `D e2e acceptance` + `E regression baseline` | `green` |
-| `full_data_platform_regression` | `python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'` | `A boundary verification` + `B contract consistency` + `C docs consistency` + `E regression baseline` | `green` |
+| Step | Label | Command | Covers | Status |
+| --- | --- | --- | --- | --- |
+| `alpha_smoke` | `First usable alpha smoke baseline` | `bash scripts/validate-first-usable-alpha-smoke.sh` | `D e2e acceptance` | `green` |
+| `remaining_live_transport` | `Remaining Qinqin live transport validation matrix` | `bash scripts/validate-remaining-phase1-live-transport.sh` | `D e2e acceptance` + `E regression baseline` | `green` |
+| `full_data_platform_regression` | `Full data-platform contract and owner-surface regression` | `python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'` | `A boundary verification` + `B contract consistency` + `C docs consistency` + `E regression baseline` | `green` |
 
 结论：
 

@@ -16,9 +16,12 @@ bash scripts/validate-full-phase1-acceptance-suite.sh
 
 该 suite 顺序执行：
 
-1. `bash scripts/validate-first-usable-alpha-smoke.sh`
-2. `bash scripts/validate-remaining-phase1-live-transport.sh`
-3. `python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'`
+1. `First usable alpha smoke baseline`
+   `bash scripts/validate-first-usable-alpha-smoke.sh`
+2. `Remaining Qinqin live transport validation matrix`
+   `bash scripts/validate-remaining-phase1-live-transport.sh`
+3. `Full data-platform contract and owner-surface regression`
+   `python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'`
 
 ## 3. 怎么判读结果
 
