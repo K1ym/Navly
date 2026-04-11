@@ -151,7 +151,6 @@ python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'
 - `docs/specs/navly-v1/verification/2026-04-11-navly-v1-full-phase-1-acceptance-suite-and-completion-board.md`
 - `docs/runbooks/full-phase-1-acceptance-suite.md`
 - `scripts/validate-full-phase1-acceptance-suite.sh`
-
 当前推荐直接运行：
 
 ```bash

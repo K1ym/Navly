@@ -44,8 +44,6 @@ VALIDATION_STATUS_LIVE_VALIDATED = _VALIDATION_MATRIX_MODULE.VALIDATION_STATUS_L
 build_phase1_remaining_live_transport_validation_matrix = (
     _VALIDATION_MATRIX_MODULE.build_phase1_remaining_live_transport_validation_matrix
 )
-
-
 class _QinqinTestServer(ThreadingHTTPServer):
     daemon_threads = True
 
