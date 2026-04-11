@@ -35,6 +35,36 @@ function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+function arraysEqual(left, right) {
+  if (left.length !== right.length) {
+    return false;
+  }
+  return left.every((value, index) => value === right[index]);
+}
+
+function toolEntriesEqual(leftEntry, rightEntry) {
+  if (!leftEntry || !rightEntry) {
+    return false;
+  }
+
+  return (
+    leftEntry.tool_name === rightEntry.tool_name
+    && leftEntry.capability_id === rightEntry.capability_id
+    && leftEntry.service_object_id === rightEntry.service_object_id
+    && arraysEqual(
+      leftEntry.supported_service_object_ids ?? [],
+      rightEntry.supported_service_object_ids ?? [],
+    )
+    && leftEntry.visibility_scope === rightEntry.visibility_scope
+    && leftEntry.owner_module === rightEntry.owner_module
+    && leftEntry.publication_kind === rightEntry.publication_kind
+    && leftEntry.tool_description === rightEntry.tool_description
+    && leftEntry.input_schema_ref === rightEntry.input_schema_ref
+    && leftEntry.output_schema_ref === rightEntry.output_schema_ref
+    && leftEntry.publication_version === rightEntry.publication_version
+  );
+}
+
 function buildToolName(capabilityId) {
   return capabilityId.replace(/\./g, '_');
 }
@@ -81,25 +111,47 @@ function buildExplanationCapabilityTool(publicationVersion) {
   });
 }
 
+function resolvePublishedBindingForCapability({
+  capabilityEntry,
+  serviceBindings,
+}) {
+  const publishedBindings = (serviceBindings.entries ?? []).filter((entry) => (
+    entry.status === 'owner_surface_published'
+    && entry.capability_id === capabilityEntry.capability_id
+  ));
+
+  const bindingByServiceObjectId = new Map(
+    publishedBindings.map((entry) => [entry.service_object_id, entry]),
+  );
+  const registryDefaultBinding = bindingByServiceObjectId.get(capabilityEntry.default_service_object_id);
+  if (registryDefaultBinding) {
+    return registryDefaultBinding;
+  }
+
+  const explicitDefaultBindings = publishedBindings.filter((entry) => entry.is_default_binding === true);
+  if (explicitDefaultBindings.length === 1) {
+    return explicitDefaultBindings[0];
+  }
+
+  throw new Error(
+    `default binding missing for capability ${capabilityEntry.capability_id}`,
+  );
+}
+
 function loadPublishedCapabilityToolEntries({
   capabilityRegistryPath = defaultCapabilityRegistryPath,
   serviceBindingsPath = defaultServiceBindingsPath,
 } = {}) {
   const capabilityRegistry = readJson(capabilityRegistryPath);
   const serviceBindings = readJson(serviceBindingsPath);
-  const serviceBindingByCapabilityId = new Map(
-    (serviceBindings.entries ?? [])
-      .filter((entry) => entry.status === 'owner_surface_published')
-      .map((entry) => [entry.capability_id, entry]),
-  );
 
   return (capabilityRegistry.entries ?? [])
     .filter((entry) => entry.status === 'owner_surface_published')
     .map((entry) => {
-      const binding = serviceBindingByCapabilityId.get(entry.capability_id);
-      if (!binding) {
-        return null;
-      }
+      const binding = resolvePublishedBindingForCapability({
+        capabilityEntry: entry,
+        serviceBindings,
+      });
       return {
         capability_id: entry.capability_id,
         default_service_object_id: binding.service_object_id,
@@ -110,11 +162,18 @@ function loadPublishedCapabilityToolEntries({
 }
 
 export function buildCapabilityToolPublicationManifest({
-  capabilityEntries = loadPublishedCapabilityToolEntries(),
+  capabilityEntries = null,
+  capabilityRegistryPath = defaultCapabilityRegistryPath,
+  serviceBindingsPath = defaultServiceBindingsPath,
   publicationVersion = 'phase-1-capability-publication-v1',
   now = new Date().toISOString(),
 } = {}) {
-  const tools = capabilityEntries.map((entry) => buildHostVisibleTool({
+  const resolvedCapabilityEntries = capabilityEntries ?? loadPublishedCapabilityToolEntries({
+    capabilityRegistryPath,
+    serviceBindingsPath,
+  });
+
+  const tools = resolvedCapabilityEntries.map((entry) => buildHostVisibleTool({
     capabilityId: entry.capability_id,
     serviceObjectId: entry.default_service_object_id,
     supportedServiceObjectIds: entry.include_explanation_supported
@@ -177,7 +236,7 @@ export function buildCapabilityToolPublicationRefresh({
   const changedToolNames = nextTools
     .map((entry) => entry.tool_name)
     .filter((toolName) => previousToolMap.has(toolName))
-    .filter((toolName) => JSON.stringify(previousToolMap.get(toolName)) !== JSON.stringify(nextToolMap.get(toolName)));
+    .filter((toolName) => !toolEntriesEqual(previousToolMap.get(toolName), nextToolMap.get(toolName)));
 
   return {
     object_name: 'tool_publication_refresh_result',
