@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 import threading
@@ -10,22 +11,39 @@ from pathlib import Path
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = DATA_PLATFORM_ROOT.parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 if str(DATA_PLATFORM_ROOT) not in sys.path:
     sys.path.insert(0, str(DATA_PLATFORM_ROOT))
 
-from connectors.qinqin.qinqin_substrate import LiveQinqinTransport, build_signed_request  # noqa: E402
-from scripts.phase1_remaining_live_transport_validation_matrix import (  # noqa: E402
-    EXPECTED_CLASSIFICATION_PATHS,
-    SAFE_ENTRYPOINT,
-    VALIDATION_STATUS_FIXTURE_ONLY,
-    VALIDATION_STATUS_LIVE_VALIDATED,
-    build_phase1_remaining_live_transport_validation_matrix,
-)
 from ingestion.staff_board_vertical_slice import run_staff_board_vertical_slice  # noqa: E402
+from connectors.qinqin.qinqin_substrate import LiveQinqinTransport, build_signed_request  # noqa: E402
 from quality.commission_setting_quality import RUNTIME_HEADER_VARIANCE_ID  # noqa: E402
 from workflows.commission_setting_governance_surface import build_commission_setting_governance_surface  # noqa: E402
 
 
+def _load_validation_matrix_module():
+    module_path = REPO_ROOT / 'platforms' / 'data-platform' / 'scripts' / 'phase1_remaining_live_transport_validation_matrix.py'
+    spec = importlib.util.spec_from_file_location(
+        'navly_phase1_live_transport_validation_matrix_test',
+        module_path,
+    )
+    if spec is None or spec.loader is None:
+        raise ImportError(f'Unable to load script module from {module_path}')
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_VALIDATION_MATRIX_MODULE = _load_validation_matrix_module()
+EXPECTED_CLASSIFICATION_PATHS = _VALIDATION_MATRIX_MODULE.EXPECTED_CLASSIFICATION_PATHS
+SAFE_ENTRYPOINT = _VALIDATION_MATRIX_MODULE.SAFE_ENTRYPOINT
+VALIDATION_STATUS_FIXTURE_ONLY = _VALIDATION_MATRIX_MODULE.VALIDATION_STATUS_FIXTURE_ONLY
+VALIDATION_STATUS_LIVE_VALIDATED = _VALIDATION_MATRIX_MODULE.VALIDATION_STATUS_LIVE_VALIDATED
+build_phase1_remaining_live_transport_validation_matrix = (
+    _VALIDATION_MATRIX_MODULE.build_phase1_remaining_live_transport_validation_matrix
+)
 class _QinqinTestServer(ThreadingHTTPServer):
     daemon_threads = True
 

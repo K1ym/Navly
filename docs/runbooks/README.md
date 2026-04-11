@@ -6,3 +6,4 @@
 
 - `docs/runbooks/data-platform/member-insight-live-transport.md`
 - `docs/runbooks/data-platform/remaining-phase-1-live-transport-validation.md`
+- `docs/runbooks/full-phase-1-acceptance-suite.md`

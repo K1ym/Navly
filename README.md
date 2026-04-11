@@ -144,6 +144,13 @@ python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'
 - `docs/runbooks/data-platform/remaining-phase-1-live-transport-validation.md`
 - `scripts/validate-remaining-phase1-live-transport.sh`
 
+### Full Phase-1 Acceptance Suite
+
+当前 full phase-1 的 authoritative acceptance suite 与 completion board 见：
+
+- `docs/specs/navly-v1/verification/2026-04-11-navly-v1-full-phase-1-acceptance-suite-and-completion-board.md`
+- `docs/runbooks/full-phase-1-acceptance-suite.md`
+- `scripts/validate-full-phase1-acceptance-suite.sh`
 当前推荐直接运行：
 
 ```bash

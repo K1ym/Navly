@@ -26,14 +26,15 @@ Navly 的文档按 **用途优先** 组织，按 **业务域** 细分。
 11. `specs/navly-v1/verification/README.md`
 12. `specs/navly-v1/verification/2026-04-09-navly-v1-first-usable-alpha-smoke-and-status-board.md`
 13. `specs/navly-v1/verification/2026-04-11-navly-v1-phase-1-remaining-qinqin-live-transport-validation-matrix.md`
-14. `architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
-15. `api/qinqin/README.md`
-16. `api/qinqin/endpoint-manifest.md`
-17. `api/qinqin/auth-and-signing.md`
-18. `specs/navly-v1/README.md`
-19. `architecture/navly-v1/README.md`
-20. `reference/navly-v1/2026-04-06-navly-v1-canonical-ids-and-glossary.md`
-21. `audits/qinqin/README.md`
+14. `specs/navly-v1/verification/2026-04-11-navly-v1-full-phase-1-acceptance-suite-and-completion-board.md`
+15. `architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
+16. `api/qinqin/README.md`
+17. `api/qinqin/endpoint-manifest.md`
+18. `api/qinqin/auth-and-signing.md`
+19. `specs/navly-v1/README.md`
+20. `architecture/navly-v1/README.md`
+21. `reference/navly-v1/2026-04-06-navly-v1-canonical-ids-and-glossary.md`
+22. `audits/qinqin/README.md`
 
 ## 当前文档域
 
