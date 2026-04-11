@@ -138,6 +138,12 @@ python3 -m unittest discover -s platforms/data-platform/tests -p 'test_*.py'
 - `docs/specs/navly-v1/verification/2026-04-09-navly-v1-first-usable-alpha-smoke-and-status-board.md`
 - `scripts/validate-first-usable-alpha-smoke.sh`
 
+剩余 Phase-1 Qinqin endpoint 的 live transport validation matrix 见：
+
+- `docs/specs/navly-v1/verification/2026-04-11-navly-v1-phase-1-remaining-qinqin-live-transport-validation-matrix.md`
+- `docs/runbooks/data-platform/remaining-phase-1-live-transport-validation.md`
+- `scripts/validate-remaining-phase1-live-transport.sh`
+
 当前推荐直接运行：
 
 ```bash
