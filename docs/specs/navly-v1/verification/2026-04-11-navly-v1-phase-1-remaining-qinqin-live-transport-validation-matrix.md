@@ -66,6 +66,7 @@ bash scripts/validate-remaining-phase1-live-transport.sh
 - 只有真正运行了 `LiveQinqinTransport` HTTP path 的 row 才能写成 `live-validated`
 - 只跑 fixture regression 的 row 必须继续写成 `fixture-only`
 - 当前 matrix 中剩余 direct Qinqin endpoint 已全部具备 loopback `live-validated` 证据
+- `commission_setting` row 是 endpoint-scoped governance surface，不对应单独发布的 capability / default service object
 
 ---
 
