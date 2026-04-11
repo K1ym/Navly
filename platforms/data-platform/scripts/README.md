@@ -19,6 +19,10 @@
   - 读取 persisted cursor ledger store
   - 运行 scheduler + ledger persistence
   - 输出 worker result / dispatch plan / cursor ledger
+- `run_nightly_sync_runtime.py`
+  - 执行 dispatch plan 对应的 actual nightly sync slice
+  - 回写 final cursor ledger
+  - 输出 runtime result 与本轮 artifact
 
 当前边界：
 
@@ -28,3 +32,4 @@
 - remaining Phase-1 matrix helper 只服务 verification / docs / tests，不是生产 runtime 入口
 - nightly sync scheduler helper 当前只做 planning / ledger / dispatch snapshot，不直接发起真实 source sync
 - nightly sync worker helper 当前已持久化 cursor ledger，但仍是本地 worker slice，不是完整 Temporal runtime
+- nightly sync runtime helper 已可本地执行实际 slice，但仍未接到正式 Temporal cluster / deployed scheduler

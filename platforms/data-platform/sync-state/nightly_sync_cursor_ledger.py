@@ -115,7 +115,35 @@ def build_nightly_sync_cursor_ledger(
     }
 
 
+def build_latest_usable_states_from_cursor_ledger_entries(
+    ledger_entries: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    states: list[dict[str, Any]] = []
+    for entry in ledger_entries:
+        latest_usable_business_date = entry.get('last_completed_business_date')
+        if not latest_usable_business_date:
+            continue
+        state_id = (
+            f"{entry['endpoint_contract_id']}::{entry['org_id']}::{entry['target_business_date']}"
+        )
+        states.append({
+            'state_id': state_id,
+            'state_trace_ref': build_state_trace_ref('latest-usable-endpoint-state', state_id),
+            'source_system_id': entry['source_system_id'],
+            'endpoint_contract_id': entry['endpoint_contract_id'],
+            'org_id': entry['org_id'],
+            'latest_usable_business_date': latest_usable_business_date,
+            'availability_status': 'available',
+            'latest_run_trace_ref': entry['ledger_trace_ref'],
+            'latest_endpoint_run_id': entry['ledger_entry_id'],
+            'latest_endpoint_status': 'completed',
+            'updated_at': entry['updated_at'],
+        })
+    return states
+
+
 __all__ = [
     'build_nightly_sync_cursor_ledger',
     'build_nightly_sync_cursor_ledger_entry',
+    'build_latest_usable_states_from_cursor_ledger_entries',
 ]
