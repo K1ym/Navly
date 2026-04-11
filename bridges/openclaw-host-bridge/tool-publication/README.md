@@ -1,14 +1,15 @@
-# Tool Publication Skeleton
+# Tool Publication Backbone
 
-本目录预留给 capability -> host tool publication。
+本目录承载 capability -> host tool publication。
 
-当前 milestone A 只建立：
+当前 phase-1 已实现：
 
-- `tool_publication_manifest` local placeholder
-- capability-oriented publication 边界说明
+- capability-oriented `tool_publication_manifest`
+- publication refresh / warmup local backbones
+- host-visible tool names 只围绕 `capability_id` / `service_object_id`
 
-当前**不**实现：
+当前仍**不**实现：
 
-- real tool registration
-- real capability discovery
-- host runtime tool invocation
+- live OpenClaw tool registration side effects
+- source endpoint / SQL / internal table 暴露
+- bridge 内部业务路由
