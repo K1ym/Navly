@@ -602,6 +602,8 @@ test('readiness pending returns fallback and consumes the capability_explanation
   assert.equal(dataPlatformClient.readinessCalls.length, 1);
   assert.equal(dataPlatformClient.serviceCalls.length, 1);
   assert.equal(dataPlatformClient.serviceCalls[0].service_object_id, EXPLANATION_SERVICE_OBJECT_ID);
+  assert.equal(result.runtime_dependency_outcome.explanation_service_query.target_business_date, '2026-04-06');
+  assert.equal(dataPlatformClient.serviceCalls[0].target_business_date, '2026-04-06');
 });
 
 test('readiness failed returns fallback with explanation_object companion output', async () => {

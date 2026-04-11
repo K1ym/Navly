@@ -158,6 +158,7 @@ function buildExplanationServiceQuery({
 
   return {
     ...baseQuery,
+    target_business_date: executionPlan.target_business_date ?? todayIsoDate(),
     extensions: {
       ...(baseQuery.extensions ?? {}),
       selected_service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
