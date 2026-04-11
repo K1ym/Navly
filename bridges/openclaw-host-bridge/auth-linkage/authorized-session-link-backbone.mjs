@@ -4,6 +4,16 @@ import {
   validateAccessContextEnvelopeShape,
 } from '../adapters/openclaw/bridge-shared-alignment.mjs';
 
+function resolveLinkageMode(hostIngressEnvelope) {
+  if (hostIngressEnvelope.host_event_kind === 'session_resume') {
+    return 'session_resume';
+  }
+  if (hostIngressEnvelope.host_event_kind === 'tool_call') {
+    return 'tool_call';
+  }
+  return 'message_handoff';
+}
+
 export function buildAuthorizedSessionLink({
   hostIngressEnvelope,
   gate0Enforcement,
@@ -45,6 +55,7 @@ export function buildAuthorizedSessionLink({
     granted_scope_refs: accessContextEnvelope.granted_scope_refs,
     granted_capability_ids: accessContextEnvelope.granted_capability_ids,
     conversation_binding_status: accessContextEnvelope.extensions?.conversation_binding_status ?? null,
+    linkage_mode: resolveLinkageMode(ingress),
     decision_status: enforcement.decision_status,
     restriction_codes: enforcement.restriction_codes,
     obligation_codes: enforcement.obligation_codes,

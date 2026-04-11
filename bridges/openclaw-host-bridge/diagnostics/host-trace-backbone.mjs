@@ -33,6 +33,7 @@ export function createMilestoneBTraceBundle({
   runtimeRequestEnvelope,
   hostDispatchResult,
   runtimeResultEnvelope = null,
+  runtimeOutcomeEvent = null,
   now = new Date().toISOString(),
 }) {
   const events = [
@@ -86,6 +87,22 @@ export function createMilestoneBTraceBundle({
     );
   }
 
+  if (authorizedSessionLink?.linkage_mode === 'session_resume') {
+    events.push(
+      createHostTraceEvent({
+        hostIngressEnvelope,
+        stage: 'session_resume_linked',
+        linkedTraceRefs: [authorizedSessionLink.trace_ref].filter(Boolean),
+        details: {
+          linkage_mode: authorizedSessionLink.linkage_mode,
+          session_ref: authorizedSessionLink.session_ref,
+          conversation_ref: authorizedSessionLink.conversation_ref,
+        },
+        now,
+      }),
+    );
+  }
+
   if (runtimeRequestEnvelope) {
     events.push(
       createHostTraceEvent({
@@ -102,6 +119,25 @@ export function createMilestoneBTraceBundle({
     );
   }
 
+  if (runtimeOutcomeEvent) {
+    events.push(
+      createHostTraceEvent({
+        hostIngressEnvelope,
+        stage: 'runtime_outcome_event_linked',
+        linkedTraceRefs: uniqueStrings([
+          runtimeOutcomeEvent.trace_ref,
+          runtimeOutcomeEvent.runtime_trace_ref,
+          ...(runtimeOutcomeEvent.trace_refs ?? []),
+        ]),
+        details: {
+          runtime_outcome_event_id: runtimeOutcomeEvent.event_id,
+          result_status: runtimeOutcomeEvent.result_status,
+        },
+        now,
+      }),
+    );
+  }
+
   events.push(
     createHostTraceEvent({
       hostIngressEnvelope,
@@ -111,6 +147,7 @@ export function createMilestoneBTraceBundle({
         decision_ref: hostDispatchResult.decision_ref,
         dispatch_status: hostDispatchResult.dispatch_status,
         dispatch_mode: hostDispatchResult.dispatch_mode,
+        failure_domain: hostDispatchResult.failure_domain,
       },
       now,
     }),
