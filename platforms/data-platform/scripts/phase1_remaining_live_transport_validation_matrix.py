@@ -125,8 +125,8 @@ REMAINING_ENDPOINT_ROWS: list[dict[str, Any]] = [
     },
     {
         'slice_id': 'commission_setting',
-        'capability_id': 'navly.store.staff_board',
-        'service_object_id': 'navly.service.store.staff_board',
+        'capability_id': None,
+        'service_object_id': None,
         'endpoint_contract_id': 'qinqin.staff.get_tech_commission_set_list.v1_8',
         'dataset_short_name': 'commission',
         'validation_status': VALIDATION_STATUS_LIVE_VALIDATED,
@@ -142,7 +142,7 @@ REMAINING_ENDPOINT_ROWS: list[dict[str, Any]] = [
         ),
         'safe_entrypoint': SAFE_ENTRYPOINT,
         'notes': (
-            'commission keeps the governance surface separate from direct serving. '
+            'commission is an endpoint-scoped governance surface, not a published capability/service binding. '
             'The live-validated row only claims loopback LiveQinqinTransport execution, not upstream credential proof.'
         ),
     },
