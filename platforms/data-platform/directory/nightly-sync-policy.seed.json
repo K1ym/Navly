@@ -1,0 +1,36 @@
+{
+  "registry_name": "nightly_sync_policy_registry",
+  "status": "phase_1_policy_frozen",
+  "entries": [
+    {
+      "sync_policy_id": "qinqin.v1_1.default_nightly_sync",
+      "source_system_id": "qinqin.v1_1",
+      "timezone": "Asia/Shanghai",
+      "activation_local_time": "03:10",
+      "formal_access_window_start_local_time": "03:00",
+      "formal_access_window_end_exclusive_local_time": "04:00",
+      "currentness_priority": "target_business_date_first",
+      "backfill_fill_direction": "latest_to_oldest",
+      "carry_forward_cursor": true,
+      "default_page_size": 200,
+      "increment_strategy_policies": {
+        "business_window_incremental": {
+          "currentness_window_business_days": 1,
+          "allow_historical_backfill": true,
+          "backfill_order": "latest_to_oldest"
+        },
+        "daily_full_replace": {
+          "currentness_window_business_days": 1,
+          "allow_historical_backfill": true,
+          "backfill_order": "latest_to_oldest"
+        },
+        "profile_refresh_windowed": {
+          "currentness_window_business_days": 7,
+          "allow_historical_backfill": false,
+          "backfill_order": "not_applicable"
+        }
+      },
+      "notes": "Currentness must be protected first inside the 03:00-04:00 access window. Historical backlog then continues from the newest missing business date toward older dates without resetting the cursor every night."
+    }
+  ]
+}

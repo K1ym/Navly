@@ -4,6 +4,16 @@
 
 当前已落地：
 
+- `nightly_sync_planner.py`
+  - 读取 governed nightly sync policy
+  - 先排 target business date currentness task
+  - 再排 newest -> oldest historical backfill task
+  - 区分 `business_window_incremental` / `daily_full_replace` / `profile_refresh_windowed`
+- `../scripts/run_nightly_sync_scheduler.py`
+  - 读取 latest-state + prior ledger
+  - 产出 scheduler snapshot / dispatch plan / cursor ledger
+  - 为后续 Temporal worker 对接提供稳定输入
+
 - `member_insight_vertical_slice.py`
   - 同一条 vertical slice 可在 `fixture` / `live` transport 下运行
   - endpoint run / ingestion run 历史执行真相持续写出
@@ -27,6 +37,7 @@
 
 当前范围：
 
+- governed nightly sync planning semantics
 - `GetCustomersList`
 - `GetConsumeBillList`
 - `GetRechargeBillList`

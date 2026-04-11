@@ -1,0 +1,27 @@
+{
+  "contract_name": "nightly_sync_cursor_state_entry",
+  "owner": "data-platform",
+  "status": "phase_1_followup_seed",
+  "fields": [
+    "state_id",
+    "state_trace_ref",
+    "source_system_id",
+    "org_id",
+    "endpoint_contract_id",
+    "target_business_date",
+    "currentness_status",
+    "backfill_progress_status",
+    "cursor_status",
+    "cursor_reason_codes",
+    "latest_usable_business_date",
+    "covered_business_dates",
+    "missing_business_dates",
+    "currentness_window_business_dates",
+    "next_currentness_business_date",
+    "next_backfill_business_date",
+    "carry_forward_cursor",
+    "backfill_fill_direction",
+    "updated_at"
+  ],
+  "notes": "Dynamic nightly sync cursor state expresses what should run next for currentness and historical backlog continuation."
+}

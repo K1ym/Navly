@@ -11,6 +11,14 @@
 - `phase1_remaining_live_transport_validation_matrix.py`
   - 输出 remaining Phase-1 Qinqin direct endpoint 的 live transport validation matrix
   - 冻结 `fixture-only` / `live-validated` 状态词汇与 expected classification path
+- `run_nightly_sync_scheduler.py`
+  - 读取 latest-state / prior-ledger JSON
+  - 输出 scheduler snapshot / dispatch plan / cursor ledger
+  - 作为后续 Temporal worker 对接前的本地 planning entrypoint
+- `run_nightly_sync_worker.py`
+  - 读取 persisted cursor ledger store
+  - 运行 scheduler + ledger persistence
+  - 输出 worker result / dispatch plan / cursor ledger
 
 当前边界：
 
@@ -18,3 +26,5 @@
 - 当前 sample 实际写出的是 `raw-replay/`、`historical-run-truth/`、`canonical/`、`latest-state/`
 - 当前 sample 不会写出 `projections/` 或 `serving/`
 - remaining Phase-1 matrix helper 只服务 verification / docs / tests，不是生产 runtime 入口
+- nightly sync scheduler helper 当前只做 planning / ledger / dispatch snapshot，不直接发起真实 source sync
+- nightly sync worker helper 当前已持久化 cursor ledger，但仍是本地 worker slice，不是完整 Temporal runtime

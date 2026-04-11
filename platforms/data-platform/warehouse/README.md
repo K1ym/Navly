@@ -9,6 +9,7 @@
 - `member_insight_canonical_backbone.py`
 - `finance_summary_canonical.py`
 - `staff_workforce_canonical_backbone.py`
+- `commission_setting_canonical.py`
 
 当前已覆盖的 L1 datasets：
 
@@ -27,3 +28,5 @@
 - `tech_shift_item`
 - `tech_shift_summary`
 - `sales_commission`
+- `commission_setting`
+- `commission_setting_detail`

@@ -9,7 +9,9 @@
 - owner contract ownership freeze
 - business-day boundary policy entry shape
 - capability dependency entry shape
+- nightly sync policy entry shape
+- nightly sync cursor state entry shape
 - source / endpoint / parameter / field / landing / variance entry shape
 - 对 registry root 附加元数据的说明
 
-Qinqin v1.1、business-day boundary policy registry、capability dependency registry 的 formal registry root 语义由 `docs/specs/data-platform/` 下的对应规格补充说明。
+Qinqin v1.1、business-day boundary policy registry、capability dependency registry、nightly sync planner policy 的 formal registry root 语义由 `docs/specs/data-platform/` 下的对应规格补充说明。

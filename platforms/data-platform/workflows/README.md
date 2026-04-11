@@ -21,6 +21,14 @@
   - 读取 governed business-day boundary policy
 - `capability_explanation_owner_surface.py`
   - 为已发布 capability surfaces 提供 companion explanation query boundary
+- `nightly_sync_scheduler.py`
+  - 把 nightly planner + cursor state + cursor ledger 收敛成 scheduler snapshot
+  - 产出 currentness-first 的 dispatch plan
+  - 为后续 Temporal worker 保持稳定输入边界
+- `nightly_sync_worker.py`
+  - 读取 persisted cursor ledger
+  - 执行 scheduler snapshot 构建
+  - 回写最新 ledger 状态
 
 当前边界：
 

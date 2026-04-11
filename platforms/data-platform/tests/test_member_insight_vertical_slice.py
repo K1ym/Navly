@@ -143,6 +143,8 @@ class MemberInsightVerticalSliceTest(unittest.TestCase):
             self.assertEqual(len(result['raw_replay']['raw_response_pages']), 2)
             self.assertEqual(len(result['raw_replay']['transport_replay_artifacts']), 2)
             self.assertEqual(len(result['canonical_artifacts']['customer']), 1)
+            self.assertEqual(len(result['canonical_artifacts']['customer_ticket']), 0)
+            self.assertEqual(len(result['canonical_artifacts']['customer_coupon']), 0)
             self.assertEqual(len(result['canonical_artifacts']['consume_bill']), 1)
             self.assertEqual(len(result['canonical_artifacts']['consume_bill_payment']), 1)
             self.assertEqual(len(result['latest_state_artifacts']['latest_usable_endpoint_states']), 2)
@@ -153,7 +155,85 @@ class MemberInsightVerticalSliceTest(unittest.TestCase):
             self.assertTrue(Path(tmpdir, 'historical-run-truth', 'ingestion-runs.json').exists())
             self.assertTrue(Path(tmpdir, 'latest-state', 'latest-usable-endpoint-state.json').exists())
             self.assertTrue(Path(tmpdir, 'canonical', 'customer.json').exists())
+            self.assertTrue(Path(tmpdir, 'canonical', 'customer_ticket.json').exists())
+            self.assertTrue(Path(tmpdir, 'canonical', 'customer_coupon.json').exists())
             self.assertTrue(Path(tmpdir, 'raw-replay', 'transport-replay-artifacts.json').exists())
+
+    def test_customer_tickets_and_coupons_land_to_structured_canonical_outputs(self) -> None:
+        fixture_bundle = self._fixture_bundle()
+        customer_row = fixture_bundle['qinqin.member.get_customers_list.v1_1'][0]['RetData']['Data'][0]
+        customer_row['Tickets'] = [
+            {
+                'Id': 'ticket_001',
+                'OrgId': 'demo-org-001',
+                'UserName': '示例用户A',
+                'UserPhone': '13900000000',
+                'CardTradeId': 'trade_ticket_001',
+                'SettleId': 'settle_ticket_001',
+                'ConsumeId': 'consume_ticket_001',
+                'ItemId': 'item_ticket_001',
+                'ExpireTime': '2026-09-28 09:43:18',
+                'IsUsed': False,
+                'State': 1,
+                'CardTradeTicketId': 'trade_ticket_detail_001',
+                'OptId': 'operator_ticket_001',
+                'OptCode': 'admin',
+                'OptName': '示例操作员',
+                'OptTime': '2025-09-28 09:43:18',
+                'TicketId': 'ticket_type_001',
+                'TicketName': '尊品足浴项目次卡',
+                'TicketPrice': 490,
+                'TicketNumIndex': 0,
+                'TicketType': 3,
+                'Remark': 'ticket remark',
+                'CardNo': 'card-no-001',
+                'CardPing': 'card-ping-001',
+            }
+        ]
+        customer_row['Coupons'] = [
+            {
+                'Id': 'coupon_001',
+                'OrgId': 'demo-org-001',
+                'UserName': '示例用户A',
+                'UserPhone': '13900000000',
+                'CardTradeId': 'trade_coupon_001',
+                'CouponTypeId': 'coupon_type_001',
+                'CouponTypeName': '项目不定额券',
+                'Type': 4,
+                'DeductionAmount': 20,
+                'AmountLimit': 0,
+                'SettleId': 'settle_coupon_001',
+                'ConsumeId': 'consume_coupon_001',
+                'ExpireTime': '2025-07-31 23:59:59',
+                'IsUsed': False,
+                'State': 1,
+                'OptTime': '2025-07-23 10:39:40',
+                'OptId': 'operator_coupon_001',
+                'OptCode': 'admin',
+                'OptName': '示例操作员',
+                'Remark': 'coupon remark',
+                'UsedTime': '2025-07-24 15:47:49',
+                'CTime': '2025-07-23 10:39:40',
+                'Source': 2,
+            }
+        ]
+
+        transport = FixtureQinqinTransport(fixture_bundle)
+        result = run_member_insight_vertical_slice(
+            transport=transport,
+            **self._base_run_kwargs(),
+        )
+
+        self.assertEqual(len(result['canonical_artifacts']['customer_ticket']), 1)
+        self.assertEqual(len(result['canonical_artifacts']['customer_coupon']), 1)
+        self.assertEqual(
+            result['canonical_artifacts']['customer_ticket'][0]['ticket_name'],
+            '尊品足浴项目次卡',
+        )
+        self.assertEqual(
+            result['canonical_artifacts']['customer_coupon'][0]['coupon_type_name'],
+            '项目不定额券',
+        )
 
     def test_empty_trailing_page_finishes_completed_not_source_empty(self) -> None:
         fixture_bundle = self._fixture_bundle()

@@ -16,3 +16,7 @@
   - 为 `GetTechCommissionSetList` 产出 latest usable endpoint state
   - 产出 business-day-policy-aware `backfill_progress_state`
   - 明确区分 currentness 与历史 backfill completeness
+- `nightly_sync_cursor_state.py`
+  - 把 nightly planner 输出收敛成 endpoint-scoped cursor state
+  - 区分 `currentness_pending` / `backfill_pending` / `current_and_complete`
+  - 明确给出 next currentness date 与 next backfill date

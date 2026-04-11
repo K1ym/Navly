@@ -22,9 +22,19 @@ def _card_groups(customer_row: dict[str, Any]) -> list[tuple[str, list[dict[str,
     ]
 
 
+def _ticket_groups(customer_row: dict[str, Any]) -> list[dict[str, Any]]:
+    return customer_row.get('Tickets') or []
+
+
+def _coupon_groups(customer_row: dict[str, Any]) -> list[dict[str, Any]]:
+    return customer_row.get('Coupons') or []
+
+
 def canonicalize_customers(raw_page_records: list[dict[str, Any]], org_id: str, requested_business_date: str) -> dict[str, list[dict[str, Any]]]:
     customers: dict[str, dict[str, Any]] = {}
     customer_cards: dict[str, dict[str, Any]] = {}
+    customer_tickets: dict[str, dict[str, Any]] = {}
+    customer_coupons: dict[str, dict[str, Any]] = {}
     for row in _rows(raw_page_records):
         customer_id = row.get('Id')
         if not customer_id:
@@ -63,9 +73,72 @@ def canonicalize_customers(raw_page_records: list[dict[str, Any]], org_id: str, 
                     'source_endpoint_contract_id': CUSTOMER_ENDPOINT_ID,
                     'requested_business_date': requested_business_date,
                 }
+        for index, ticket in enumerate(_ticket_groups(row), start=1):
+            ticket_id = ticket.get('Id') or f'{customer_id}:ticket:{index}'
+            customer_tickets[ticket_id] = {
+                'customer_ticket_id': ticket_id,
+                'customer_id': customer_id,
+                'org_id': ticket.get('OrgId') or row.get('OrgId') or org_id,
+                'user_name': ticket.get('UserName') or row.get('Name'),
+                'user_phone': ticket.get('UserPhone') or row.get('Phone'),
+                'card_trade_id': ticket.get('CardTradeId'),
+                'settle_id': ticket.get('SettleId'),
+                'consume_id': ticket.get('ConsumeId'),
+                'item_id': ticket.get('ItemId'),
+                'expires_at': ticket.get('ExpireTime'),
+                'is_used': ticket.get('IsUsed'),
+                'state': ticket.get('State'),
+                'card_trade_ticket_id': ticket.get('CardTradeTicketId'),
+                'operator_id': ticket.get('OptId'),
+                'operator_code': ticket.get('OptCode'),
+                'operator_name': ticket.get('OptName'),
+                'operated_at': ticket.get('OptTime'),
+                'ticket_id': ticket.get('TicketId'),
+                'ticket_name': ticket.get('TicketName'),
+                'ticket_price': ticket.get('TicketPrice'),
+                'ticket_num_index': ticket.get('TicketNumIndex'),
+                'ticket_type': ticket.get('TicketType'),
+                'remark': ticket.get('Remark'),
+                'card_no': ticket.get('CardNo'),
+                'card_ping': ticket.get('CardPing'),
+                'source_endpoint_contract_id': CUSTOMER_ENDPOINT_ID,
+                'requested_business_date': requested_business_date,
+            }
+        for index, coupon in enumerate(_coupon_groups(row), start=1):
+            coupon_id = coupon.get('Id') or f'{customer_id}:coupon:{index}'
+            customer_coupons[coupon_id] = {
+                'customer_coupon_id': coupon_id,
+                'customer_id': customer_id,
+                'org_id': coupon.get('OrgId') or row.get('OrgId') or org_id,
+                'user_name': coupon.get('UserName') or row.get('Name'),
+                'user_phone': coupon.get('UserPhone') or row.get('Phone'),
+                'card_trade_id': coupon.get('CardTradeId'),
+                'coupon_type_id': coupon.get('CouponTypeId'),
+                'coupon_type_name': coupon.get('CouponTypeName'),
+                'coupon_type': coupon.get('Type'),
+                'deduction_amount': coupon.get('DeductionAmount'),
+                'amount_limit': coupon.get('AmountLimit'),
+                'settle_id': coupon.get('SettleId'),
+                'consume_id': coupon.get('ConsumeId'),
+                'expires_at': coupon.get('ExpireTime'),
+                'is_used': coupon.get('IsUsed'),
+                'state': coupon.get('State'),
+                'operated_at': coupon.get('OptTime'),
+                'operator_id': coupon.get('OptId'),
+                'operator_code': coupon.get('OptCode'),
+                'operator_name': coupon.get('OptName'),
+                'remark': coupon.get('Remark'),
+                'used_at': coupon.get('UsedTime'),
+                'created_at': coupon.get('CTime'),
+                'source': coupon.get('Source'),
+                'source_endpoint_contract_id': CUSTOMER_ENDPOINT_ID,
+                'requested_business_date': requested_business_date,
+            }
     return {
         'customer': list(customers.values()),
         'customer_card': list(customer_cards.values()),
+        'customer_ticket': list(customer_tickets.values()),
+        'customer_coupon': list(customer_coupons.values()),
     }
 
 
