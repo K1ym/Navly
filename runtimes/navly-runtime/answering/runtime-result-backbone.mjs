@@ -67,18 +67,70 @@ function buildAnswerFragments({ resultStatus, routeResult, dependencyOutcome }) 
     {
       fragment_type: 'service_object',
       capability_id: routeResult.selected_capability_id,
-      service_object_id: routeResult.selected_service_object_id,
+      service_object_id: themeServiceResponse?.service_object_id ?? routeResult.selected_service_object_id,
       data_window: themeServiceResponse?.data_window ?? {},
       service_object: themeServiceResponse?.service_object ?? {},
     },
   ];
 }
 
-function buildExplanationFragments({ resultStatus, routeResult, dependencyOutcome, ingressError }) {
-  if (resultStatus === 'answered') {
-    return [];
+function buildAccessDecisionFragment(dependencyOutcome) {
+  const accessDecisionStatus = dependencyOutcome?.access_decision_status ?? null;
+  const restrictionCodes = dependencyOutcome?.restriction_codes ?? [];
+  const obligationCodes = dependencyOutcome?.obligation_codes ?? [];
+  const reasonCodes = dependencyOutcome?.capability_access_response?.access_decision?.reason_codes
+    ?? dependencyOutcome?.reason_codes
+    ?? [];
+
+  if (
+    !accessDecisionStatus
+    || (
+      accessDecisionStatus === 'allow'
+      && reasonCodes.length === 0
+      && restrictionCodes.length === 0
+      && obligationCodes.length === 0
+    )
+  ) {
+    return null;
   }
 
+  return {
+    fragment_type: 'access_decision',
+    access_decision_status: accessDecisionStatus,
+    reason_codes: reasonCodes,
+    restriction_codes: restrictionCodes,
+    obligation_codes: obligationCodes,
+  };
+}
+
+function buildCapabilityExplanationFragment(dependencyOutcome) {
+  const explanationServiceResponse = dependencyOutcome?.explanation_service_response;
+  if (explanationServiceResponse) {
+    return {
+      fragment_type: 'capability_explanation_service',
+      capability_id: explanationServiceResponse.capability_id,
+      service_object_id: explanationServiceResponse.service_object_id,
+      service_status: explanationServiceResponse.service_status,
+      explanation_object: explanationServiceResponse.explanation_object ?? null,
+      service_object: explanationServiceResponse.service_object ?? {},
+    };
+  }
+
+  const themeServiceResponse = dependencyOutcome?.theme_service_response;
+  if (themeServiceResponse?.explanation_object) {
+    return {
+      fragment_type: 'capability_explanation_object',
+      capability_id: themeServiceResponse.capability_id,
+      service_object_id: themeServiceResponse.service_object_id,
+      service_status: themeServiceResponse.service_status,
+      explanation_object: themeServiceResponse.explanation_object,
+    };
+  }
+
+  return null;
+}
+
+function buildExplanationFragments({ resultStatus, routeResult, dependencyOutcome, ingressError }) {
   if (ingressError) {
     return [
       {
@@ -87,6 +139,12 @@ function buildExplanationFragments({ resultStatus, routeResult, dependencyOutcom
         detail: ingressError.message,
       },
     ];
+  }
+
+  const accessDecisionFragment = buildAccessDecisionFragment(dependencyOutcome);
+  const capabilityExplanationFragment = buildCapabilityExplanationFragment(dependencyOutcome);
+  if (resultStatus === 'answered') {
+    return [accessDecisionFragment, capabilityExplanationFragment].filter(Boolean);
   }
 
   if (!routeResult || routeResult.route_status !== 'resolved') {
@@ -100,6 +158,8 @@ function buildExplanationFragments({ resultStatus, routeResult, dependencyOutcom
   }
 
   return [
+    capabilityExplanationFragment,
+    accessDecisionFragment,
     {
       fragment_type: 'guarded_execution',
       dependency_stage: dependencyOutcome?.dependency_stage ?? 'unknown',
@@ -107,9 +167,11 @@ function buildExplanationFragments({ resultStatus, routeResult, dependencyOutcom
       error_message: dependencyOutcome?.error_message ?? null,
       readiness_status: dependencyOutcome?.readiness_response?.readiness_status ?? null,
       service_status: dependencyOutcome?.theme_service_response?.service_status ?? null,
-      access_decision_status: dependencyOutcome?.capability_access_response?.access_decision?.decision_status ?? null,
+      access_decision_status: dependencyOutcome?.access_decision_status
+        ?? dependencyOutcome?.capability_access_response?.access_decision?.decision_status
+        ?? null,
     },
-  ];
+  ].filter(Boolean);
 }
 
 function buildEscalationAction({ resultStatus, dependencyOutcome }) {
@@ -145,6 +207,9 @@ function collectDependencyTraceRefs(dependencyOutcome) {
     [dependencyOutcome.theme_service_response?.trace_ref],
     dependencyOutcome.theme_service_response?.state_trace_refs,
     dependencyOutcome.theme_service_response?.run_trace_refs,
+    [dependencyOutcome.explanation_service_response?.trace_ref],
+    dependencyOutcome.explanation_service_response?.state_trace_refs,
+    dependencyOutcome.explanation_service_response?.run_trace_refs,
   );
 }
 
@@ -188,6 +253,12 @@ export function assembleRuntimeResultEnvelope({
       message_mode: runtimeIdentity.message_mode,
       response_channel_capabilities: runtimeIdentity.response_channel_capabilities,
       delivery_hint: runtimeIdentity.delivery_hint ?? {},
+      access_decision_status: dependencyOutcome?.access_decision_status ?? null,
+      restriction_codes: dependencyOutcome?.restriction_codes ?? [],
+      obligation_codes: dependencyOutcome?.obligation_codes ?? [],
+      readiness_status: dependencyOutcome?.readiness_response?.readiness_status ?? null,
+      service_status: dependencyOutcome?.theme_service_response?.service_status ?? null,
+      explanation_service_status: dependencyOutcome?.explanation_service_response?.service_status ?? null,
     },
   };
 }
