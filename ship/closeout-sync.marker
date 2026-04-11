@@ -1,0 +1,9 @@
+written_at=2026-04-11T22:15:21+08:00
+written_after_github_sync=true
+written_after_linear_sync=true
+github_pr=https://github.com/K1ym/Navly/pull/43
+github_branch=asperakay/full-phase-closeout-sync
+linear_issue=ASP-40
+linear_comment_id=08937247-79d7-4188-b91a-d04b9bdf3eef
+duplicate_audit=stale_/Users/kyo/Downloads/Navly_business_day_boundary_drafts_not_ported
+closeout_gate_count=5
