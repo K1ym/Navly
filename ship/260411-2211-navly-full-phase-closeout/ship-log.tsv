@@ -1,0 +1,2 @@
+timestamp	type	target	checklist_score	dry_run	shipped	verified	duration	notes
+2026-04-11T14:15:21Z	code-pr	https://github.com/K1ym/Navly/pull/43	5	false	true	true	PT9M	README closeout entrypoint synced; ASP-40 note posted; stale business-day drafts audited but not ported
