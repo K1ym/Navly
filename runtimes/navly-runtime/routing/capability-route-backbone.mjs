@@ -124,15 +124,22 @@ function resolveByRequestedService({ entries, requestedServiceObjectId }) {
     return null;
   }
 
-  const match = entries.find((entry) => entry.supported_service_object_ids.includes(requestedServiceObjectId));
-  if (!match) {
+  const matches = entries.filter((entry) => entry.supported_service_object_ids.includes(requestedServiceObjectId));
+  if (matches.length === 0) {
     return {
       route_status: 'unresolved',
       reason_codes: ['runtime.route.service_not_registered'],
     };
   }
 
-  return buildResolvedRoute({ entry: match, requestedServiceObjectId });
+  if (matches.length > 1) {
+    return {
+      route_status: 'unresolved',
+      reason_codes: ['runtime.route.service_ambiguous'],
+    };
+  }
+
+  return buildResolvedRoute({ entry: matches[0], requestedServiceObjectId });
 }
 
 function resolveByMatchTokens({ entries, userInputText, requestedServiceObjectId }) {

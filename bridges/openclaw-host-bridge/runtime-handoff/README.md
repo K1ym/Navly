@@ -6,6 +6,7 @@
 
 - `runtime_request_envelope` assembly backbone
 - canonical `decision_ref` handoff closure
+- published capability tool -> runtime handoff closure
 - shared interaction consumption only
 - fail-closed handoff preconditions
 

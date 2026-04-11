@@ -10,6 +10,7 @@ import {
 } from '../adapters/owner-side-dependency-clients.mjs';
 
 const FIXED_NOW = '2026-04-06T08:00:00.000Z';
+const EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(moduleDir, '..', '..', '..');
 const fixtureBundlePath = path.join(
@@ -21,6 +22,29 @@ const fixtureBundlePath = path.join(
   'member_insight',
   'qinqin_fixture_pages.bundle.json',
 );
+const staffFixtureBundlePath = path.join(
+  repoRoot,
+  'platforms',
+  'data-platform',
+  'tests',
+  'fixtures',
+  'staff_board',
+  'qinqin_staff_fixture_pages.bundle.json',
+);
+const financeFixtureBundlePath = path.join(
+  repoRoot,
+  'platforms',
+  'data-platform',
+  'tests',
+  'fixtures',
+  'finance_summary',
+  'qinqin_fixture_pages.bundle.json',
+);
+const dailyOverviewFixtureBundlePaths = [
+  fixtureBundlePath,
+  staffFixtureBundlePath,
+  financeFixtureBundlePath,
+];
 
 function buildOwnerAccessContextEnvelope(overrides = {}) {
   return {
@@ -33,7 +57,13 @@ function buildOwnerAccessContextEnvelope(overrides = {}) {
     tenant_ref: 'navly:tenant:sample-retail',
     primary_scope_ref: 'navly:scope:store:sample-store-001',
     granted_scope_refs: ['navly:scope:store:sample-store-001'],
-    granted_capability_ids: ['navly.store.member_insight', 'navly.system.capability_explanation'],
+    granted_capability_ids: [
+      'navly.store.member_insight',
+      'navly.store.daily_overview',
+      'navly.store.staff_board',
+      'navly.store.finance_summary',
+      'navly.system.capability_explanation',
+    ],
     issued_at: FIXED_NOW,
     expires_at: '2026-04-06T09:00:00.000Z',
     ...overrides,
@@ -224,6 +254,92 @@ test('owner-side adapter closure serves member_insight without mocked clients', 
   assert.ok(result.runtime_dependency_outcome.readiness_response);
   assert.ok(result.runtime_dependency_outcome.theme_service_response);
   assert.ok(result.runtime_result_envelope.trace_refs.every((ref) => !ref.startsWith('navly:decision:')));
+});
+
+test('owner-side adapter closure serves staff_board without mocked clients', async () => {
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildOwnerRuntimeRequestEnvelope({
+      user_input_text: '帮我看下员工看板',
+      requested_capability_id: 'navly.store.staff_board',
+      requested_service_object_id: 'navly.service.store.staff_board',
+    }),
+    now: FIXED_NOW,
+    dependencyClientFactoryOptions: {
+      authAdapterOptions: {
+        nowFactory: () => FIXED_NOW,
+      },
+      dataAdapterOptions: {
+        defaultOrgId: 'demo-org-001',
+        defaultAppSecret: 'test-secret',
+        fixtureBundlePaths: [staffFixtureBundlePath],
+      },
+    },
+  });
+
+  assert.equal(result.runtime_result_envelope.result_status, 'answered');
+  assert.equal(result.runtime_result_envelope.selected_capability_id, 'navly.store.staff_board');
+  assert.equal(result.runtime_result_envelope.selected_service_object_id, 'navly.service.store.staff_board');
+  assert.equal(result.runtime_dependency_outcome.theme_service_response.service_object.staff_count, 2);
+});
+
+test('owner-side adapter closure serves daily_overview without mocked clients', async () => {
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildOwnerRuntimeRequestEnvelope({
+      user_input_text: '给我今日门店日报',
+      requested_capability_id: 'navly.store.daily_overview',
+      requested_service_object_id: 'navly.service.store.daily_overview',
+    }),
+    now: FIXED_NOW,
+    dependencyClientFactoryOptions: {
+      authAdapterOptions: {
+        nowFactory: () => FIXED_NOW,
+      },
+      dataAdapterOptions: {
+        defaultOrgId: 'demo-org-001',
+        defaultAppSecret: 'test-secret',
+        fixtureBundlePaths: dailyOverviewFixtureBundlePaths,
+      },
+    },
+  });
+
+  assert.equal(result.runtime_result_envelope.result_status, 'answered');
+  assert.equal(result.runtime_result_envelope.selected_capability_id, 'navly.store.daily_overview');
+  assert.equal(result.runtime_result_envelope.selected_service_object_id, 'navly.service.store.daily_overview');
+  assert.deepEqual(
+    result.runtime_dependency_outcome.theme_service_response.service_object.published_service_object_ids,
+    [
+      'navly.service.store.member_insight',
+      'navly.service.store.staff_board',
+      'navly.service.store.finance_summary',
+    ],
+  );
+});
+
+test('owner-side adapter closure serves finance_summary capability_explanation without mocked clients', async () => {
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildOwnerRuntimeRequestEnvelope({
+      user_input_text: '解释财务汇总当前状态',
+      requested_capability_id: 'navly.store.finance_summary',
+      requested_service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
+    }),
+    now: FIXED_NOW,
+    dependencyClientFactoryOptions: {
+      authAdapterOptions: {
+        nowFactory: () => FIXED_NOW,
+      },
+      dataAdapterOptions: {
+        defaultOrgId: 'demo-org-001',
+        defaultAppSecret: 'test-secret',
+        fixtureBundlePaths: [financeFixtureBundlePath],
+      },
+    },
+  });
+
+  assert.equal(result.runtime_result_envelope.result_status, 'answered');
+  assert.equal(result.runtime_result_envelope.selected_capability_id, 'navly.store.finance_summary');
+  assert.equal(result.runtime_result_envelope.selected_service_object_id, EXPLANATION_SERVICE_OBJECT_ID);
+  assert.equal(result.runtime_dependency_outcome.theme_service_response.service_object.readiness_status, 'ready');
+  assert.equal(result.runtime_dependency_outcome.theme_service_response.service_object.theme_service_status, 'served');
 });
 
 test('owner-side data adapter fails closed when org context is unavailable', async () => {
