@@ -13,7 +13,7 @@ function writeJson(filePath, payload) {
   fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 }
 
-test('tool publication manifest respects the registry default binding when multiple bindings exist', () => {
+test('tool publication manifest respects the registry default binding when multiple bindings exist', async () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'navly-tool-publication-'));
   const capabilityRegistryPath = path.join(tempDir, 'capability-registry.seed.json');
   const serviceBindingsPath = path.join(tempDir, 'capability-service-bindings.seed.json');
@@ -49,7 +49,7 @@ test('tool publication manifest respects the registry default binding when multi
     ],
   });
 
-  const manifest = buildCapabilityToolPublicationManifest({
+  const manifest = await buildCapabilityToolPublicationManifest({
     capabilityRegistryPath,
     serviceBindingsPath,
     publicationVersion: 'test-publication-v1',
@@ -65,7 +65,7 @@ test('tool publication manifest respects the registry default binding when multi
   ]);
 });
 
-test('tool publication manifest fails closed when no default binding can be resolved', () => {
+test('tool publication manifest fails closed when no default binding can be resolved', async () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'navly-tool-publication-'));
   const capabilityRegistryPath = path.join(tempDir, 'capability-registry.seed.json');
   const serviceBindingsPath = path.join(tempDir, 'capability-service-bindings.seed.json');
@@ -101,8 +101,8 @@ test('tool publication manifest fails closed when no default binding can be reso
     ],
   });
 
-  assert.throws(
-    () => buildCapabilityToolPublicationManifest({
+  await assert.rejects(
+    buildCapabilityToolPublicationManifest({
       capabilityRegistryPath,
       serviceBindingsPath,
       publicationVersion: 'test-publication-v1',

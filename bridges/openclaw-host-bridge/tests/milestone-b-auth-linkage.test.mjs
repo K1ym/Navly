@@ -143,8 +143,8 @@ test('milestone B backbone assembles ingress identity, authorized session link, 
   assert.ok(pipeline.host_trace_events.length >= 5);
 });
 
-test('phase-1 capability tool publication manifest is capability-first and does not leak source internals', () => {
-  const manifest = buildCapabilityToolPublicationManifest({
+test('phase-1 capability tool publication manifest is capability-first and does not leak source internals', async () => {
+  const manifest = await buildCapabilityToolPublicationManifest({
     publicationVersion: 'asp38-test-manifest',
   });
 
@@ -165,8 +165,8 @@ test('phase-1 capability tool publication manifest is capability-first and does 
   assert.equal(publicationSurfaceText.includes('endpoint_contract'), false);
 });
 
-test('phase-1 capability tool publication warmup and refresh stay local and capability oriented', () => {
-  const manifest = buildCapabilityToolPublicationManifest({
+test('phase-1 capability tool publication warmup and refresh stay local and capability oriented', async () => {
+  const manifest = await buildCapabilityToolPublicationManifest({
     publicationVersion: 'asp38-test-refresh',
   });
   const warmup = buildCapabilityToolPublicationWarmup({
@@ -187,7 +187,7 @@ test('phase-1 capability tool publication warmup and refresh stay local and capa
   assert.ok(refresh.added_tool_names.includes('navly_store_finance_summary'));
 });
 
-test('published capability tool can build a canonical runtime_request_envelope for the explanation companion path', () => {
+test('published capability tool can build a canonical runtime_request_envelope for the explanation companion path', async () => {
   const rawHostIngress = buildRawHostIngress({
     request_id: 'asp38-tool-request-001',
     host_event_kind: 'tool_invocation',
@@ -210,7 +210,7 @@ test('published capability tool can build a canonical runtime_request_envelope f
     gate0Enforcement,
     accessContextEnvelope: accessChain.access_context_envelope,
   });
-  const manifest = buildCapabilityToolPublicationManifest({
+  const manifest = await buildCapabilityToolPublicationManifest({
     publicationVersion: 'asp38-test-runtime-handoff',
   });
   const financeTool = manifest.tools.find((entry) => entry.capability_id === 'navly.store.finance_summary');
@@ -231,7 +231,7 @@ test('published capability tool can build a canonical runtime_request_envelope f
   assert.equal(JSON.stringify(runtimeRequestEnvelope).toLowerCase().includes('endpoint_contract'), false);
 });
 
-test('published capability tool handoff fails closed when the requested service binding is not published', () => {
+test('published capability tool handoff fails closed when the requested service binding is not published', async () => {
   const rawHostIngress = buildRawHostIngress({
     request_id: 'asp38-tool-request-invalid-binding',
     host_event_kind: 'tool_invocation',
@@ -254,7 +254,7 @@ test('published capability tool handoff fails closed when the requested service 
     gate0Enforcement,
     accessContextEnvelope: accessChain.access_context_envelope,
   });
-  const manifest = buildCapabilityToolPublicationManifest({
+  const manifest = await buildCapabilityToolPublicationManifest({
     publicationVersion: 'asp38-test-runtime-handoff-invalid',
   });
   const financeTool = manifest.tools.find((entry) => entry.capability_id === 'navly.store.finance_summary');

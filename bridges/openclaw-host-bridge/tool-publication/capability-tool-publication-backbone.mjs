@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -31,8 +31,8 @@ const RUNTIME_RESULT_SCHEMA_REF = 'shared/contracts/interaction/runtime_result_e
 const EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
 const EXPLANATION_CAPABILITY_ID = 'navly.system.capability_explanation';
 
-function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+async function readJson(filePath) {
+  return JSON.parse(await fs.readFile(filePath, 'utf8'));
 }
 
 function arraysEqual(left, right) {
@@ -138,12 +138,12 @@ function resolvePublishedBindingForCapability({
   );
 }
 
-function loadPublishedCapabilityToolEntries({
+async function loadPublishedCapabilityToolEntries({
   capabilityRegistryPath = defaultCapabilityRegistryPath,
   serviceBindingsPath = defaultServiceBindingsPath,
 } = {}) {
-  const capabilityRegistry = readJson(capabilityRegistryPath);
-  const serviceBindings = readJson(serviceBindingsPath);
+  const capabilityRegistry = await readJson(capabilityRegistryPath);
+  const serviceBindings = await readJson(serviceBindingsPath);
 
   return (capabilityRegistry.entries ?? [])
     .filter((entry) => entry.status === 'owner_surface_published')
@@ -161,14 +161,14 @@ function loadPublishedCapabilityToolEntries({
     .filter(Boolean);
 }
 
-export function buildCapabilityToolPublicationManifest({
+export async function buildCapabilityToolPublicationManifest({
   capabilityEntries = null,
   capabilityRegistryPath = defaultCapabilityRegistryPath,
   serviceBindingsPath = defaultServiceBindingsPath,
   publicationVersion = 'phase-1-capability-publication-v1',
   now = new Date().toISOString(),
 } = {}) {
-  const resolvedCapabilityEntries = capabilityEntries ?? loadPublishedCapabilityToolEntries({
+  const resolvedCapabilityEntries = capabilityEntries ?? await loadPublishedCapabilityToolEntries({
     capabilityRegistryPath,
     serviceBindingsPath,
   });
