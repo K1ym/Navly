@@ -20,6 +20,14 @@
 - `navly.store.finance_summary`
 - `navly.system.capability_explanation`
 
+### 当前 host/operator 扩展集合
+
+- `navly.ops.sync_status`
+- `navly.ops.backfill_status`
+- `navly.ops.sync_rerun`
+- `navly.ops.sync_backfill`
+- `navly.ops.quality_report`
+
 说明：
 - `store_daily_overview`、`store_member_insight` 等可作为文档短名
 - 不再作为跨模块 canonical ID
@@ -39,6 +47,14 @@
 - `navly.service.store.staff_board`
 - `navly.service.store.finance_summary`
 - `navly.service.system.capability_explanation`
+
+### 当前 host/operator 扩展集合
+
+- `navly.service.ops.sync_status`
+- `navly.service.ops.backfill_status`
+- `navly.service.ops.sync_rerun`
+- `navly.service.ops.sync_backfill`
+- `navly.service.ops.quality_report`
 
 ### phase-1 扩展候选
 

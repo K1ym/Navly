@@ -1,0 +1,79 @@
+{
+  "surface_name": "navly_first_party_host_skill_surface",
+  "status": "phase_1_closeout",
+  "skills": [
+    {
+      "skill_id": "navly-store-daily-overview",
+      "display_name": "Navly Store Daily Overview",
+      "tool_names": [
+        "navly_daily_overview"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager_or_staff"
+    },
+    {
+      "skill_id": "navly-store-member-insight",
+      "display_name": "Navly Store Member Insight",
+      "tool_names": [
+        "navly_member_insight"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager_or_staff"
+    },
+    {
+      "skill_id": "navly-store-finance-summary",
+      "display_name": "Navly Store Finance Summary",
+      "tool_names": [
+        "navly_finance_summary"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager"
+    },
+    {
+      "skill_id": "navly-store-staff-board",
+      "display_name": "Navly Store Staff Board",
+      "tool_names": [
+        "navly_staff_board"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager"
+    },
+    {
+      "skill_id": "navly-capability-explain",
+      "display_name": "Navly Capability Explain",
+      "tool_names": [
+        "navly_explain_unavailable"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager_or_staff"
+    },
+    {
+      "skill_id": "navly-sync-ops",
+      "display_name": "Navly Sync Ops",
+      "tool_names": [
+        "navly_sync_status",
+        "navly_backfill_status",
+        "navly_rerun_sync",
+        "navly_trigger_backfill"
+      ],
+      "host_agent_id": "ops",
+      "surface_kind": "operator",
+      "user_group": "operator_or_admin"
+    },
+    {
+      "skill_id": "navly-data-quality",
+      "display_name": "Navly Data Quality",
+      "tool_names": [
+        "navly_quality_report"
+      ],
+      "host_agent_id": "ops",
+      "surface_kind": "operator",
+      "user_group": "operator_or_admin"
+    }
+  ]
+}

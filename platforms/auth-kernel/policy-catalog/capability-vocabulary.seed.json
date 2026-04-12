@@ -33,6 +33,36 @@
       "owner_module": "data-platform",
       "capability_kind": "data_read",
       "description": "Canonical phase-1 capability explanation capability."
+    },
+    {
+      "capability_id": "navly.ops.sync_status",
+      "owner_module": "data-platform",
+      "capability_kind": "data_read",
+      "description": "Canonical operator sync status capability published through the first-party host surface."
+    },
+    {
+      "capability_id": "navly.ops.backfill_status",
+      "owner_module": "data-platform",
+      "capability_kind": "data_read",
+      "description": "Canonical operator backfill status capability published through the first-party host surface."
+    },
+    {
+      "capability_id": "navly.ops.sync_rerun",
+      "owner_module": "data-platform",
+      "capability_kind": "data_read",
+      "description": "Canonical operator rerun capability published through the first-party host surface."
+    },
+    {
+      "capability_id": "navly.ops.sync_backfill",
+      "owner_module": "data-platform",
+      "capability_kind": "data_read",
+      "description": "Canonical operator backfill trigger capability published through the first-party host surface."
+    },
+    {
+      "capability_id": "navly.ops.quality_report",
+      "owner_module": "data-platform",
+      "capability_kind": "data_read",
+      "description": "Canonical operator data quality capability published through the first-party host surface."
     }
   ]
 }
