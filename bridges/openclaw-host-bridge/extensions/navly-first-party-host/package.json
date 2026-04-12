@@ -1,0 +1,12 @@
+{
+  "name": "@navly/first-party-host",
+  "version": "2026.4.12",
+  "private": true,
+  "description": "Navly first-party host tool surface for OpenClaw live channels.",
+  "type": "module",
+  "openclaw": {
+    "extensions": [
+      "./index.mjs"
+    ]
+  }
+}

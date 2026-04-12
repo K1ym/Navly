@@ -1,0 +1,75 @@
+{
+  "id": "navly-first-party-host",
+  "name": "Navly First-Party Host",
+  "description": "Publishes Navly first-party capability-oriented host tools and bundled skills for live OpenClaw channels.",
+  "skills": [
+    "skills"
+  ],
+  "contracts": {
+    "tools": [
+      "navly_daily_overview",
+      "navly_member_insight",
+      "navly_finance_summary",
+      "navly_staff_board",
+      "navly_explain_unavailable",
+      "navly_sync_status",
+      "navly_backfill_status",
+      "navly_rerun_sync",
+      "navly_trigger_backfill",
+      "navly_quality_report"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "repoRoot": {
+        "type": "string",
+        "description": "Absolute Navly repo root used to load the first-party publication manifest and runtime modules."
+      },
+      "dataPlatformEnvPath": {
+        "type": "string",
+        "description": "Absolute path to the Navly data-platform env file for live runtime defaults."
+      },
+      "defaultChannel": {
+        "type": "string",
+        "description": "Fallback channel kind when plugin tool context does not expose a channel."
+      },
+      "channelAccountRef": {
+        "type": "string",
+        "description": "Optional fixed channel_account_ref injected into Navly host ingress."
+      },
+      "identityAliasNamespace": {
+        "type": "string",
+        "description": "Optional alias namespace override for requesterSenderId evidence."
+      },
+      "defaultScopeRef": {
+        "type": "string",
+        "description": "Optional fallback scope_ref when a tool call omits it."
+      },
+      "defaultOrgId": {
+        "type": "string",
+        "description": "Optional fallback OrgId for live Qinqin reads."
+      },
+      "defaultAppSecret": {
+        "type": "string",
+        "description": "Optional fallback AppSecret for live Qinqin reads."
+      },
+      "transportKind": {
+        "type": "string",
+        "description": "Runtime data transport kind. Defaults to live."
+      },
+      "businessTimezone": {
+        "type": "string",
+        "description": "Timezone used to derive default business_date when omitted."
+      },
+      "scopeOrgMap": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "Optional mapping from Navly scope_ref to Qinqin OrgId."
+      }
+    }
+  }
+}
