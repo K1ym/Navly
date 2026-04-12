@@ -28,7 +28,7 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 
 def _load_member_insight_dependency_entry(data_platform_root: Path = DATA_PLATFORM_ROOT) -> dict[str, Any]:
-    registry = _load_json(data_platform_root / 'directory' / 'capability-dependency-registry.placeholder.json')
+    registry = _load_json(data_platform_root / 'directory' / 'capability-dependency-registry.seed.json')
     for entry in registry['entries']:
         if entry['capability_id'] == VERTICAL_SLICE_CAPABILITY_ID:
             return entry

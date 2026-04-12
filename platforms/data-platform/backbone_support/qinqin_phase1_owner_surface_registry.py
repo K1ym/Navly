@@ -58,7 +58,7 @@ def service_object_bindings(data_platform_root: Path = DATA_PLATFORM_ROOT) -> di
 
 @lru_cache(maxsize=4)
 def capability_dependencies(data_platform_root: Path = DATA_PLATFORM_ROOT) -> dict[str, dict[str, Any]]:
-    entries = _load_json(data_platform_root / 'directory' / 'capability-dependency-registry.placeholder.json')['entries']
+    entries = _load_json(data_platform_root / 'directory' / 'capability-dependency-registry.seed.json')['entries']
     return {
         entry['capability_id']: entry
         for entry in entries
