@@ -19,8 +19,9 @@
 - first-party manager-facing capability surface
   - `daily_overview` answered aggregate surface
   - `member_insight` answered owner-side surface
-  - `finance_summary` / `staff_board` structured not-ready surfaces
+  - `finance_summary` / `staff_board` answered owner-side surfaces on phase-1-ready data
   - `capability_explanation` answered structured explanation surface
+  - 若依赖缺数，manager-facing surface 仍 fail-close 为结构化 fallback / not-ready
 - first-party operator capability route publication
   - published through route registry
   - default runtime behavior remains structured pending / fail-closed, not fake source results
@@ -46,21 +47,20 @@
 
 ## 最小 capability 闭环
 
-当前 fully served minimal capability：
-
-- `navly.store.member_insight`
-- 默认 `service_object_id = navly.service.store.member_insight`
-
-其余 first-party host surfaces：
+当前 phase-1 manager service set：
 
 - `navly.store.daily_overview`
 - `navly.service.store.daily_overview`
+- `navly.store.member_insight`
+- `navly.service.store.member_insight`
 - `navly.store.finance_summary`
 - `navly.service.store.finance_summary`
 - `navly.store.staff_board`
 - `navly.service.store.staff_board`
 - `navly.system.capability_explanation`
 - `navly.service.system.capability_explanation`
+
+其中 `member_insight` 仍是最低层 canonical anchor slice；`finance_summary` / `staff_board` / `daily_overview` 都通过 formal owner-surface / aggregate surface 接入默认 runtime path。
 
 主链路：
 

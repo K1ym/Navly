@@ -35,7 +35,7 @@
       "supported_service_object_ids": [
         "navly.service.store.daily_overview"
       ],
-      "status": "implemented_host_surface"
+      "status": "implemented_phase1_aggregate"
     },
     {
       "route_id": "capability.navly.store.finance_summary",
@@ -45,14 +45,15 @@
         "store_finance_summary",
         "finance summary",
         "财务汇总",
-        "充值汇总"
+        "充值汇总",
+        "流水汇总"
       ],
       "capability_id": "navly.store.finance_summary",
       "default_service_object_id": "navly.service.store.finance_summary",
       "supported_service_object_ids": [
         "navly.service.store.finance_summary"
       ],
-      "status": "published_not_ready_surface"
+      "status": "implemented_phase1_owner_surface"
     },
     {
       "route_id": "capability.navly.store.staff_board",
@@ -62,30 +63,31 @@
         "store_staff_board",
         "staff board",
         "员工看板",
-        "员工概览"
+        "技师看板"
       ],
       "capability_id": "navly.store.staff_board",
       "default_service_object_id": "navly.service.store.staff_board",
       "supported_service_object_ids": [
         "navly.service.store.staff_board"
       ],
-      "status": "published_not_ready_surface"
+      "status": "implemented_phase1_owner_surface"
     },
     {
       "route_id": "capability.navly.system.capability_explanation",
       "match_mode": "explicit_or_match_tokens",
       "match_tokens": [
         "capability_explanation",
-        "capability explain",
-        "为什么不可用",
-        "解释原因"
+        "capability explanation",
+        "解释不可用",
+        "为什么答不了",
+        "缺数解释"
       ],
       "capability_id": "navly.system.capability_explanation",
       "default_service_object_id": "navly.service.system.capability_explanation",
       "supported_service_object_ids": [
         "navly.service.system.capability_explanation"
       ],
-      "status": "implemented_host_surface"
+      "status": "implemented_phase1_fallback_surface"
     },
     {
       "route_id": "capability.navly.ops.sync_status",
@@ -170,5 +172,5 @@
     "fallback_capability_id": "navly.system.capability_explanation",
     "fallback_service_object_id": "navly.service.system.capability_explanation"
   },
-  "notes": "Phase-1 host closeout route registry for the first-party manager-facing and operator-facing capability surface. Member insight remains the canonical fully served slice, daily overview is served through a formal aggregate surface, and the remaining published capabilities fail closed with structured explanations until richer owner surfaces land."
+  "notes": "Phase-1 host closeout route registry: manager-facing owner/service surfaces resolve through formal owner surfaces, while operator-facing publication remains structured pending."
 }

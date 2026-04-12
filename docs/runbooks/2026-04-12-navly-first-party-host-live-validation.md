@@ -68,8 +68,9 @@
 - 命中 `navly-store-finance-summary`
 - 调用 `navly_finance_summary`
 - `capability_id = navly.store.finance_summary`
-- 若 owner surface 尚未 ready，则 runtime 返回 `result_status=fallback`
-- fallback 必须给出结构化 reason codes，不暴露 source endpoint / SQL
+- 在 phase-1-ready data path 上，runtime 返回 `result_status=answered`
+- reply 中包含 `navly.service.store.finance_summary` formal service object
+- 若 live data 真实缺数，仍必须 fail-close 为结构化 fallback，不暴露 source endpoint / SQL
 
 问题 4：
 `看看员工看板`
@@ -79,7 +80,9 @@
 - 命中 `navly-store-staff-board`
 - 调用 `navly_staff_board`
 - `capability_id = navly.store.staff_board`
-- 若 owner surface 尚未 ready，则 runtime 返回结构化 not-ready explanation
+- 在 phase-1-ready data path 上，runtime 返回 `result_status=answered`
+- reply 中包含 `navly.service.store.staff_board` formal service object
+- 若 live data 真实缺数，仍必须返回结构化 not-ready explanation
 
 问题 5：
 `为什么我现在拿不到财务汇总？`

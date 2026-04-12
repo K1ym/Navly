@@ -18,8 +18,8 @@
 - first-party host tool surface
 - real capability discovery -> host publication manifest
 - live first-party tool handoff into runtime execution
-- manager-facing `daily_overview` / `member_insight` / `capability_explanation` answered surfaces
-- manager-facing `finance_summary` / `staff_board` structured not-ready fallback surfaces
+- manager-facing `daily_overview` / `member_insight` / `finance_summary` / `staff_board` / `capability_explanation` formal answered surfaces on phase-1-ready data
+- manager-facing surfaces在依赖缺数时仍 fail-close 为结构化 fallback / not-ready explanation
 - operator-facing host tool publication with fail-closed pending surfaces
 - milestone B validate 脚本与最小 node tests
 
@@ -102,7 +102,7 @@
 - `capability_id = navly.store.member_insight`
 - `service_object_id = navly.service.store.member_insight`
 
-`daily_overview` 已作为 first-party answered host surface 落地，但底层 richer finance/staff service 仍通过 structured not-ready surface 表达。
+`member_insight` 仍是最低层 canonical anchor slice；`finance_summary` / `staff_board` / `daily_overview` 已通过 formal owner surfaces 与 aggregate surface 接到同一条 first-party host path。
 
 ## canonical freeze
 
