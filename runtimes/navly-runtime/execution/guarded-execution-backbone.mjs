@@ -45,6 +45,11 @@ function buildDataAdapterContext(interactionContext) {
     end_time: pickString(slots.data_window_end_time),
     app_secret: pickString(slots.data_app_secret),
     fixture_bundle_path: pickString(slots.data_fixture_bundle_path),
+    transport_kind: pickString(slots.data_transport_kind),
+    live_base_url: pickString(slots.data_live_base_url),
+    live_authorization: pickString(slots.data_live_authorization),
+    live_token: pickString(slots.data_live_token),
+    live_timeout_ms: pickString(slots.data_live_timeout_ms),
   };
 }
 
