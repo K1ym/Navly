@@ -14,3 +14,8 @@
 - Qinqin v1.1 contract governance registry completeness
 - field catalog / landing policy / variance register consistency
 - member insight owner-side readiness / theme service surface
+- full `8` endpoint governance closure
+- full `19` structured target landing closure
+- endpoint-scoped completeness closure
+- five-store validation matrix
+- `source_empty / auth / sign / schema / business` taxonomy regression

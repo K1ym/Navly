@@ -30,13 +30,25 @@
   - `serving/member_insight_theme_service_surface.py`
 - 基础单测与 CLI runner
 - Qinqin v1.1 contract governance consistency tests
+- full structured-target landing backbone
+  - `warehouse/qinqin_structured_target_landing.py`
+  - 覆盖 manifest 中全部 `19` 个 structured targets
+- endpoint governance proof backbone
+  - `quality/qinqin_endpoint_governance.py`
+  - 为全部 `8` 个 endpoint 产出 `field_coverage_snapshot` / `schema_alignment_snapshot` / `quality_issues`
+- endpoint completeness closure backbone
+  - `completeness/qinqin_endpoint_completeness.py`
+  - 为全部 `8` 个 endpoint 产出 endpoint-scoped completeness objects
+- five-store governance validation matrix
+  - `build_five_store_endpoint_validation_matrix(...)`
+  - 可同时回答 “did it run” 与 “did fields align”
 
 当前**未完成**：
 
 - live connector / real HTTP transport / 完整错误分类治理
-- 全量 endpoint 铺开
+- richer service / serving 消费闭合
 - PostgreSQL / dbt / 持久化模型落地
-- 完整 latest state / quality / readiness / projection runtime 逻辑
+- capability-level serving default read path 闭合
 - rich serving / UI / 多消费端接口
 - phase-1 全链路闭合
 
@@ -72,6 +84,7 @@
   - `projections/`
 - 当前 milestone B 已具备 backbone，但这**不等于** ready / service runtime 已完成
 - 当前已对 `member_insight` 发布 formal owner-side readiness / theme service surface，但 runtime 还未在默认路径消费该 surface
+- 当前 `quality/` 与 `completeness/` 已具备 endpoint-governance / completeness proof objects，但这不等于 runtime 默认读取面已经切换完成
 
 ## 重要说明
 
