@@ -1,0 +1,22 @@
+{
+  "contract_name": "member_insight_customer_card_canonical_row_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "customer_card_id",
+    "customer_id",
+    "card_group",
+    "org_id",
+    "card_type_id",
+    "card_type_name",
+    "card_no",
+    "balance",
+    "total_amount",
+    "consume_amount",
+    "opened_at",
+    "expires_at",
+    "state",
+    "source_endpoint_contract_id",
+    "requested_business_date"
+  ]
+}

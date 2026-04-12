@@ -1,0 +1,14 @@
+{
+  "contract_name": "operator_status_bundle_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "request_id",
+    "trace_ref",
+    "state_snapshot",
+    "sync_status",
+    "backfill_status",
+    "quality_report"
+  ],
+  "notes": "Top-level query bundle returned by the repo-controlled operator status query path."
+}

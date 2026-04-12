@@ -11,6 +11,8 @@ const defaultDataPlatformRoot = path.join(repoRoot, 'platforms', 'data-platform'
 
 const CAPABILITY_EXPLANATION_CAPABILITY_ID = 'navly.system.capability_explanation';
 const CAPABILITY_EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
+const PENDING_OPERATOR_SURFACE_STATUS = 'published_not_ready_operator_surface';
+const OPERATOR_PENDING_REASON_CODE = 'operator_surface_pending';
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -19,19 +21,19 @@ function readJson(filePath) {
 function loadSupportedOwnerSurfaceRegistry(dataPlatformRoot) {
   const capabilityRegistry = readJson(path.join(dataPlatformRoot, 'directory', 'capability-registry.seed.json'));
   const serviceBindingRegistry = readJson(path.join(dataPlatformRoot, 'directory', 'capability-service-bindings.seed.json'));
-  const capabilities = new Set(
-    (capabilityRegistry.entries ?? [])
-      .filter((entry) => !String(entry?.status ?? '').startsWith('retired'))
-      .map((entry) => entry.capability_id),
-  );
-  const serviceBindingByCapability = new Map(
-    (serviceBindingRegistry.entries ?? [])
-      .filter((entry) => !String(entry?.status ?? '').startsWith('retired'))
-      .map((entry) => [entry.capability_id, entry.service_object_id]),
-  );
+  const supportedCapabilityEntries = (capabilityRegistry.entries ?? [])
+    .filter((entry) => !String(entry?.status ?? '').startsWith('retired'));
+  const supportedServiceBindingEntries = (serviceBindingRegistry.entries ?? [])
+    .filter((entry) => !String(entry?.status ?? '').startsWith('retired'));
+
   return {
-    supportedCapabilityIds: capabilities,
-    serviceBindingByCapability,
+    supportedCapabilityIds: new Set(supportedCapabilityEntries.map((entry) => entry.capability_id)),
+    capabilityStatusById: new Map(
+      supportedCapabilityEntries.map((entry) => [entry.capability_id, String(entry?.status ?? 'unknown')]),
+    ),
+    serviceBindingByCapability: new Map(
+      supportedServiceBindingEntries.map((entry) => [entry.capability_id, entry.service_object_id]),
+    ),
   };
 }
 
@@ -238,6 +240,79 @@ function buildScopeMismatchService(query, reasonCodes = ['scope_out_of_contract'
   };
 }
 
+function buildPendingCapabilityReadiness(
+  query,
+  {
+    reasonCode = OPERATOR_PENDING_REASON_CODE,
+    ownerSurface = 'operator_surface',
+  } = {},
+) {
+  return {
+    request_id: query.request_id,
+    trace_ref: query.trace_ref,
+    capability_id: query.capability_id,
+    readiness_status: 'pending',
+    evaluated_scope_ref: query.target_scope_ref,
+    requested_business_date: query.target_business_date,
+    latest_usable_business_date: query.target_business_date,
+    reason_codes: [reasonCode],
+    blocking_dependencies: [
+      {
+        dependency_kind: 'owner_surface',
+        dependency_ref: query.capability_id,
+        blocking_reason_code: reasonCode,
+        state_trace_refs: [],
+        run_trace_refs: [],
+      },
+    ],
+    state_trace_refs: [],
+    run_trace_refs: [],
+    evaluated_at: new Date().toISOString(),
+    extensions: {
+      owner_surface: ownerSurface,
+    },
+  };
+}
+
+function buildPendingThemeService(
+  query,
+  {
+    reasonCode = OPERATOR_PENDING_REASON_CODE,
+    ownerSurface = 'operator_surface',
+  } = {},
+) {
+  return {
+    request_id: query.request_id,
+    trace_ref: query.trace_ref,
+    capability_id: query.capability_id,
+    service_object_id: query.service_object_id,
+    service_status: 'not_ready',
+    service_object: {},
+    data_window: {
+      from: query.target_business_date,
+      to: query.target_business_date,
+    },
+    explanation_object: {
+      capability_id: query.capability_id,
+      explanation_scope: 'service',
+      reason_codes: [reasonCode],
+      summary_tokens: [query.capability_id, 'not_ready', query.target_business_date],
+      state_trace_refs: [],
+      run_trace_refs: [],
+      extensions: {
+        owner_surface: ownerSurface,
+      },
+    },
+    state_trace_refs: [],
+    run_trace_refs: [],
+    served_at: new Date().toISOString(),
+    extensions: {
+      owner_surface: ownerSurface,
+      readiness_status: 'pending',
+    },
+  };
+}
+
 function pruneExpiredRunCache(runCache, nowEpochMs, runCacheTtlMs) {
   if (!Number.isFinite(runCacheTtlMs) || runCacheTtlMs <= 0) {
     return;
@@ -281,7 +356,15 @@ export function createOwnerSideDataPlatformAdapter({
   runPhase1OwnerSurfaceImpl = runPhase1OwnerSurface,
 } = {}) {
   const runCache = new Map();
-  const { supportedCapabilityIds, serviceBindingByCapability } = loadSupportedOwnerSurfaceRegistry(dataPlatformRoot);
+  const {
+    supportedCapabilityIds,
+    capabilityStatusById,
+    serviceBindingByCapability,
+  } = loadSupportedOwnerSurfaceRegistry(dataPlatformRoot);
+
+  function isPublishedPendingOperatorSurface(capabilityId) {
+    return capabilityStatusById.get(capabilityId) === PENDING_OPERATOR_SURFACE_STATUS;
+  }
 
   async function loadPhase1OwnerSurface(query) {
     const context = resolveDataContext(query, {
@@ -347,6 +430,10 @@ export function createOwnerSideDataPlatformAdapter({
         return buildUnsupportedReadiness(query);
       }
 
+      if (isPublishedPendingOperatorSurface(query.capability_id)) {
+        return buildPendingCapabilityReadiness(query);
+      }
+
       const ownerSurface = await loadPhase1OwnerSurface(query);
       return ownerSurface.readiness_response;
     },
@@ -359,6 +446,10 @@ export function createOwnerSideDataPlatformAdapter({
       const expectedServiceObjectId = serviceBindingByCapability.get(query.capability_id);
       if (!expectedServiceObjectId || query.service_object_id !== expectedServiceObjectId) {
         return buildScopeMismatchService(query);
+      }
+
+      if (isPublishedPendingOperatorSurface(query.capability_id)) {
+        return buildPendingThemeService(query);
       }
 
       const ownerSurface = await loadPhase1OwnerSurface(query);

@@ -93,9 +93,9 @@
   - `raw-store/`
   - `warehouse/`
   - `sync-state/`
-  - `quality/`
-  - `completeness/`
-  - `projections/`
+- `quality/`
+- `completeness/`
+- `projections/`
 - 当前 milestone B 已具备 guarded owner-side surface set，但这**不等于** Postgres-first truth substrate、host publication、或 live runtime 已完成
 - runtime 默认 owner-side data adapter 已切到上述 formal owner/service surfaces；默认路径不再直接读 artifact/backbone internals
 - 当前 `quality/` 与 `completeness/` 已具备 endpoint-governance / completeness proof objects，并为 phase-1 service set 提供稳定依赖边界

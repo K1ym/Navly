@@ -1,0 +1,21 @@
+{
+  "contract_name": "service_projection_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "projection_id",
+    "projection_trace_ref",
+    "capability_id",
+    "service_object_id",
+    "org_id",
+    "requested_business_date",
+    "latest_usable_business_date",
+    "service_status",
+    "service_object",
+    "explanation_object",
+    "run_trace_refs",
+    "state_trace_refs",
+    "served_at"
+  ],
+  "notes": "Persisted service-layer projection truth. Runtime should default to this surface rather than artifact trees or raw payload inspection."
+}

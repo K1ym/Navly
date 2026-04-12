@@ -1,0 +1,21 @@
+{
+  "contract_name": "truth_store_snapshot_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "scheduler_runs",
+    "ingestion_runs",
+    "endpoint_runs",
+    "page_runs",
+    "raw_replay_artifacts",
+    "canonical_facts",
+    "latest_sync_states",
+    "backfill_progress_states",
+    "field_coverage_snapshots",
+    "schema_alignment_snapshots",
+    "quality_issues",
+    "capability_readiness_snapshots",
+    "service_projections"
+  ],
+  "notes": "Repo-local persisted truth substrate snapshot used for cross-process resume/query smoke before a live PostgreSQL adapter is bound."
+}

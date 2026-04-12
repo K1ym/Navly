@@ -1,0 +1,19 @@
+{
+  "contract_name": "quality_issue_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "quality_issue_id",
+    "issue_trace_ref",
+    "endpoint_contract_id",
+    "org_id",
+    "requested_business_date",
+    "quality_code",
+    "severity",
+    "message",
+    "run_trace_ref",
+    "state_trace_ref",
+    "opened_at"
+  ],
+  "notes": "Closeout quality taxonomy entry with explicit linkage back to run and state traces."
+}
