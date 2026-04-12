@@ -1,0 +1,17 @@
+{
+  "contract_name": "ingestion_page_run_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "page_run_id",
+    "page_run_trace_ref",
+    "endpoint_run_id",
+    "endpoint_contract_id",
+    "page_index",
+    "replay_artifact_id",
+    "response_record_count",
+    "page_status",
+    "captured_at"
+  ],
+  "notes": "Explicit page-level execution truth for replayability and failure localization."
+}

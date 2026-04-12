@@ -28,7 +28,7 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 
 def _load_member_insight_dependency_entry(data_platform_root: Path = DATA_PLATFORM_ROOT) -> dict[str, Any]:
-    registry = _load_json(data_platform_root / 'directory' / 'capability-dependency-registry.placeholder.json')
+    registry = _load_json(data_platform_root / 'directory' / 'capability-dependency-registry.seed.json')
     for entry in registry['entries']:
         if entry['capability_id'] == VERTICAL_SLICE_CAPABILITY_ID:
             return entry
@@ -135,6 +135,7 @@ def run_member_insight_vertical_slice(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,
             org_id=org_id,
+            requested_business_date=requested_business_date,
             transport_kind=resolved_transport_kind,
         )
         raw_pages_by_endpoint[endpoint_contract_id] = []
@@ -171,6 +172,7 @@ def run_member_insight_vertical_slice(
             transport_replay_artifact = artifact_store.append_transport_replay_artifact(
                 endpoint_run_id=endpoint_run['endpoint_run_id'],
                 endpoint_contract_id=endpoint_contract_id,
+                requested_business_date=requested_business_date,
                 page_index=page_index,
                 replay_artifact=normalized_fetch_result['replay_artifact'],
             )

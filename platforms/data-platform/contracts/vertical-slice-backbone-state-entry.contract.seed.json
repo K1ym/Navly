@@ -1,0 +1,16 @@
+{
+  "contract_name": "vertical_slice_backbone_state_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "state_id",
+    "state_trace_ref",
+    "capability_id",
+    "service_object_id",
+    "requested_business_date",
+    "backbone_status",
+    "available_endpoint_contract_ids",
+    "updated_at"
+  ],
+  "notes": "Diagnostic backbone-state object for the member_insight vertical slice. This remains a bounded owner-scope state object, not a replacement for latest_sync_state."
+}

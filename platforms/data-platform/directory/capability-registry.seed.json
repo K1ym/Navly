@@ -1,6 +1,6 @@
 {
   "registry_name": "capability_registry",
-  "status": "milestone_a_seed",
+  "status": "phase_1_closeout_partial",
   "shared_contract_owner_path": "shared/contracts",
   "entries": [
     {
@@ -8,8 +8,8 @@
       "document_short_name": "store_member_insight",
       "domain": "store",
       "default_service_object_id": "navly.service.store.member_insight",
-      "status": "seeded_not_implemented",
-      "notes": "Phase-1 vertical slice anchor capability."
+      "status": "phase_1_closeout_authoritative",
+      "notes": "Phase-1 closeout authoritative capability for the member insight production slice."
     },
     {
       "capability_id": "navly.store.daily_overview",

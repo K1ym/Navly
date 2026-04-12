@@ -1,16 +1,21 @@
 {
   "contract_name": "raw_response_page_entry",
   "owner": "data-platform",
-  "status": "milestone_b_seed",
+  "status": "phase_1_closeout_contract_frozen",
   "fields": [
     "raw_page_id",
     "run_trace_ref",
     "endpoint_run_id",
     "endpoint_contract_id",
     "page_index",
+    "transport_kind",
+    "replay_artifact_id",
     "request_envelope",
     "response_envelope",
     "response_record_count",
+    "source_response_code",
+    "source_response_message",
     "captured_at"
-  ]
+  ],
+  "notes": "Authoritative source-page truth entry for the PostgreSQL-first closeout path. Page records must remain linked to transport replay artifacts while preserving source response semantics."
 }

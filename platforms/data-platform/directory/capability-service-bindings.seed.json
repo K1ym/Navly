@@ -1,12 +1,12 @@
 {
   "registry_name": "capability_service_binding_registry",
-  "status": "milestone_a_seed",
+  "status": "phase_1_closeout_partial",
   "shared_contract_owner_path": "shared/contracts",
   "entries": [
     {
       "service_object_id": "navly.service.store.member_insight",
       "document_short_name": "store_member_insight",
-      "status": "seeded_not_implemented",
+      "status": "phase_1_closeout_authoritative",
       "capability_id": "navly.store.member_insight",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -40,5 +40,5 @@
       "include_explanation_supported": true
     }
   ],
-  "notes": "Milestone A seed for canonical capability -> service bindings only. Companion explanation objects are intentionally kept out until a dedicated owner-scope registry is introduced."
+  "notes": "Member insight binding is authoritative for the phase-1 closeout slice. Companion explanation objects are intentionally kept out until a dedicated owner-scope registry is introduced."
 }

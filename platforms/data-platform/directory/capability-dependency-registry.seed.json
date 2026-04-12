@@ -1,11 +1,11 @@
 {
   "registry_name": "capability_dependency_registry",
-  "status": "milestone_a_placeholder",
+  "status": "phase_1_closeout_member_insight_authoritative",
   "entries": [
     {
       "capability_id": "navly.store.member_insight",
-      "dependency_status": "vertical_slice_seeded",
-      "notes": "Milestone B first vertical slice dependency seed for member insight backbone.",
+      "dependency_status": "phase_1_closeout_authoritative",
+      "notes": "Phase-1 closeout authoritative dependency matrix for the member insight production slice.",
       "default_service_object_id": "navly.service.store.member_insight",
       "endpoint_contract_ids": [
         "qinqin.member.get_customers_list.v1_1",
@@ -20,18 +20,18 @@
     },
     {
       "capability_id": "navly.store.daily_overview",
-      "dependency_status": "not_yet_expanded",
-      "notes": "Dependency matrix is deferred beyond skeleton creation."
+      "dependency_status": "deferred_not_implemented",
+      "notes": "Dependency matrix remains deferred beyond the current closeout lane."
     },
     {
       "capability_id": "navly.store.staff_board",
-      "dependency_status": "not_yet_expanded",
-      "notes": "Dependency matrix is deferred beyond skeleton creation."
+      "dependency_status": "deferred_not_implemented",
+      "notes": "Dependency matrix remains deferred beyond the current closeout lane."
     },
     {
       "capability_id": "navly.store.finance_summary",
-      "dependency_status": "not_yet_expanded",
-      "notes": "Dependency matrix is deferred beyond skeleton creation."
+      "dependency_status": "deferred_not_implemented",
+      "notes": "Dependency matrix remains deferred beyond the current closeout lane."
     }
   ],
   "shared_contract_owner_path": "shared/contracts"

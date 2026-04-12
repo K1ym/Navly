@@ -16,6 +16,9 @@
 - theme service query wiring（消费 service truth）
 - owner-side auth/data adapter closure（可消费真实 owner surface）
   - `member_insight` 默认不再消费内部 summary/backbone shape，而是消费 data-platform formal owner-side readiness / theme service surface
+  - 当提供 `state_snapshot_path` 时，owner-side data adapter 可直接消费 persisted owner surface，而不是重新触发 vertical slice sync
+  - `state_snapshot_path` 可来自 nightly worker path，也可来自 transitional artifact bridge
+  - persisted readiness 存在但 service projection 缺失时，theme service 必须 fail closed 为 `not_ready`
 - `runtime_result_envelope` 主路径闭合（answered / fallback / escalated / rejected / runtime_error）
 - `runtime_outcome_event` 对齐输出
 - Milestone A/B 自检脚本与最小链路测试
