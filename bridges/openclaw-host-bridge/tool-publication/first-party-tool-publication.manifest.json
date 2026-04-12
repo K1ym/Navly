@@ -1,0 +1,492 @@
+{
+  "object_name": "tool_publication_manifest",
+  "object_scope": "bridge_local",
+  "publication_version": "phase1-first-party-closeout",
+  "generated_from": {
+    "capability_registry_path": "platforms/data-platform/directory/capability-registry.seed.json",
+    "capability_service_binding_path": "platforms/data-platform/directory/capability-service-bindings.seed.json",
+    "auth_capability_vocabulary_path": "platforms/auth-kernel/policy-catalog/capability-vocabulary.seed.json",
+    "host_skill_surface_path": "bridges/openclaw-host-bridge/tool-publication/host-skill-surface.seed.json",
+    "host_tool_surface_path": "bridges/openclaw-host-bridge/tool-publication/host-tool-surface.seed.json"
+  },
+  "skill_count": 7,
+  "tool_count": 10,
+  "skills": [
+    {
+      "skill_id": "navly-store-daily-overview",
+      "display_name": "Navly Store Daily Overview",
+      "tool_names": [
+        "navly_daily_overview"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager_or_staff",
+      "published_tool_count": 1
+    },
+    {
+      "skill_id": "navly-store-member-insight",
+      "display_name": "Navly Store Member Insight",
+      "tool_names": [
+        "navly_member_insight"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager_or_staff",
+      "published_tool_count": 1
+    },
+    {
+      "skill_id": "navly-store-finance-summary",
+      "display_name": "Navly Store Finance Summary",
+      "tool_names": [
+        "navly_finance_summary"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager",
+      "published_tool_count": 1
+    },
+    {
+      "skill_id": "navly-store-staff-board",
+      "display_name": "Navly Store Staff Board",
+      "tool_names": [
+        "navly_staff_board"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager",
+      "published_tool_count": 1
+    },
+    {
+      "skill_id": "navly-capability-explain",
+      "display_name": "Navly Capability Explain",
+      "tool_names": [
+        "navly_explain_unavailable"
+      ],
+      "host_agent_id": "main",
+      "surface_kind": "business",
+      "user_group": "store_manager_or_staff",
+      "published_tool_count": 1
+    },
+    {
+      "skill_id": "navly-sync-ops",
+      "display_name": "Navly Sync Ops",
+      "tool_names": [
+        "navly_sync_status",
+        "navly_backfill_status",
+        "navly_rerun_sync",
+        "navly_trigger_backfill"
+      ],
+      "host_agent_id": "ops",
+      "surface_kind": "operator",
+      "user_group": "operator_or_admin",
+      "published_tool_count": 4
+    },
+    {
+      "skill_id": "navly-data-quality",
+      "display_name": "Navly Data Quality",
+      "tool_names": [
+        "navly_quality_report"
+      ],
+      "host_agent_id": "ops",
+      "surface_kind": "operator",
+      "user_group": "operator_or_admin",
+      "published_tool_count": 1
+    }
+  ],
+  "tools": [
+    {
+      "tool_name": "navly_daily_overview",
+      "skill_ids": [
+        "navly-store-daily-overview"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "operator_only": false,
+      "capability_id": "navly.store.daily_overview",
+      "service_object_id": "navly.service.store.daily_overview",
+      "capability_status": "implemented_phase1_aggregate",
+      "service_binding_status": "implemented_phase1_aggregate",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation",
+        "comparison_mode"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.store.daily_overview",
+        "requested_service_object_id": "navly.service.store.daily_overview"
+      }
+    },
+    {
+      "tool_name": "navly_member_insight",
+      "skill_ids": [
+        "navly-store-member-insight"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "operator_only": false,
+      "capability_id": "navly.store.member_insight",
+      "service_object_id": "navly.service.store.member_insight",
+      "capability_status": "implemented_phase1_owner_surface",
+      "service_binding_status": "implemented_phase1_owner_surface",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.store.member_insight",
+        "requested_service_object_id": "navly.service.store.member_insight"
+      }
+    },
+    {
+      "tool_name": "navly_finance_summary",
+      "skill_ids": [
+        "navly-store-finance-summary"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "operator_only": false,
+      "capability_id": "navly.store.finance_summary",
+      "service_object_id": "navly.service.store.finance_summary",
+      "capability_status": "implemented_phase1_owner_surface",
+      "service_binding_status": "implemented_phase1_owner_surface",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation",
+        "comparison_mode"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.store.finance_summary",
+        "requested_service_object_id": "navly.service.store.finance_summary"
+      }
+    },
+    {
+      "tool_name": "navly_staff_board",
+      "skill_ids": [
+        "navly-store-staff-board"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "operator_only": false,
+      "capability_id": "navly.store.staff_board",
+      "service_object_id": "navly.service.store.staff_board",
+      "capability_status": "implemented_phase1_owner_surface",
+      "service_binding_status": "implemented_phase1_owner_surface",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation",
+        "comparison_mode"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.store.staff_board",
+        "requested_service_object_id": "navly.service.store.staff_board"
+      }
+    },
+    {
+      "tool_name": "navly_explain_unavailable",
+      "skill_ids": [
+        "navly-capability-explain"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "operator_only": false,
+      "capability_id": "navly.system.capability_explanation",
+      "service_object_id": "navly.service.system.capability_explanation",
+      "capability_status": "implemented_phase1_fallback_surface",
+      "service_binding_status": "implemented_phase1_fallback_surface",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "include_explanation"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.system.capability_explanation",
+        "requested_service_object_id": "navly.service.system.capability_explanation"
+      }
+    },
+    {
+      "tool_name": "navly_sync_status",
+      "skill_ids": [
+        "navly-sync-ops"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "operator_only": true,
+      "capability_id": "navly.ops.sync_status",
+      "service_object_id": "navly.service.ops.sync_status",
+      "capability_status": "published_not_ready_operator_surface",
+      "service_binding_status": "published_not_ready_operator_surface",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.ops.sync_status",
+        "requested_service_object_id": "navly.service.ops.sync_status"
+      }
+    },
+    {
+      "tool_name": "navly_backfill_status",
+      "skill_ids": [
+        "navly-sync-ops"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "operator_only": true,
+      "capability_id": "navly.ops.backfill_status",
+      "service_object_id": "navly.service.ops.backfill_status",
+      "capability_status": "published_not_ready_operator_surface",
+      "service_binding_status": "published_not_ready_operator_surface",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "backfill_from",
+        "backfill_to",
+        "include_explanation"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.ops.backfill_status",
+        "requested_service_object_id": "navly.service.ops.backfill_status"
+      }
+    },
+    {
+      "tool_name": "navly_rerun_sync",
+      "skill_ids": [
+        "navly-sync-ops"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "operator_only": true,
+      "capability_id": "navly.ops.sync_rerun",
+      "service_object_id": "navly.service.ops.sync_rerun",
+      "capability_status": "published_not_ready_operator_surface",
+      "service_binding_status": "published_not_ready_operator_surface",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "rerun_mode",
+        "include_explanation"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.ops.sync_rerun",
+        "requested_service_object_id": "navly.service.ops.sync_rerun"
+      }
+    },
+    {
+      "tool_name": "navly_trigger_backfill",
+      "skill_ids": [
+        "navly-sync-ops"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "operator_only": true,
+      "capability_id": "navly.ops.sync_backfill",
+      "service_object_id": "navly.service.ops.sync_backfill",
+      "capability_status": "published_not_ready_operator_surface",
+      "service_binding_status": "published_not_ready_operator_surface",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "backfill_from",
+        "backfill_to",
+        "include_explanation"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.ops.sync_backfill",
+        "requested_service_object_id": "navly.service.ops.sync_backfill"
+      }
+    },
+    {
+      "tool_name": "navly_quality_report",
+      "skill_ids": [
+        "navly-data-quality"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "operator_only": true,
+      "capability_id": "navly.ops.quality_report",
+      "service_object_id": "navly.service.ops.quality_report",
+      "capability_status": "published_not_ready_operator_surface",
+      "service_binding_status": "published_not_ready_operator_surface",
+      "capability_kind": "data_read",
+      "owner_module": "runtime",
+      "required_context_fields": [
+        "request_id",
+        "trace_ref",
+        "access_context_envelope",
+        "decision_ref"
+      ],
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "include_explanation"
+      ],
+      "runtime_handoff": {
+        "requested_capability_id": "navly.ops.quality_report",
+        "requested_service_object_id": "navly.service.ops.quality_report"
+      }
+    }
+  ],
+  "host_tool_registrations": [
+    {
+      "tool_name": "navly_daily_overview",
+      "capability_id": "navly.store.daily_overview",
+      "service_object_id": "navly.service.store.daily_overview",
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    },
+    {
+      "tool_name": "navly_member_insight",
+      "capability_id": "navly.store.member_insight",
+      "service_object_id": "navly.service.store.member_insight",
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    },
+    {
+      "tool_name": "navly_finance_summary",
+      "capability_id": "navly.store.finance_summary",
+      "service_object_id": "navly.service.store.finance_summary",
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    },
+    {
+      "tool_name": "navly_staff_board",
+      "capability_id": "navly.store.staff_board",
+      "service_object_id": "navly.service.store.staff_board",
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    },
+    {
+      "tool_name": "navly_explain_unavailable",
+      "capability_id": "navly.system.capability_explanation",
+      "service_object_id": "navly.service.system.capability_explanation",
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    },
+    {
+      "tool_name": "navly_sync_status",
+      "capability_id": "navly.ops.sync_status",
+      "service_object_id": "navly.service.ops.sync_status",
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    },
+    {
+      "tool_name": "navly_backfill_status",
+      "capability_id": "navly.ops.backfill_status",
+      "service_object_id": "navly.service.ops.backfill_status",
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    },
+    {
+      "tool_name": "navly_rerun_sync",
+      "capability_id": "navly.ops.sync_rerun",
+      "service_object_id": "navly.service.ops.sync_rerun",
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    },
+    {
+      "tool_name": "navly_trigger_backfill",
+      "capability_id": "navly.ops.sync_backfill",
+      "service_object_id": "navly.service.ops.sync_backfill",
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    },
+    {
+      "tool_name": "navly_quality_report",
+      "capability_id": "navly.ops.quality_report",
+      "service_object_id": "navly.service.ops.quality_report",
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "registration_status": "ready"
+    }
+  ]
+}

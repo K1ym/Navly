@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertMatchesSharedPattern, sharedPatterns } from '../contracts/shared-contract-alignment.mjs';
+import { mergeArrayByKey, readOptionalOverrideSeed } from '../local-overrides/seed-override-loader.mjs';
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -16,16 +17,29 @@ function aliasLookupKey(aliasNamespace, aliasValue) {
 export function loadActorRegistryBackbone() {
   const actorRegistrySeed = readJsonSeed('actor-registry.seed.json');
   const identityAliasRegistrySeed = readJsonSeed('identity-alias-registry.seed.json');
+  const actorRegistryOverride = readOptionalOverrideSeed('actor-registry.override.json');
+  const identityAliasRegistryOverride = readOptionalOverrideSeed('identity-alias-registry.override.json');
+
+  const actors = mergeArrayByKey(
+    actorRegistrySeed.actors ?? [],
+    actorRegistryOverride?.actors ?? [],
+    (entry) => entry.actor_ref,
+  );
+  const aliases = mergeArrayByKey(
+    identityAliasRegistrySeed.aliases ?? [],
+    identityAliasRegistryOverride?.aliases ?? [],
+    (entry) => `${entry.alias_namespace}:${entry.alias_value}`,
+  );
 
   const actorsByRef = new Map();
-  for (const actor of actorRegistrySeed.actors ?? []) {
+  for (const actor of actors) {
     assertMatchesSharedPattern('actor_ref', actor.actor_ref, sharedPatterns.actorRef);
     assertMatchesSharedPattern('tenant_ref', actor.tenant_ref, sharedPatterns.tenantRef);
     actorsByRef.set(actor.actor_ref, actor);
   }
 
   const aliasLookup = new Map();
-  for (const alias of identityAliasRegistrySeed.aliases ?? []) {
+  for (const alias of aliases) {
     const key = aliasLookupKey(alias.alias_namespace, alias.alias_value);
     const existing = aliasLookup.get(key) ?? [];
     existing.push(alias);
@@ -34,7 +48,7 @@ export function loadActorRegistryBackbone() {
 
   return {
     actorsByRef,
-    aliases: identityAliasRegistrySeed.aliases ?? [],
+    aliases,
     aliasLookup,
   };
 }

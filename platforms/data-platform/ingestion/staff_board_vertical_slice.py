@@ -254,6 +254,7 @@ def run_staff_board_vertical_slice(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,
             org_id=org_id,
+            requested_business_date=requested_business_date,
             transport_kind=resolved_transport_kind,
         )
         raw_pages_by_endpoint[endpoint_contract_id] = []
@@ -292,6 +293,7 @@ def run_staff_board_vertical_slice(
             transport_replay_artifact = artifact_store.append_transport_replay_artifact(
                 endpoint_run_id=endpoint_run['endpoint_run_id'],
                 endpoint_contract_id=endpoint_contract_id,
+                requested_business_date=requested_business_date,
                 page_index=page_index,
                 replay_artifact=normalized_fetch_result['replay_artifact'],
             )
@@ -386,7 +388,12 @@ def run_staff_board_vertical_slice(
 
             if uses_pagination:
                 total = _pagination_total(response_envelope, response_record_count)
-                current_page_size = int(request_envelope['payload'][registry.preferred_wire_name('page_size')])
+                current_page_size = int(
+                    request_envelope['payload'].get(registry.preferred_wire_name('page_size'))
+                    or request_envelope['payload'].get('PageSize')
+                    or request_envelope['payload'].get('page_size')
+                    or page_size
+                )
                 if total > page_index * current_page_size:
                     page_index += 1
                     continue

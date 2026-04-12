@@ -16,6 +16,8 @@
 - session_grant_snapshot closure
 - access_context_envelope owner-side consumption mapping
 - audit_event_ledger / decision_trace_view / downstream outcome linkage skeleton
+- optional local override layer for production actor / alias / role / scope mapping
+  - default override dir: `/etc/navly/auth-kernel`
 - milestone A / B 自检脚本与 phase-1 backbone tests
 
 本轮**不**实现：

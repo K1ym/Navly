@@ -37,25 +37,7 @@
         "navly.service.store.daily_overview",
         "navly.service.system.capability_explanation"
       ],
-      "status": "implemented_phase_1_store_surface"
-    },
-    {
-      "route_id": "capability.navly.store.staff_board",
-      "match_mode": "explicit_or_match_tokens",
-      "match_tokens": [
-        "staff_board",
-        "store_staff_board",
-        "staff board",
-        "员工看板",
-        "员工情况"
-      ],
-      "capability_id": "navly.store.staff_board",
-      "default_service_object_id": "navly.service.store.staff_board",
-      "supported_service_object_ids": [
-        "navly.service.store.staff_board",
-        "navly.service.system.capability_explanation"
-      ],
-      "status": "implemented_phase_1_store_surface"
+      "status": "implemented_phase1_aggregate"
     },
     {
       "route_id": "capability.navly.store.finance_summary",
@@ -65,7 +47,8 @@
         "store_finance_summary",
         "finance summary",
         "财务汇总",
-        "营收汇总"
+        "充值汇总",
+        "流水汇总"
       ],
       "capability_id": "navly.store.finance_summary",
       "default_service_object_id": "navly.service.store.finance_summary",
@@ -73,7 +56,117 @@
         "navly.service.store.finance_summary",
         "navly.service.system.capability_explanation"
       ],
-      "status": "implemented_phase_1_store_surface"
+      "status": "implemented_phase1_owner_surface"
+    },
+    {
+      "route_id": "capability.navly.store.staff_board",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "staff_board",
+        "store_staff_board",
+        "staff board",
+        "员工看板",
+        "技师看板"
+      ],
+      "capability_id": "navly.store.staff_board",
+      "default_service_object_id": "navly.service.store.staff_board",
+      "supported_service_object_ids": [
+        "navly.service.store.staff_board",
+        "navly.service.system.capability_explanation"
+      ],
+      "status": "implemented_phase1_owner_surface"
+    },
+    {
+      "route_id": "capability.navly.system.capability_explanation",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "capability_explanation",
+        "capability explanation",
+        "解释不可用",
+        "为什么答不了",
+        "缺数解释"
+      ],
+      "capability_id": "navly.system.capability_explanation",
+      "default_service_object_id": "navly.service.system.capability_explanation",
+      "supported_service_object_ids": [
+        "navly.service.system.capability_explanation"
+      ],
+      "status": "implemented_phase1_fallback_surface"
+    },
+    {
+      "route_id": "capability.navly.ops.sync_status",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "sync_status",
+        "sync status",
+        "同步状态"
+      ],
+      "capability_id": "navly.ops.sync_status",
+      "default_service_object_id": "navly.service.ops.sync_status",
+      "supported_service_object_ids": [
+        "navly.service.ops.sync_status"
+      ],
+      "status": "published_not_ready_operator_surface"
+    },
+    {
+      "route_id": "capability.navly.ops.backfill_status",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "backfill_status",
+        "backfill status",
+        "补数状态"
+      ],
+      "capability_id": "navly.ops.backfill_status",
+      "default_service_object_id": "navly.service.ops.backfill_status",
+      "supported_service_object_ids": [
+        "navly.service.ops.backfill_status"
+      ],
+      "status": "published_not_ready_operator_surface"
+    },
+    {
+      "route_id": "capability.navly.ops.sync_rerun",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "sync_rerun",
+        "rerun sync",
+        "重跑同步"
+      ],
+      "capability_id": "navly.ops.sync_rerun",
+      "default_service_object_id": "navly.service.ops.sync_rerun",
+      "supported_service_object_ids": [
+        "navly.service.ops.sync_rerun"
+      ],
+      "status": "published_not_ready_operator_surface"
+    },
+    {
+      "route_id": "capability.navly.ops.sync_backfill",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "sync_backfill",
+        "trigger backfill",
+        "触发补数"
+      ],
+      "capability_id": "navly.ops.sync_backfill",
+      "default_service_object_id": "navly.service.ops.sync_backfill",
+      "supported_service_object_ids": [
+        "navly.service.ops.sync_backfill"
+      ],
+      "status": "published_not_ready_operator_surface"
+    },
+    {
+      "route_id": "capability.navly.ops.quality_report",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "quality_report",
+        "quality report",
+        "质量报告"
+      ],
+      "capability_id": "navly.ops.quality_report",
+      "default_service_object_id": "navly.service.ops.quality_report",
+      "supported_service_object_ids": [
+        "navly.service.ops.quality_report"
+      ],
+      "status": "published_not_ready_operator_surface"
     }
   ],
   "default_fallback": {
@@ -83,5 +176,5 @@
     "fallback_capability_id": "navly.system.capability_explanation",
     "fallback_service_object_id": "navly.service.system.capability_explanation"
   },
-  "notes": "Phase-1 runtime surface closes member_insight, daily_overview, staff_board, and finance_summary while allowing the companion capability_explanation service binding when the capability is explicit."
+  "notes": "Phase-1 host closeout route registry: manager-facing owner/service surfaces resolve through formal owner surfaces, while operator-facing publication remains structured pending."
 }
