@@ -94,7 +94,7 @@ test('first-party live handoff closes manager daily overview into runtime execut
   assert.ok(result.host_dispatch_result.trace_refs.includes(result.runtime_pipeline.runtime_result_envelope.runtime_trace_ref));
 });
 
-test('first-party live handoff exposes manager finance summary as structured fallback when owner surface is not ready', async () => {
+test('first-party live handoff closes manager finance summary into runtime execution and host dispatch', async () => {
   const result = await runFirstPartyLiveHostTool({
     toolName: 'navly_finance_summary',
     rawHostIngress: buildRawHostIngress({
@@ -118,11 +118,11 @@ test('first-party live handoff exposes manager finance summary as structured fal
   });
 
   assert.equal(result.live_access_chain.access_decision.decision_status, 'allow');
-  assert.equal(result.runtime_pipeline.runtime_result_envelope.result_status, 'fallback');
-  assert.ok(result.runtime_pipeline.runtime_result_envelope.reason_codes.includes('owner_surface_pending'));
+  assert.equal(result.runtime_pipeline.runtime_result_envelope.result_status, 'answered');
+  assert.equal(result.runtime_pipeline.runtime_result_envelope.selected_service_object_id, 'navly.service.store.finance_summary');
   assert.equal(result.host_dispatch_result.dispatch_status, 'ready_for_runtime_dispatch');
-  assert.equal(result.host_dispatch_result.reply_blocks[0].fragment_type, 'guarded_execution');
-  assert.ok(result.host_dispatch_result.reply_blocks[0].reason_codes.includes('owner_surface_pending'));
+  assert.equal(result.host_dispatch_result.reply_blocks[0].fragment_type, 'service_object');
+  assert.equal(result.host_dispatch_result.reply_blocks[0].service_object.capability_id, 'navly.store.finance_summary');
 });
 
 test('agent selection remains host isolation only and cannot substitute for finance access truth', async () => {
@@ -162,4 +162,3 @@ test('agent selection remains host isolation only and cannot substitute for fina
   assert.equal(result.runtime_pipeline, null);
   assert.equal(result.gate0_enforcement.enforcement_status, 'blocked_missing_access_context');
 });
-

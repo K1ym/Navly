@@ -19,27 +19,27 @@ class ServiceSurfaceRegistryTest(unittest.TestCase):
         cls.contract_ownership = _load_json(DATA_PLATFORM_ROOT / 'contracts' / 'contract-ownership.seed.json')
 
     def test_phase_one_store_capabilities_mark_owner_surfaces_as_published(self) -> None:
-        self.assertEqual(self.capability_registry['status'], 'phase_1_owner_surface_published')
+        self.assertEqual(self.capability_registry['status'], 'phase_1_host_closeout')
         statuses_by_capability = {
             entry['capability_id']: entry['status']
             for entry in self.capability_registry['entries']
         }
-        self.assertEqual(statuses_by_capability['navly.store.member_insight'], 'owner_surface_published')
-        self.assertEqual(statuses_by_capability['navly.store.daily_overview'], 'owner_surface_published')
-        self.assertEqual(statuses_by_capability['navly.store.staff_board'], 'owner_surface_published')
-        self.assertEqual(statuses_by_capability['navly.store.finance_summary'], 'owner_surface_published')
+        self.assertEqual(statuses_by_capability['navly.store.member_insight'], 'implemented_phase1_owner_surface')
+        self.assertEqual(statuses_by_capability['navly.store.daily_overview'], 'implemented_phase1_aggregate')
+        self.assertEqual(statuses_by_capability['navly.store.staff_board'], 'implemented_phase1_owner_surface')
+        self.assertEqual(statuses_by_capability['navly.store.finance_summary'], 'implemented_phase1_owner_surface')
 
     def test_phase_one_default_service_bindings_are_published(self) -> None:
-        self.assertEqual(self.service_bindings['status'], 'phase_1_owner_surface_published')
+        self.assertEqual(self.service_bindings['status'], 'phase_1_host_closeout')
         statuses_by_service_object = {
             entry['service_object_id']: entry['status']
             for entry in self.service_bindings['entries']
         }
-        self.assertEqual(statuses_by_service_object['navly.service.store.member_insight'], 'owner_surface_published')
-        self.assertEqual(statuses_by_service_object['navly.service.store.daily_overview'], 'owner_surface_published')
-        self.assertEqual(statuses_by_service_object['navly.service.store.staff_board'], 'owner_surface_published')
-        self.assertEqual(statuses_by_service_object['navly.service.store.finance_summary'], 'owner_surface_published')
-        self.assertIn('companion explanation object', self.service_bindings['notes'])
+        self.assertEqual(statuses_by_service_object['navly.service.store.member_insight'], 'implemented_phase1_owner_surface')
+        self.assertEqual(statuses_by_service_object['navly.service.store.daily_overview'], 'implemented_phase1_aggregate')
+        self.assertEqual(statuses_by_service_object['navly.service.store.staff_board'], 'implemented_phase1_owner_surface')
+        self.assertEqual(statuses_by_service_object['navly.service.store.finance_summary'], 'implemented_phase1_owner_surface')
+        self.assertIn('phase-1 host closeout', self.service_bindings['notes'].lower())
 
     def test_contract_ownership_tracks_shared_explanation_object_dependency(self) -> None:
         self.assertIn('capability_explanation_object', self.contract_ownership['shared_contract_dependencies'])

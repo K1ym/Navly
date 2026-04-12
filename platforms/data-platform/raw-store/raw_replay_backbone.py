@@ -20,6 +20,9 @@ def build_run_trace_ref(run_type: str, run_id: str) -> str:
 class IngestionRunRecord:
     ingestion_run_id: str
     run_trace_ref: str
+    scheduler_trace_ref: str | None
+    workflow_id: str | None
+    task_kind: str
     capability_id: str
     service_object_id: str
     source_system_id: str
@@ -40,11 +43,11 @@ class EndpointRunRecord:
     ingestion_run_id: str
     endpoint_contract_id: str
     org_id: str
+    requested_business_date: str
     transport_kind: str
     endpoint_status: str
     page_count: int
     record_count: int
-    terminal_outcome_category: str | None
     started_at: str
     completed_at: str | None
     error_taxonomy: str | None
@@ -74,9 +77,10 @@ class RawResponsePageRecord:
 @dataclass
 class TransportReplayArtifactRecord:
     replay_artifact_id: str
-    run_trace_ref: str
+    replay_trace_ref: str
     endpoint_run_id: str
     endpoint_contract_id: str
+    requested_business_date: str
     page_index: int
     transport_kind: str
     transport_outcome: str
@@ -114,11 +118,17 @@ class VerticalSliceArtifactStore:
         window_start_at: str,
         window_end_at: str,
         transport_kind: str,
+        scheduler_trace_ref: str | None = None,
+        workflow_id: str | None = None,
+        task_kind: str = 'ad_hoc_diagnostic',
     ) -> dict[str, Any]:
         ingestion_run_id = f'ir_{uuid.uuid4().hex[:12]}'
         record = IngestionRunRecord(
             ingestion_run_id=ingestion_run_id,
             run_trace_ref=build_run_trace_ref('ingestion-run', ingestion_run_id),
+            scheduler_trace_ref=scheduler_trace_ref,
+            workflow_id=workflow_id,
+            task_kind=task_kind,
             capability_id=capability_id,
             service_object_id=service_object_id,
             source_system_id=source_system_id,
@@ -148,6 +158,7 @@ class VerticalSliceArtifactStore:
         ingestion_run_id: str,
         endpoint_contract_id: str,
         org_id: str,
+        requested_business_date: str,
         transport_kind: str,
     ) -> dict[str, Any]:
         endpoint_run_id = f'er_{uuid.uuid4().hex[:12]}'
@@ -157,11 +168,11 @@ class VerticalSliceArtifactStore:
             ingestion_run_id=ingestion_run_id,
             endpoint_contract_id=endpoint_contract_id,
             org_id=org_id,
+            requested_business_date=requested_business_date,
             transport_kind=transport_kind,
             endpoint_status='running',
             page_count=0,
             record_count=0,
-            terminal_outcome_category=None,
             started_at=utcnow_iso(),
             completed_at=None,
             error_taxonomy=None,
@@ -180,7 +191,6 @@ class VerticalSliceArtifactStore:
         endpoint_status: str,
         page_count: int,
         record_count: int,
-        terminal_outcome_category: str | None = None,
         error_taxonomy: str | None = None,
         error_code: str | None = None,
         error_message: str | None = None,
@@ -192,7 +202,6 @@ class VerticalSliceArtifactStore:
                 record['endpoint_status'] = endpoint_status
                 record['page_count'] = page_count
                 record['record_count'] = record_count
-                record['terminal_outcome_category'] = terminal_outcome_category
                 record['completed_at'] = utcnow_iso()
                 record['error_taxonomy'] = error_taxonomy
                 record['error_code'] = error_code
@@ -207,15 +216,17 @@ class VerticalSliceArtifactStore:
         *,
         endpoint_run_id: str,
         endpoint_contract_id: str,
+        requested_business_date: str,
         page_index: int,
         replay_artifact: Mapping[str, Any],
     ) -> dict[str, Any]:
         replay_artifact_id = f'ra_{uuid.uuid4().hex[:12]}'
         record = TransportReplayArtifactRecord(
             replay_artifact_id=replay_artifact_id,
-            run_trace_ref=build_run_trace_ref('replay-artifact', replay_artifact_id),
+            replay_trace_ref=build_run_trace_ref('replay-artifact', replay_artifact_id),
             endpoint_run_id=endpoint_run_id,
             endpoint_contract_id=endpoint_contract_id,
+            requested_business_date=requested_business_date,
             page_index=page_index,
             transport_kind=str(replay_artifact.get('transport_kind') or 'unknown'),
             transport_outcome=str(replay_artifact.get('transport_outcome') or 'unknown'),

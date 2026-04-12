@@ -31,6 +31,24 @@ const RUNTIME_RESULT_SCHEMA_REF = 'shared/contracts/interaction/runtime_result_e
 const EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
 const EXPLANATION_CAPABILITY_ID = 'navly.system.capability_explanation';
 
+const PUBLISHED_CAPABILITY_STATUSES = new Set([
+  'owner_surface_published',
+  'implemented_owner_surface',
+  'implemented_host_surface',
+  'implemented_phase1_owner_surface',
+  'implemented_phase1_aggregate',
+  'implemented_phase1_fallback_surface',
+]);
+
+const PUBLISHED_BINDING_STATUSES = new Set([
+  'owner_surface_published',
+  'implemented_owner_surface',
+  'implemented_host_surface',
+  'implemented_phase1_owner_surface',
+  'implemented_phase1_aggregate',
+  'implemented_phase1_fallback_surface',
+]);
+
 async function readJson(filePath) {
   return JSON.parse(await fs.readFile(filePath, 'utf8'));
 }
@@ -111,12 +129,20 @@ function buildExplanationCapabilityTool(publicationVersion) {
   });
 }
 
+function isPublishedCapabilityStatus(status) {
+  return PUBLISHED_CAPABILITY_STATUSES.has(String(status ?? '').trim());
+}
+
+function isPublishedBindingStatus(status) {
+  return PUBLISHED_BINDING_STATUSES.has(String(status ?? '').trim());
+}
+
 function resolvePublishedBindingForCapability({
   capabilityEntry,
   serviceBindings,
 }) {
   const publishedBindings = (serviceBindings.entries ?? []).filter((entry) => (
-    entry.status === 'owner_surface_published'
+    isPublishedBindingStatus(entry.status)
     && entry.capability_id === capabilityEntry.capability_id
   ));
 
@@ -146,7 +172,7 @@ async function loadPublishedCapabilityToolEntries({
   const serviceBindings = await readJson(serviceBindingsPath);
 
   return (capabilityRegistry.entries ?? [])
-    .filter((entry) => entry.status === 'owner_surface_published')
+    .filter((entry) => isPublishedCapabilityStatus(entry.status))
     .map((entry) => {
       const binding = resolvePublishedBindingForCapability({
         capabilityEntry: entry,
