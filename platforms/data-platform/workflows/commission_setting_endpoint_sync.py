@@ -111,6 +111,7 @@ def run_commission_setting_endpoint_sync(
         ingestion_run_id=ingestion_run['ingestion_run_id'],
         endpoint_contract_id=COMMISSION_SETTING_ENDPOINT_ID,
         org_id=org_id,
+        requested_business_date=requested_business_date,
         transport_kind=resolved_transport_kind,
     )
 
@@ -140,6 +141,7 @@ def run_commission_setting_endpoint_sync(
     transport_replay_artifact = artifact_store.append_transport_replay_artifact(
         endpoint_run_id=endpoint_run['endpoint_run_id'],
         endpoint_contract_id=COMMISSION_SETTING_ENDPOINT_ID,
+        requested_business_date=requested_business_date,
         page_index=1,
         replay_artifact=normalized_fetch_result['replay_artifact'],
     )

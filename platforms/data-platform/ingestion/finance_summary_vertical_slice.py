@@ -260,6 +260,7 @@ def run_finance_summary_vertical_slice(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,
             org_id=org_id,
+            requested_business_date=requested_business_date,
             transport_kind=resolved_transport_kind,
         )
         raw_pages_by_endpoint[endpoint_contract_id] = []
@@ -300,6 +301,7 @@ def run_finance_summary_vertical_slice(
             transport_replay_artifact = artifact_store.append_transport_replay_artifact(
                 endpoint_run_id=endpoint_run['endpoint_run_id'],
                 endpoint_contract_id=endpoint_contract_id,
+                requested_business_date=requested_business_date,
                 page_index=page_index,
                 replay_artifact=normalized_fetch_result['replay_artifact'],
             )
@@ -422,7 +424,12 @@ def run_finance_summary_vertical_slice(
                 continue
 
             if uses_pagination:
-                current_page_size = int(request_envelope['payload'][page_size_wire])
+                current_page_size = int(
+                    request_envelope['payload'].get(page_size_wire)
+                    or request_envelope['payload'].get('PageSize')
+                    or request_envelope['payload'].get('page_size')
+                    or page_size
+                )
                 has_more_pages = response_total > (page_index * current_page_size)
                 if has_more_pages:
                     page_index += 1

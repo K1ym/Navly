@@ -48,6 +48,7 @@ class EndpointRunRecord:
     endpoint_status: str
     page_count: int
     record_count: int
+    terminal_outcome_category: str | None
     started_at: str
     completed_at: str | None
     error_taxonomy: str | None
@@ -173,6 +174,7 @@ class VerticalSliceArtifactStore:
             endpoint_status='running',
             page_count=0,
             record_count=0,
+            terminal_outcome_category=None,
             started_at=utcnow_iso(),
             completed_at=None,
             error_taxonomy=None,
@@ -191,6 +193,7 @@ class VerticalSliceArtifactStore:
         endpoint_status: str,
         page_count: int,
         record_count: int,
+        terminal_outcome_category: str | None = None,
         error_taxonomy: str | None = None,
         error_code: str | None = None,
         error_message: str | None = None,
@@ -202,6 +205,7 @@ class VerticalSliceArtifactStore:
                 record['endpoint_status'] = endpoint_status
                 record['page_count'] = page_count
                 record['record_count'] = record_count
+                record['terminal_outcome_category'] = terminal_outcome_category
                 record['completed_at'] = utcnow_iso()
                 record['error_taxonomy'] = error_taxonomy
                 record['error_code'] = error_code

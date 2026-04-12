@@ -16,7 +16,8 @@
       "capability_id": "navly.store.member_insight",
       "default_service_object_id": "navly.service.store.member_insight",
       "supported_service_object_ids": [
-        "navly.service.store.member_insight"
+        "navly.service.store.member_insight",
+        "navly.service.system.capability_explanation"
       ],
       "status": "implemented_milestone_b_primary"
     },
@@ -33,7 +34,8 @@
       "capability_id": "navly.store.daily_overview",
       "default_service_object_id": "navly.service.store.daily_overview",
       "supported_service_object_ids": [
-        "navly.service.store.daily_overview"
+        "navly.service.store.daily_overview",
+        "navly.service.system.capability_explanation"
       ],
       "status": "implemented_phase1_aggregate"
     },
@@ -51,7 +53,8 @@
       "capability_id": "navly.store.finance_summary",
       "default_service_object_id": "navly.service.store.finance_summary",
       "supported_service_object_ids": [
-        "navly.service.store.finance_summary"
+        "navly.service.store.finance_summary",
+        "navly.service.system.capability_explanation"
       ],
       "status": "implemented_phase1_owner_surface"
     },
@@ -68,7 +71,8 @@
       "capability_id": "navly.store.staff_board",
       "default_service_object_id": "navly.service.store.staff_board",
       "supported_service_object_ids": [
-        "navly.service.store.staff_board"
+        "navly.service.store.staff_board",
+        "navly.service.system.capability_explanation"
       ],
       "status": "implemented_phase1_owner_surface"
     },
