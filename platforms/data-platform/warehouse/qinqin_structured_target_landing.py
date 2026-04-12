@@ -164,6 +164,100 @@ def _scalar_parent_context(parent_value: Any) -> dict[str, Any]:
     }
 
 
+def _source_index(source_record_path: str) -> int:
+    if '[' not in source_record_path or ']' not in source_record_path:
+        return 0
+    tail = source_record_path.rsplit('[', 1)[-1].split(']', 1)[0]
+    try:
+        return int(tail)
+    except ValueError:
+        return 0
+
+
+def _enrich_member_insight_canonical_fields(
+    *,
+    target_dataset: str,
+    field_values: dict[str, Any],
+    parent_context: dict[str, Any],
+    source_record_path: str,
+    row_value: Any,
+    endpoint_contract_id: str,
+    requested_business_date: str,
+) -> dict[str, Any]:
+    if target_dataset == 'customer':
+        return {
+            'customer_id': field_values.get('Data__Id'),
+            'org_id': field_values.get('Data__OrgId'),
+            'phone': field_values.get('Data__Phone'),
+            'name': field_values.get('Data__Name'),
+            'stored_amount': field_values.get('Data__StoredAmount'),
+            'consume_amount': field_values.get('Data__ConsumeAmount'),
+            'last_consume_time': field_values.get('Data__LastConsumeTime'),
+            'registered_at': field_values.get('Data__CTime'),
+            'marketer_id': field_values.get('Data__MarketerId'),
+            'marketer_name': field_values.get('Data__MarketerName'),
+            'source_endpoint_contract_id': endpoint_contract_id,
+            'requested_business_date': requested_business_date,
+        }
+    if target_dataset == 'customer_card':
+        return {
+            'customer_card_id': field_values.get('Data__Storeds__Id') or field_values.get('Data__Equitys__Id'),
+            'customer_id': parent_context.get('Id'),
+            'card_group': 'stored_card' if 'Data__Storeds__Id' in field_values else 'equity_card',
+            'org_id': field_values.get('Data__Storeds__OrgId') or field_values.get('Data__Equitys__OrgId'),
+            'card_type_id': field_values.get('Data__Storeds__CardTypeId') or field_values.get('Data__Equitys__CardTypeId'),
+            'card_type_name': field_values.get('Data__Storeds__CardTypeName') or field_values.get('Data__Equitys__CardTypeName'),
+            'card_no': field_values.get('Data__Storeds__CardNo') or field_values.get('Data__Equitys__CardNo'),
+            'balance': field_values.get('Data__Storeds__Balance') or field_values.get('Data__Equitys__Balance'),
+            'total_amount': field_values.get('Data__Storeds__Total') or field_values.get('Data__Equitys__Total'),
+            'consume_amount': field_values.get('Data__Storeds__Consume') or field_values.get('Data__Equitys__Consume'),
+            'opened_at': field_values.get('Data__Storeds__OpenTime') or field_values.get('Data__Equitys__OpenTime'),
+            'expires_at': field_values.get('Data__Storeds__ExpireTime') or field_values.get('Data__Equitys__ExpireTime'),
+            'state': field_values.get('Data__Storeds__State') or field_values.get('Data__Equitys__State'),
+            'source_endpoint_contract_id': endpoint_contract_id,
+            'requested_business_date': requested_business_date,
+        }
+    if target_dataset == 'consume_bill':
+        return {
+            'consume_bill_id': field_values.get('Data__SettleId'),
+            'settle_no': field_values.get('Data__SettleNo'),
+            'org_id': parent_context.get('OrgId') or field_values.get('Data__OrgId'),
+            'consume_amount': field_values.get('Data__Consume'),
+            'pay_amount': field_values.get('Data__Pay'),
+            'discount_amount': field_values.get('Data__DiscountAmount'),
+            'deduction_amount': field_values.get('Data__DeductionAmount'),
+            'ticket_amount': field_values.get('Data__TicketAmount'),
+            'created_at': field_values.get('Data__CTime'),
+            'settled_at': field_values.get('Data__OptTime'),
+            'room_code': field_values.get('Data__RoomCode'),
+            'hand_card_code': field_values.get('Data__HandCardCode'),
+            'operator_code': field_values.get('Data__OptCode'),
+            'operator_name': field_values.get('Data__OptName'),
+            'source_endpoint_contract_id': endpoint_contract_id,
+            'requested_business_date': requested_business_date,
+        }
+    if target_dataset == 'consume_bill_payment':
+        return {
+            'consume_bill_id': parent_context.get('SettleId'),
+            'payment_sequence': _source_index(source_record_path),
+            'payment_name': field_values.get('Data__Payments__Name'),
+            'payment_amount': field_values.get('Data__Payments__Amount'),
+            'payment_type': field_values.get('Data__Payments__PaymentType'),
+            'payment_source': field_values.get('Data__Payments__PyamentSource'),
+            'source_endpoint_contract_id': endpoint_contract_id,
+            'requested_business_date': requested_business_date,
+        }
+    if target_dataset == 'consume_bill_info':
+        return {
+            'consume_bill_id': parent_context.get('SettleId'),
+            'info_sequence': _source_index(source_record_path),
+            'payload': row_value if isinstance(row_value, dict) else {},
+            'source_endpoint_contract_id': endpoint_contract_id,
+            'requested_business_date': requested_business_date,
+        }
+    return {}
+
+
 def _landing_row(
     *,
     page_record: dict[str, Any],
@@ -193,7 +287,8 @@ def _landing_row(
                 field_values[_normalize_field_key(field['field_path'])] = value
 
     source_record_path = row_root['source_path'] if row_root is not None else f"page:{page_record['page_index']}"
-    return {
+    parent_context = _scalar_parent_context(row_root.get('parent_value') if row_root else None)
+    record = {
         'landing_row_id': f"{descriptor['policy_id']}::{page_record['raw_page_id']}::{source_record_path}",
         'source_system_id': SOURCE_SYSTEM_ID,
         'endpoint_contract_id': descriptor['endpoint_contract_id'],
@@ -207,8 +302,20 @@ def _landing_row(
         'source_record_path': source_record_path,
         'parent_source_path': row_root.get('parent_path') if row_root else None,
         'field_values': field_values,
-        'parent_context': _scalar_parent_context(row_root.get('parent_value') if row_root else None),
+        'parent_context': parent_context,
+        **_enrich_member_insight_canonical_fields(
+            target_dataset=descriptor['target_dataset'],
+            field_values=field_values,
+            parent_context=parent_context,
+            source_record_path=source_record_path,
+            row_value=row_root.get('value') if row_root else None,
+            endpoint_contract_id=descriptor['endpoint_contract_id'],
+            requested_business_date=requested_business_date,
+        ),
     }
+    if descriptor['target_dataset'] == 'customer_card' and row_root is None and not field_values:
+        return {}
+    return record
 
 
 def build_qinqin_structured_target_artifacts(
@@ -244,15 +351,15 @@ def build_qinqin_structured_target_artifacts(
                             )
                         )
                     continue
-                target_rows.append(
-                    _landing_row(
-                        page_record=page_record,
-                        descriptor=descriptor,
-                        row_root=None,
-                        org_id=org_id,
-                        requested_business_date=requested_business_date,
-                    )
+                row = _landing_row(
+                    page_record=page_record,
+                    descriptor=descriptor,
+                    row_root=None,
+                    org_id=org_id,
+                    requested_business_date=requested_business_date,
                 )
+                if row:
+                    target_rows.append(row)
 
     return artifacts
 

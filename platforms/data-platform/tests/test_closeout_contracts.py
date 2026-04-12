@@ -93,7 +93,7 @@ class CloseoutContractsTest(unittest.TestCase):
         service_bindings = _load_json(DATA_PLATFORM_ROOT / 'directory' / 'capability-service-bindings.seed.json')
 
         self.assertFalse((DATA_PLATFORM_ROOT / 'directory' / 'capability-dependency-registry.placeholder.json').exists())
-        self.assertEqual(dependency_registry['status'], 'phase_1_closeout_member_insight_authoritative')
+        self.assertEqual(dependency_registry['status'], 'phase_1_owner_surface_dependencies')
 
         dependency_entry = next(
             entry for entry in dependency_registry['entries']
@@ -108,17 +108,17 @@ class CloseoutContractsTest(unittest.TestCase):
             if entry['capability_id'] == 'navly.store.member_insight'
         )
 
-        self.assertEqual(dependency_entry['dependency_status'], 'phase_1_closeout_authoritative')
-        self.assertEqual(capability_entry['status'], 'phase_1_closeout_authoritative')
-        self.assertEqual(binding_entry['status'], 'phase_1_closeout_authoritative')
+        self.assertEqual(dependency_entry['dependency_status'], 'implemented_phase1_owner_surface')
+        self.assertEqual(capability_entry['status'], 'implemented_phase1_owner_surface')
+        self.assertEqual(binding_entry['status'], 'implemented_phase1_owner_surface')
 
     def test_partial_capability_registries_only_mark_member_insight_authoritative(self) -> None:
         dependency_registry = _load_json(DATA_PLATFORM_ROOT / 'directory' / 'capability-dependency-registry.seed.json')
         capability_registry = _load_json(DATA_PLATFORM_ROOT / 'directory' / 'capability-registry.seed.json')
         service_bindings = _load_json(DATA_PLATFORM_ROOT / 'directory' / 'capability-service-bindings.seed.json')
 
-        self.assertEqual(capability_registry['status'], 'phase_1_closeout_partial')
-        self.assertEqual(service_bindings['status'], 'phase_1_closeout_partial')
+        self.assertEqual(capability_registry['status'], 'phase_1_host_closeout')
+        self.assertEqual(service_bindings['status'], 'phase_1_host_closeout')
 
         capability_statuses = {
             entry['capability_id']: entry['status']
@@ -133,18 +133,20 @@ class CloseoutContractsTest(unittest.TestCase):
             for entry in dependency_registry['entries']
         }
 
-        self.assertEqual(capability_statuses['navly.store.member_insight'], 'phase_1_closeout_authoritative')
-        self.assertEqual(binding_statuses['navly.store.member_insight'], 'phase_1_closeout_authoritative')
-        self.assertEqual(dependency_statuses['navly.store.member_insight'], 'phase_1_closeout_authoritative')
-
+        self.assertEqual(capability_statuses['navly.store.member_insight'], 'implemented_phase1_owner_surface')
+        self.assertEqual(binding_statuses['navly.store.member_insight'], 'implemented_phase1_owner_surface')
+        self.assertEqual(dependency_statuses['navly.store.member_insight'], 'implemented_phase1_owner_surface')
+        self.assertEqual(capability_statuses['navly.store.daily_overview'], 'implemented_phase1_aggregate')
+        self.assertEqual(binding_statuses['navly.store.daily_overview'], 'implemented_phase1_aggregate')
+        self.assertEqual(dependency_statuses['navly.store.daily_overview'], 'implemented_phase1_owner_surface')
         for capability_id in (
-            'navly.store.daily_overview',
             'navly.store.staff_board',
             'navly.store.finance_summary',
+            'navly.system.capability_explanation',
         ):
-            self.assertEqual(capability_statuses[capability_id], 'seeded_not_implemented')
-            self.assertEqual(binding_statuses[capability_id], 'seeded_not_implemented')
-            self.assertEqual(dependency_statuses[capability_id], 'deferred_not_implemented')
+            self.assertEqual(capability_statuses[capability_id], 'implemented_phase1_owner_surface' if capability_id != 'navly.system.capability_explanation' else 'implemented_phase1_fallback_surface')
+            self.assertEqual(binding_statuses[capability_id], 'implemented_phase1_owner_surface' if capability_id != 'navly.system.capability_explanation' else 'implemented_phase1_fallback_surface')
+            self.assertEqual(dependency_statuses[capability_id], 'implemented_phase1_owner_surface')
 
     def test_operator_status_report_contracts_match_truth_store_shape(self) -> None:
         sync_report_contract = _load_json(self.contracts_dir / 'operator-sync-status-report-entry.contract.seed.json')

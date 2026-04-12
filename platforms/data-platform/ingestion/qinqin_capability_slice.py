@@ -158,6 +158,7 @@ def run_qinqin_capability_slice(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,
             org_id=org_id,
+            requested_business_date=requested_business_date,
             transport_kind=resolved_transport_kind,
         )
         raw_pages_by_endpoint[endpoint_contract_id] = []
@@ -194,6 +195,7 @@ def run_qinqin_capability_slice(
             transport_replay_artifact = artifact_store.append_transport_replay_artifact(
                 endpoint_run_id=endpoint_run['endpoint_run_id'],
                 endpoint_contract_id=endpoint_contract_id,
+                requested_business_date=requested_business_date,
                 page_index=page_index,
                 replay_artifact=normalized_fetch_result['replay_artifact'],
             )

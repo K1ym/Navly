@@ -260,6 +260,16 @@ class PostgresTruthSubstrate:
         requested_business_date: str,
         rows: Iterable[dict[str, Any]],
     ) -> None:
+        def field_value(payload: dict[str, Any], *keys: str) -> Any:
+            for key in keys:
+                if key in payload:
+                    return payload[key]
+            field_values = payload.get('field_values') if isinstance(payload.get('field_values'), dict) else {}
+            for key in keys:
+                if key in field_values:
+                    return field_values[key]
+            return None
+
         for row in rows:
             payload = copy.deepcopy(row)
             record = {
@@ -270,17 +280,39 @@ class PostgresTruthSubstrate:
                 'payload_json': payload,
             }
             if fact_kind == 'customer':
-                record['customer_id'] = str(payload['customer_id'])
+                customer_id = field_value(payload, 'customer_id', 'Data__Id')
+                if customer_id is None:
+                    raise KeyError('customer_id')
+                record['customer_id'] = str(customer_id)
             elif fact_kind == 'customer_card':
-                record['customer_card_id'] = str(payload['customer_card_id'])
+                customer_card_id = field_value(
+                    payload,
+                    'customer_card_id',
+                    'Data__Storeds__Id',
+                    'Data__Equitys__Id',
+                )
+                if customer_card_id is None:
+                    raise KeyError('customer_card_id')
+                record['customer_card_id'] = str(customer_card_id)
             elif fact_kind == 'consume_bill':
-                record['settle_id'] = str(payload['consume_bill_id'])
+                settle_id = field_value(payload, 'consume_bill_id', 'Data__SettleId')
+                if settle_id is None:
+                    raise KeyError('consume_bill_id')
+                record['settle_id'] = str(settle_id)
             elif fact_kind == 'consume_bill_payment':
-                record['settle_id'] = str(payload['consume_bill_id'])
-                record['payment_index'] = int(payload['payment_sequence'])
+                settle_id = field_value(payload, 'consume_bill_id', 'Data__SettleId')
+                payment_index = field_value(payload, 'payment_sequence', 'Data__Payments__PaymentIndex')
+                if settle_id is None:
+                    raise KeyError('consume_bill_id')
+                record['settle_id'] = str(settle_id)
+                record['payment_index'] = int(payment_index or 0)
             elif fact_kind == 'consume_bill_info':
-                record['settle_id'] = str(payload['consume_bill_id'])
-                record['info_index'] = int(payload['info_sequence'])
+                settle_id = field_value(payload, 'consume_bill_id', 'Data__SettleId')
+                info_index = field_value(payload, 'info_sequence', 'Data__Infos__InfoIndex')
+                if settle_id is None:
+                    raise KeyError('consume_bill_id')
+                record['settle_id'] = str(settle_id)
+                record['info_index'] = int(info_index or 0)
             else:
                 raise KeyError(f'Unsupported fact_kind: {fact_kind}')
             self.canonical_facts[fact_kind].append(record)
