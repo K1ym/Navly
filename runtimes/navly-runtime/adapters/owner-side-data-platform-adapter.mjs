@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -7,18 +8,36 @@ const execFileAsync = promisify(execFile);
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(moduleDir, '..', '..', '..');
 const defaultDataPlatformRoot = path.join(repoRoot, 'platforms', 'data-platform');
-const defaultFixtureBundlePath = path.join(
-  defaultDataPlatformRoot,
-  'tests',
-  'fixtures',
-  'member_insight',
-  'qinqin_fixture_pages.bundle.json',
-);
 
-const canonicalCapabilityId = 'navly.store.member_insight';
-const canonicalServiceObjectId = 'navly.service.store.member_insight';
+const CAPABILITY_EXPLANATION_CAPABILITY_ID = 'navly.system.capability_explanation';
+const CAPABILITY_EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
+const PENDING_OPERATOR_SURFACE_STATUS = 'published_not_ready_operator_surface';
+const OPERATOR_PENDING_REASON_CODE = 'operator_surface_pending';
 
-const memberInsightOwnerSurfaceCode = String.raw`import json
+function readJson(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function loadSupportedOwnerSurfaceRegistry(dataPlatformRoot) {
+  const capabilityRegistry = readJson(path.join(dataPlatformRoot, 'directory', 'capability-registry.seed.json'));
+  const serviceBindingRegistry = readJson(path.join(dataPlatformRoot, 'directory', 'capability-service-bindings.seed.json'));
+  const supportedCapabilityEntries = (capabilityRegistry.entries ?? [])
+    .filter((entry) => !String(entry?.status ?? '').startsWith('retired'));
+  const supportedServiceBindingEntries = (serviceBindingRegistry.entries ?? [])
+    .filter((entry) => !String(entry?.status ?? '').startsWith('retired'));
+
+  return {
+    supportedCapabilityIds: new Set(supportedCapabilityEntries.map((entry) => entry.capability_id)),
+    capabilityStatusById: new Map(
+      supportedCapabilityEntries.map((entry) => [entry.capability_id, String(entry?.status ?? 'unknown')]),
+    ),
+    serviceBindingByCapability: new Map(
+      supportedServiceBindingEntries.map((entry) => [entry.capability_id, entry.service_object_id]),
+    ),
+  };
+}
+
+const phase1OwnerSurfaceCode = String.raw`import json
 import sys
 from pathlib import Path
 
@@ -31,47 +50,41 @@ from connectors.qinqin.qinqin_substrate import (
     FixtureQinqinTransport,
     LiveQinqinTransport,
 )
-from workflows.member_insight_owner_surface import (
-    build_member_insight_owner_surface,
-    build_member_insight_owner_surface_from_snapshot,
-)
+from tests.support.qinqin_governance_fixture_builder import build_aligned_fixture_pages_by_endpoint
+from workflows.qinqin_phase1_owner_surface import build_qinqin_phase1_owner_surface
 
 args = json.loads(sys.argv[2])
-state_snapshot_path = args.get("state_snapshot_path")
-if state_snapshot_path:
-    result = build_member_insight_owner_surface_from_snapshot(
-        request_id=args["request_id"],
-        trace_ref=args["trace_ref"],
-        target_scope_ref=args["target_scope_ref"],
-        target_business_date=args["requested_business_date"],
-        org_id=args["org_id"],
-        state_snapshot_path=state_snapshot_path,
-    )
-else:
-    transport_kind = args.get("transport_kind") or "fixture"
-    if transport_kind == "fixture":
-        fixture_bundle = json.loads(Path(args["fixture_bundle_path"]).read_text(encoding="utf-8"))
-        transport = FixtureQinqinTransport(fixture_bundle)
+transport_kind = args.get("transport_kind") or "fixture"
+if transport_kind == "fixture":
+    fixture_bundle_path = args.get("fixture_bundle_path")
+    if fixture_bundle_path:
+        fixture_bundle = json.loads(Path(fixture_bundle_path).read_text(encoding="utf-8"))
     else:
-        live_timeout_ms = args.get("live_timeout_ms") or DEFAULT_LIVE_TIMEOUT_MS
-        transport = LiveQinqinTransport(
-            base_url=args["live_base_url"],
-            timeout_ms=int(live_timeout_ms),
-            authorization=args.get("live_authorization"),
-            token=args.get("live_token"),
-        )
-
-    result = build_member_insight_owner_surface(
-        request_id=args["request_id"],
-        trace_ref=args["trace_ref"],
-        target_scope_ref=args["target_scope_ref"],
-        target_business_date=args["requested_business_date"],
-        org_id=args["org_id"],
-        start_time=args["start_time"],
-        end_time=args["end_time"],
-        app_secret=args["app_secret"],
-        transport=transport,
+        fixture_bundle = build_aligned_fixture_pages_by_endpoint(value_suffix="runtime")
+    transport = FixtureQinqinTransport(fixture_bundle)
+else:
+    live_timeout_ms = args.get("live_timeout_ms") or DEFAULT_LIVE_TIMEOUT_MS
+    transport = LiveQinqinTransport(
+        base_url=args["live_base_url"],
+        timeout_ms=int(live_timeout_ms),
+        authorization=args.get("live_authorization"),
+        token=args.get("live_token"),
     )
+
+result = build_qinqin_phase1_owner_surface(
+    request_id=args["request_id"],
+    trace_ref=args["trace_ref"],
+    target_scope_ref=args["target_scope_ref"],
+    target_business_date=args["requested_business_date"],
+    requested_capability_id=args["capability_id"],
+    requested_service_object_id=args["service_object_id"],
+    org_id=args.get("org_id"),
+    start_time=args.get("start_time"),
+    end_time=args.get("end_time"),
+    app_secret=args.get("app_secret"),
+    transport=transport,
+    explanation_context=args.get("explanation_context") or {},
+)
 print(json.dumps({
     "readiness_response": result["readiness_response"],
     "theme_service_response": result["theme_service_response"],
@@ -83,29 +96,32 @@ function asNonEmptyString(value) {
 
 function resolveDataContext(query, adapterOptions) {
   const contextFromQuery = query?.extensions?.data_adapter_context ?? {};
+  const explanationContext = query?.extensions?.explanation_context ?? {};
+  const capabilityId = asNonEmptyString(query?.capability_id);
   const targetBusinessDate = asNonEmptyString(query?.target_business_date);
+  if (!capabilityId) {
+    throw new Error('owner-side data adapter requires capability_id');
+  }
   if (!targetBusinessDate) {
     throw new Error('owner-side data adapter requires target_business_date');
   }
 
+  const requiresDataTransport = capabilityId !== CAPABILITY_EXPLANATION_CAPABILITY_ID;
   const orgId = asNonEmptyString(contextFromQuery.org_id) ?? asNonEmptyString(adapterOptions.defaultOrgId);
-  if (!orgId) {
-    throw new Error('owner-side data adapter requires org_id');
-  }
-
   const appSecret = asNonEmptyString(contextFromQuery.app_secret)
     ?? asNonEmptyString(adapterOptions.defaultAppSecret)
     ?? asNonEmptyString(process.env.NAVLY_RUNTIME_DATA_APP_SECRET);
-  const stateSnapshotPath = asNonEmptyString(contextFromQuery.state_snapshot_path)
-    ?? asNonEmptyString(adapterOptions.stateSnapshotPath)
-    ?? asNonEmptyString(process.env.NAVLY_RUNTIME_DATA_STATE_SNAPSHOT);
-  if (!appSecret && !stateSnapshotPath) {
+
+  if (requiresDataTransport && !orgId) {
+    throw new Error('owner-side data adapter requires org_id');
+  }
+  if (requiresDataTransport && !appSecret) {
     throw new Error('owner-side data adapter requires app_secret');
   }
 
   const fixtureBundlePath = asNonEmptyString(contextFromQuery.fixture_bundle_path)
     ?? asNonEmptyString(adapterOptions.fixtureBundlePath)
-    ?? defaultFixtureBundlePath;
+    ?? null;
   const transportKind = asNonEmptyString(contextFromQuery.transport_kind) ?? 'fixture';
 
   const startTime = asNonEmptyString(contextFromQuery.start_time) ?? `${targetBusinessDate} 00:00:00`;
@@ -132,6 +148,10 @@ function resolveDataContext(query, adapterOptions) {
     request_id: query.request_id,
     trace_ref: query.trace_ref,
     target_scope_ref: query.target_scope_ref,
+    capability_id: capabilityId,
+    service_object_id: asNonEmptyString(query?.service_object_id)
+      ?? adapterOptions.serviceBindingByCapability.get(capabilityId)
+      ?? CAPABILITY_EXPLANATION_SERVICE_OBJECT_ID,
     org_id: orgId,
     requested_business_date: targetBusinessDate,
     start_time: startTime,
@@ -139,15 +159,15 @@ function resolveDataContext(query, adapterOptions) {
     app_secret: appSecret,
     fixture_bundle_path: fixtureBundlePath,
     transport_kind: transportKind,
-    state_snapshot_path: stateSnapshotPath,
     live_base_url: liveBaseUrl,
     live_authorization: liveAuthorization,
     live_token: liveToken,
     live_timeout_ms: (Number.isFinite(liveTimeoutMs) && liveTimeoutMs > 0) ? liveTimeoutMs : 15000,
+    explanation_context: explanationContext,
   };
 }
 
-async function runMemberInsightOwnerSurface({
+async function runPhase1OwnerSurface({
   pythonExecutable,
   dataPlatformRoot,
   input,
@@ -157,7 +177,7 @@ async function runMemberInsightOwnerSurface({
     pythonExecutable,
     [
       '-c',
-      memberInsightOwnerSurfaceCode,
+      phase1OwnerSurfaceCode,
       dataPlatformRoot,
       JSON.stringify(input),
     ],
@@ -220,6 +240,79 @@ function buildScopeMismatchService(query, reasonCodes = ['scope_out_of_contract'
   };
 }
 
+function buildPendingCapabilityReadiness(
+  query,
+  {
+    reasonCode = OPERATOR_PENDING_REASON_CODE,
+    ownerSurface = 'operator_surface',
+  } = {},
+) {
+  return {
+    request_id: query.request_id,
+    trace_ref: query.trace_ref,
+    capability_id: query.capability_id,
+    readiness_status: 'pending',
+    evaluated_scope_ref: query.target_scope_ref,
+    requested_business_date: query.target_business_date,
+    latest_usable_business_date: query.target_business_date,
+    reason_codes: [reasonCode],
+    blocking_dependencies: [
+      {
+        dependency_kind: 'owner_surface',
+        dependency_ref: query.capability_id,
+        blocking_reason_code: reasonCode,
+        state_trace_refs: [],
+        run_trace_refs: [],
+      },
+    ],
+    state_trace_refs: [],
+    run_trace_refs: [],
+    evaluated_at: new Date().toISOString(),
+    extensions: {
+      owner_surface: ownerSurface,
+    },
+  };
+}
+
+function buildPendingThemeService(
+  query,
+  {
+    reasonCode = OPERATOR_PENDING_REASON_CODE,
+    ownerSurface = 'operator_surface',
+  } = {},
+) {
+  return {
+    request_id: query.request_id,
+    trace_ref: query.trace_ref,
+    capability_id: query.capability_id,
+    service_object_id: query.service_object_id,
+    service_status: 'not_ready',
+    service_object: {},
+    data_window: {
+      from: query.target_business_date,
+      to: query.target_business_date,
+    },
+    explanation_object: {
+      capability_id: query.capability_id,
+      explanation_scope: 'service',
+      reason_codes: [reasonCode],
+      summary_tokens: [query.capability_id, 'not_ready', query.target_business_date],
+      state_trace_refs: [],
+      run_trace_refs: [],
+      extensions: {
+        owner_surface: ownerSurface,
+      },
+    },
+    state_trace_refs: [],
+    run_trace_refs: [],
+    served_at: new Date().toISOString(),
+    extensions: {
+      owner_surface: ownerSurface,
+      readiness_status: 'pending',
+    },
+  };
+}
+
 function pruneExpiredRunCache(runCache, nowEpochMs, runCacheTtlMs) {
   if (!Number.isFinite(runCacheTtlMs) || runCacheTtlMs <= 0) {
     return;
@@ -252,8 +345,7 @@ export function createOwnerSideDataPlatformAdapter({
   dataPlatformRoot = defaultDataPlatformRoot,
   defaultOrgId = null,
   defaultAppSecret = null,
-  fixtureBundlePath = defaultFixtureBundlePath,
-  stateSnapshotPath = null,
+  fixtureBundlePath = null,
   liveBaseUrl = null,
   liveAuthorization = null,
   liveToken = null,
@@ -261,37 +353,48 @@ export function createOwnerSideDataPlatformAdapter({
   runCacheMaxEntries = 32,
   runCacheTtlMs = 5 * 60 * 1000,
   nowEpochMsFactory = () => Date.now(),
-  runMemberInsightOwnerSurfaceImpl = runMemberInsightOwnerSurface,
+  runPhase1OwnerSurfaceImpl = runPhase1OwnerSurface,
 } = {}) {
   const runCache = new Map();
+  const {
+    supportedCapabilityIds,
+    capabilityStatusById,
+    serviceBindingByCapability,
+  } = loadSupportedOwnerSurfaceRegistry(dataPlatformRoot);
 
-  async function loadMemberInsightOwnerSurface(query) {
+  function isPublishedPendingOperatorSurface(capabilityId) {
+    return capabilityStatusById.get(capabilityId) === PENDING_OPERATOR_SURFACE_STATUS;
+  }
+
+  async function loadPhase1OwnerSurface(query) {
     const context = resolveDataContext(query, {
       defaultOrgId,
       defaultAppSecret,
       fixtureBundlePath,
-      stateSnapshotPath,
       liveBaseUrl,
       liveAuthorization,
       liveToken,
       liveTimeoutMs,
+      serviceBindingByCapability,
     });
 
     const cacheKey = JSON.stringify([
       query.request_id,
       query.trace_ref,
       query.target_scope_ref,
+      context.capability_id,
+      context.service_object_id,
       context.org_id,
       context.requested_business_date,
       context.start_time,
       context.end_time,
       context.fixture_bundle_path,
       context.transport_kind,
-      context.state_snapshot_path,
       context.live_base_url,
       context.live_authorization,
       context.live_token,
       context.live_timeout_ms,
+      context.explanation_context,
     ]);
 
     const nowEpochMsCandidate = Number(nowEpochMsFactory());
@@ -303,7 +406,7 @@ export function createOwnerSideDataPlatformAdapter({
       return cachedEntry.promise;
     }
 
-    const runPromise = runMemberInsightOwnerSurfaceImpl({
+    const runPromise = runPhase1OwnerSurfaceImpl({
       pythonExecutable,
       dataPlatformRoot,
       input: context,
@@ -323,20 +426,33 @@ export function createOwnerSideDataPlatformAdapter({
 
   return {
     async queryCapabilityReadiness(query) {
-      if (query.capability_id !== canonicalCapabilityId) {
+      if (!supportedCapabilityIds.has(query.capability_id)) {
         return buildUnsupportedReadiness(query);
       }
 
-      const ownerSurface = await loadMemberInsightOwnerSurface(query);
+      if (isPublishedPendingOperatorSurface(query.capability_id)) {
+        return buildPendingCapabilityReadiness(query);
+      }
+
+      const ownerSurface = await loadPhase1OwnerSurface(query);
       return ownerSurface.readiness_response;
     },
 
     async queryThemeService(query) {
-      if (query.capability_id !== canonicalCapabilityId || query.service_object_id !== canonicalServiceObjectId) {
+      if (!supportedCapabilityIds.has(query.capability_id)) {
+        return buildScopeMismatchService(query, ['capability_not_registered']);
+      }
+
+      const expectedServiceObjectId = serviceBindingByCapability.get(query.capability_id);
+      if (!expectedServiceObjectId || query.service_object_id !== expectedServiceObjectId) {
         return buildScopeMismatchService(query);
       }
 
-      const ownerSurface = await loadMemberInsightOwnerSurface(query);
+      if (isPublishedPendingOperatorSurface(query.capability_id)) {
+        return buildPendingThemeService(query);
+      }
+
+      const ownerSurface = await loadPhase1OwnerSurface(query);
       return ownerSurface.theme_service_response;
     },
   };

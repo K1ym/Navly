@@ -5,21 +5,15 @@
 当前已具备：
 
 - `member_insight_owner_surface.py`
-  - sync-backed owner surface：调用 member insight vertical slice
-  - snapshot-backed owner surface：读取 persisted truth substrate
+  - 调用 member insight vertical slice
   - 组装 readiness response
   - 组装 theme service response
-- `postgres_temporal_nightly_sync.py`
-  - `NightlySyncPlanner`
-  - `NightlySyncRuntime`
-  - `TemporalNightlySyncPlane`
-  - nightly / backfill / retry / rerun 的 repo-authoritative workflow path
+- `qinqin_phase1_owner_surface.py`
+  - 保持 `member_insight` owner surface authoritative
+  - 组装 `finance_summary` / `staff_board` / `daily_overview` / `capability_explanation` formal owner surface
+  - 对 runtime 暴露统一 phase-1 owner-side read boundary
 
 当前边界：
 
-- `member_insight_owner_surface.py` 同时承载：
-  - owner-side local sync path
-  - persisted snapshot query path
-- `postgres_temporal_nightly_sync.py` 是当前 intended production orchestration path
-- workflow 仍不拥有数据真相；run/state/quality/readiness/projection 必须写回 PostgreSQL truth substrate
+- 当前仍是本地 owner-side workflow，不是 Temporal / production scheduler 落地
 - 不在这里实现 runtime / bridge 接面代码

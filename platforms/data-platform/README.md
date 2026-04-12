@@ -1,6 +1,6 @@
 # Navly Data Platform
 
-状态：phase-1 closeout lane with retained milestone-b diagnostic backbone
+状态：milestone-b backbone
 
 本目录是 `Navly_v1` 数据中台的实现骨架与 backbone 入口。
 
@@ -28,22 +28,35 @@
 - first formal owner-side readiness / theme service surface
   - `completeness/member_insight_readiness_surface.py`
   - `serving/member_insight_theme_service_surface.py`
+- phase-1 owner/service surface closure
+  - `workflows/qinqin_phase1_owner_surface.py`
+  - `serving/qinqin_phase1_theme_service_surface.py`
+  - `completeness/qinqin_phase1_readiness_surface.py`
+  - formal service set:
+    - `navly.service.store.member_insight`
+    - `navly.service.store.finance_summary`
+    - `navly.service.store.staff_board`
+    - `navly.service.store.daily_overview`
+    - `navly.service.system.capability_explanation`
 - 基础单测与 CLI runner
 - Qinqin v1.1 contract governance consistency tests
-- PostgreSQL-first closeout substrate in repo code
-  - `migration/sql/2026-04-12-navly-v1-phase1-postgres-truth-substrate.sql`
-  - `backbone_support/postgres_truth_substrate.py`
-- Temporal-native nightly/backfill workflow plane in repo code
-  - `workflows/postgres_temporal_nightly_sync.py`
-  - nightly scheduler / execution / retry / rerun path
-  - expected business date set + carry-forward cursor + latest-to-oldest backfill planning
+- full structured-target landing backbone
+  - `warehouse/qinqin_structured_target_landing.py`
+  - 覆盖 manifest 中全部 `19` 个 structured targets
+- endpoint governance proof backbone
+  - `quality/qinqin_endpoint_governance.py`
+  - 为全部 `8` 个 endpoint 产出 `field_coverage_snapshot` / `schema_alignment_snapshot` / `quality_issues`
+- endpoint completeness closure backbone
+  - `completeness/qinqin_endpoint_completeness.py`
+  - 为全部 `8` 个 endpoint 产出 endpoint-scoped completeness objects
+- five-store governance validation matrix
+  - `build_five_store_endpoint_validation_matrix(...)`
+  - 可同时回答 “did it run” 与 “did fields align”
 
 当前**未完成**：
 
 - live connector / real HTTP transport / 完整错误分类治理
-- 全量 endpoint 铺开
-- live PostgreSQL adapter / dbt runtime / 真实 Temporal worker deployment 绑定
-- 完整 latest state / quality / readiness / projection runtime 逻辑
+- PostgreSQL / dbt / 持久化模型落地
 - rich serving / UI / 多消费端接口
 - phase-1 全链路闭合
 
@@ -51,12 +64,9 @@
 
 - 跨模块 shared contracts owner：`shared/contracts`
 - `platforms/data-platform/contracts/`：只保留 data-platform owner contracts
-- `platforms/data-platform/directory/`：承载 data-platform 当前纳管 registry；Qinqin v1.1 contract governance 已进入 formal registry，`member_insight` 的 capability / binding / dependency registry 也已进入 authoritative path，其余 capability 仍可能保持 deferred seed 状态
-- `member_insight` 对应的 capability / service binding / dependency registry 现已进入 closeout authoritative seed path
+- `platforms/data-platform/directory/`：承载 data-platform 当前纳管 registry；Qinqin v1.1 contract governance 已进入 formal registry，其余对象仍可能是 seed / placeholder
 - data-platform 不拥有 access truth
-- data-platform 当前实现仍然只是在自身 owner scope 内推进 raw truth / canonical fact truth / latest state backbone
-- `platforms/data-platform/` 现在已经给出 PostgreSQL-first / Temporal-first 的 authoritative repo path；
-  runtime artifact tree 与本地 owner-side workflow 只允许作为 diagnostics、replay、smoke path
+- data-platform 当前实现已在自身 owner scope 内闭合 phase-1 service/serving 默认读边界，但这仍不等于 Postgres truth substrate、live host、或 full phase-1 acceptance 已完成
 
 ## C0-L3 目录映射
 
@@ -71,24 +81,27 @@
 ## 对 runtime / Copilot 的默认读取边界
 
 - 默认读取边界仍应是 `serving/`
+- phase-1 默认 service set：
+  - `navly.service.store.member_insight`
+  - `navly.service.store.finance_summary`
+  - `navly.service.store.staff_board`
+  - `navly.service.store.daily_overview`
+  - `navly.service.system.capability_explanation`
 - runtime / Copilot 不应默认直读：
   - `connectors/`
   - `ingestion/`
   - `raw-store/`
   - `warehouse/`
   - `sync-state/`
-  - `quality/`
-  - `completeness/`
-  - `projections/`
-- 当前 milestone B 已具备 backbone，但这**不等于** ready / service runtime 已完成
-- 当前已对 `member_insight` 发布 formal owner-side readiness / theme service surface，但 runtime 还未在默认路径消费该 surface
-- nightly truth / backfill / orchestration 的 authoritative path 现在应指向：
-  - PostgreSQL truth substrate SQL
-  - `PostgresTruthSubstrate`
-  - `postgres_temporal_nightly_sync.py`
+- `quality/`
+- `completeness/`
+- `projections/`
+- 当前 milestone B 已具备 guarded owner-side surface set，但这**不等于** Postgres-first truth substrate、host publication、或 live runtime 已完成
+- runtime 默认 owner-side data adapter 已切到上述 formal owner/service surfaces；默认路径不再直接读 artifact/backbone internals
+- 当前 `quality/` 与 `completeness/` 已具备 endpoint-governance / completeness proof objects，并为 phase-1 service set 提供稳定依赖边界
 
 ## 重要说明
 
 - 当前已不再只是 milestone A skeleton / seed only
-- 当前状态更准确地说是：**phase-1 closeout 的 PostgreSQL/Temporal 主路径已在 repo code 内冻结，并保留 milestone-B diagnostics/backbone 作为受控过渡层**
-- 现阶段仍不能把本目录描述成“8 端点、live infra、full serving 已完成”
+- 当前状态更准确地说是：**milestone B backbone + phase-1 owner/service set 已建立，但 phase-1 远未完成**
+- 现阶段不能把本目录描述成“完整 ingestion / readiness / serving / persistence / live closure 已完成”
