@@ -28,15 +28,23 @@
 - first formal owner-side readiness / theme service surface
   - `completeness/member_insight_readiness_surface.py`
   - `serving/member_insight_theme_service_surface.py`
+- phase-1 owner/service surface closure
+  - `workflows/qinqin_phase1_owner_surface.py`
+  - `serving/qinqin_phase1_theme_service_surface.py`
+  - `completeness/qinqin_phase1_readiness_surface.py`
+  - formal service set:
+    - `navly.service.store.member_insight`
+    - `navly.service.store.finance_summary`
+    - `navly.service.store.staff_board`
+    - `navly.service.store.daily_overview`
+    - `navly.service.system.capability_explanation`
 - 基础单测与 CLI runner
 - Qinqin v1.1 contract governance consistency tests
 
 当前**未完成**：
 
 - live connector / real HTTP transport / 完整错误分类治理
-- 全量 endpoint 铺开
 - PostgreSQL / dbt / 持久化模型落地
-- 完整 latest state / quality / readiness / projection runtime 逻辑
 - rich serving / UI / 多消费端接口
 - phase-1 全链路闭合
 
@@ -46,7 +54,7 @@
 - `platforms/data-platform/contracts/`：只保留 data-platform owner contracts
 - `platforms/data-platform/directory/`：承载 data-platform 当前纳管 registry；Qinqin v1.1 contract governance 已进入 formal registry，其余对象仍可能是 seed / placeholder
 - data-platform 不拥有 access truth
-- data-platform 当前实现仍然只是在自身 owner scope 内推进 raw truth / canonical fact truth / latest state backbone
+- data-platform 当前实现已在自身 owner scope 内闭合 phase-1 service/serving 默认读边界，但这仍不等于 Postgres truth substrate、live host、或 full phase-1 acceptance 已完成
 
 ## C0-L3 目录映射
 
@@ -61,6 +69,12 @@
 ## 对 runtime / Copilot 的默认读取边界
 
 - 默认读取边界仍应是 `serving/`
+- phase-1 默认 service set：
+  - `navly.service.store.member_insight`
+  - `navly.service.store.finance_summary`
+  - `navly.service.store.staff_board`
+  - `navly.service.store.daily_overview`
+  - `navly.service.system.capability_explanation`
 - runtime / Copilot 不应默认直读：
   - `connectors/`
   - `ingestion/`
@@ -70,11 +84,12 @@
   - `quality/`
   - `completeness/`
   - `projections/`
-- 当前 milestone B 已具备 backbone，但这**不等于** ready / service runtime 已完成
-- 当前已对 `member_insight` 发布 formal owner-side readiness / theme service surface，但 runtime 还未在默认路径消费该 surface
+- 当前 milestone B 已具备 guarded owner-side surface set，但这**不等于** Postgres-first truth substrate、host publication、或 live runtime 已完成
+- runtime 默认 owner-side data adapter 已切到上述 formal owner/service surfaces；默认路径不再直接读 artifact/backbone internals
+- 当前 `quality/` 与 `completeness/` 已具备 endpoint-governance / completeness proof objects，并为 phase-1 service set 提供稳定依赖边界
 
 ## 重要说明
 
 - 当前已不再只是 milestone A skeleton / seed only
-- 当前状态更准确地说是：**milestone B backbone 已建立，但 phase-1 远未完成**
-- 现阶段不能把本目录描述成“完整 ingestion / readiness / serving / persistence 已完成”
+- 当前状态更准确地说是：**milestone B backbone + phase-1 owner/service set 已建立，但 phase-1 远未完成**
+- 现阶段不能把本目录描述成“完整 ingestion / readiness / serving / persistence / live closure 已完成”

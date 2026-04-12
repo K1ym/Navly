@@ -1,12 +1,12 @@
 {
   "registry_name": "capability_service_binding_registry",
-  "status": "milestone_a_seed",
+  "status": "phase_1_owner_surface_set",
   "shared_contract_owner_path": "shared/contracts",
   "entries": [
     {
       "service_object_id": "navly.service.store.member_insight",
       "document_short_name": "store_member_insight",
-      "status": "seeded_not_implemented",
+      "status": "implemented_phase1_owner_surface",
       "capability_id": "navly.store.member_insight",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -15,7 +15,7 @@
     {
       "service_object_id": "navly.service.store.daily_overview",
       "document_short_name": "store_daily_overview",
-      "status": "seeded_not_implemented",
+      "status": "implemented_phase1_owner_surface",
       "capability_id": "navly.store.daily_overview",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -24,7 +24,7 @@
     {
       "service_object_id": "navly.service.store.staff_board",
       "document_short_name": "store_staff_board",
-      "status": "seeded_not_implemented",
+      "status": "implemented_phase1_owner_surface",
       "capability_id": "navly.store.staff_board",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -33,12 +33,21 @@
     {
       "service_object_id": "navly.service.store.finance_summary",
       "document_short_name": "store_finance_summary",
-      "status": "seeded_not_implemented",
+      "status": "implemented_phase1_owner_surface",
       "capability_id": "navly.store.finance_summary",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
+    },
+    {
+      "service_object_id": "navly.service.system.capability_explanation",
+      "document_short_name": "capability_explanation",
+      "status": "implemented_phase1_owner_surface",
+      "capability_id": "navly.system.capability_explanation",
       "service_kind": "theme_service",
       "is_default_binding": true,
       "include_explanation_supported": true
     }
   ],
-  "notes": "Milestone A seed for canonical capability -> service bindings only. Companion explanation objects are intentionally kept out until a dedicated owner-scope registry is introduced."
+  "notes": "ASP-49 closes the full phase-1 capability -> service binding set, including the formal capability_explanation fallback surface."
 }
