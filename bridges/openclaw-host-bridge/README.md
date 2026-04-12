@@ -1,6 +1,6 @@
 # Navly_v1 openclaw-host-bridge
 
-状态：milestone-b backbone / host handoff only
+状态：phase-1 host publication + live handoff closeout slice
 
 本目录是 `Navly_v1` `openclaw-host-bridge` 的实现骨架入口。
 
@@ -14,16 +14,20 @@
 - milestone B `runtime_request_envelope` assembly backbone
 - milestone B host dispatch handoff backbone
 - milestone B host trace event backbone
+- first-party host skill surface
+- first-party host tool surface
+- real capability discovery -> host publication manifest
+- live first-party tool handoff into runtime execution
+- manager-facing `daily_overview` / `member_insight` / `capability_explanation` answered surfaces
+- manager-facing `finance_summary` / `staff_board` structured not-ready fallback surfaces
+- operator-facing host tool publication with fail-closed pending surfaces
 - milestone B validate 脚本与最小 node tests
 
 当前**未完成**：
 
-- 完整 host integration
-- milestone C runtime execution closure
-- milestone D dispatch execution / outcome forwarding closure
-- 完整 capability tool publication
-- 任何业务能力逻辑
-- `data-platform` / `auth-kernel` / `runtime` 内部逻辑
+- upstream OpenClaw patch
+- richer host lifecycle hooks / live gateway bootstrap
+- richer operator execution beyond structured pending responses
 - upstream OpenClaw patch
 
 ## 当前 owning boundary
@@ -34,10 +38,12 @@
 - bridge 不把 OpenClaw session / workspace 当 canonical truth
 - bridge local object 保持在 bridge 内部，不提升为 shared canonical contracts
 - bridge <-> runtime 只消费 `shared/contracts/interaction/` 已冻结对象
+- bridge closeout 通过 formal registries / adapters 消费：
+  - `platforms/data-platform/**`
+  - `platforms/auth-kernel/**`
+  - `runtimes/navly-runtime/**`
+- bridge 不反向拥有这些模块的 source-of-truth 语义
 - 不修改 `shared/contracts/**`
-- 不修改 `platforms/data-platform/**`
-- 不修改 `platforms/auth-kernel/**`
-- 不修改 `runtimes/**`
 - 不修改 `upstreams/openclaw/**`
 
 ## bridge local objects
@@ -83,12 +89,20 @@
 
 ## 当前最小 cross-module canonical slice
 
-当前 bridge/runtime 的最小 canonical 主链统一到：
+当前 bridge/runtime 的 first-party manager canonical surfaces 包括：
+
+- `navly.store.daily_overview`
+- `navly.store.member_insight`
+- `navly.store.finance_summary`
+- `navly.store.staff_board`
+- `navly.system.capability_explanation`
+
+其中 fully served 的 canonical minimal slice 仍是：
 
 - `capability_id = navly.store.member_insight`
 - `service_object_id = navly.service.store.member_insight`
 
-`daily_overview` 不再作为当前最小 cross-module 主链默认值。
+`daily_overview` 已作为 first-party answered host surface 落地，但底层 richer finance/staff service 仍通过 structured not-ready surface 表达。
 
 ## canonical freeze
 
@@ -109,5 +123,7 @@
 运行：
 
 ```bash
-bridges/openclaw-host-bridge/scripts/validate-milestone-b.sh
+node --test bridges/openclaw-host-bridge/tests/first-party-host-surface.test.mjs \
+  bridges/openclaw-host-bridge/tests/first-party-live-handoff.test.mjs \
+  bridges/openclaw-host-bridge/tests/milestone-b-auth-linkage.test.mjs
 ```

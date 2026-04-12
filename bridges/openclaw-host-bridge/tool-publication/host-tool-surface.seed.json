@@ -1,0 +1,184 @@
+{
+  "surface_name": "navly_first_party_host_tool_surface",
+  "status": "phase_1_closeout",
+  "required_context_fields": [
+    "request_id",
+    "trace_ref",
+    "access_context_envelope",
+    "decision_ref"
+  ],
+  "tools": [
+    {
+      "tool_name": "navly_daily_overview",
+      "skill_ids": [
+        "navly-store-daily-overview"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.store.daily_overview",
+      "service_object_id": "navly.service.store.daily_overview",
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation",
+        "comparison_mode"
+      ],
+      "operator_only": false
+    },
+    {
+      "tool_name": "navly_member_insight",
+      "skill_ids": [
+        "navly-store-member-insight"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.store.member_insight",
+      "service_object_id": "navly.service.store.member_insight",
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation"
+      ],
+      "operator_only": false
+    },
+    {
+      "tool_name": "navly_finance_summary",
+      "skill_ids": [
+        "navly-store-finance-summary"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.store.finance_summary",
+      "service_object_id": "navly.service.store.finance_summary",
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation",
+        "comparison_mode"
+      ],
+      "operator_only": false
+    },
+    {
+      "tool_name": "navly_staff_board",
+      "skill_ids": [
+        "navly-store-staff-board"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.store.staff_board",
+      "service_object_id": "navly.service.store.staff_board",
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation",
+        "comparison_mode"
+      ],
+      "operator_only": false
+    },
+    {
+      "tool_name": "navly_explain_unavailable",
+      "skill_ids": [
+        "navly-capability-explain"
+      ],
+      "host_agent_id": "main",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.system.capability_explanation",
+      "service_object_id": "navly.service.system.capability_explanation",
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "include_explanation"
+      ],
+      "operator_only": false
+    },
+    {
+      "tool_name": "navly_sync_status",
+      "skill_ids": [
+        "navly-sync-ops"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.ops.sync_status",
+      "service_object_id": "navly.service.ops.sync_status",
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "freshness_mode",
+        "include_explanation"
+      ],
+      "operator_only": true
+    },
+    {
+      "tool_name": "navly_backfill_status",
+      "skill_ids": [
+        "navly-sync-ops"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.ops.backfill_status",
+      "service_object_id": "navly.service.ops.backfill_status",
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "backfill_from",
+        "backfill_to",
+        "include_explanation"
+      ],
+      "operator_only": true
+    },
+    {
+      "tool_name": "navly_rerun_sync",
+      "skill_ids": [
+        "navly-sync-ops"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.ops.sync_rerun",
+      "service_object_id": "navly.service.ops.sync_rerun",
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "rerun_mode",
+        "include_explanation"
+      ],
+      "operator_only": true
+    },
+    {
+      "tool_name": "navly_trigger_backfill",
+      "skill_ids": [
+        "navly-sync-ops"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.ops.sync_backfill",
+      "service_object_id": "navly.service.ops.sync_backfill",
+      "allowed_input_fields": [
+        "scope_ref",
+        "backfill_from",
+        "backfill_to",
+        "include_explanation"
+      ],
+      "operator_only": true
+    },
+    {
+      "tool_name": "navly_quality_report",
+      "skill_ids": [
+        "navly-data-quality"
+      ],
+      "host_agent_id": "ops",
+      "visibility_scope": "host_visible",
+      "capability_id": "navly.ops.quality_report",
+      "service_object_id": "navly.service.ops.quality_report",
+      "allowed_input_fields": [
+        "scope_ref",
+        "business_date",
+        "include_explanation"
+      ],
+      "operator_only": true
+    }
+  ]
+}

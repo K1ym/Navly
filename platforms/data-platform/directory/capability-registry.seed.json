@@ -8,32 +8,80 @@
       "document_short_name": "store_member_insight",
       "domain": "store",
       "default_service_object_id": "navly.service.store.member_insight",
-      "status": "seeded_not_implemented",
-      "notes": "Phase-1 vertical slice anchor capability."
+      "status": "implemented_owner_surface",
+      "notes": "Phase-1 vertical slice anchor capability with formal owner-side readiness/service support."
     },
     {
       "capability_id": "navly.store.daily_overview",
       "document_short_name": "store_daily_overview",
       "domain": "store",
       "default_service_object_id": "navly.service.store.daily_overview",
-      "status": "seeded_not_implemented",
-      "notes": "Document short name only; canonical cross-module ID is namespaced."
+      "status": "implemented_host_surface",
+      "notes": "Manager-facing aggregate overview surface exposed through the first-party host publication layer."
     },
     {
       "capability_id": "navly.store.staff_board",
       "document_short_name": "store_staff_board",
       "domain": "store",
       "default_service_object_id": "navly.service.store.staff_board",
-      "status": "seeded_not_implemented",
-      "notes": "Seed only; no readiness logic yet."
+      "status": "published_not_ready_surface",
+      "notes": "First-party host surface is published; formal service responds with structured not-ready explanations until richer owner surfaces land."
     },
     {
       "capability_id": "navly.store.finance_summary",
       "document_short_name": "store_finance_summary",
       "domain": "store",
       "default_service_object_id": "navly.service.store.finance_summary",
-      "status": "seeded_not_implemented",
-      "notes": "Seed only; no serving logic yet."
+      "status": "published_not_ready_surface",
+      "notes": "First-party host surface is published; formal service responds with structured not-ready explanations until richer owner surfaces land."
+    },
+    {
+      "capability_id": "navly.system.capability_explanation",
+      "document_short_name": "capability_explanation",
+      "domain": "system",
+      "default_service_object_id": "navly.service.system.capability_explanation",
+      "status": "implemented_host_surface",
+      "notes": "Formal fallback/explanation surface used by runtime and first-party host tools."
+    },
+    {
+      "capability_id": "navly.ops.sync_status",
+      "document_short_name": "ops_sync_status",
+      "domain": "ops",
+      "default_service_object_id": "navly.service.ops.sync_status",
+      "status": "published_not_ready_operator_surface",
+      "notes": "Operator-only capability published through the first-party host surface; runtime currently returns structured pending explanations."
+    },
+    {
+      "capability_id": "navly.ops.backfill_status",
+      "document_short_name": "ops_backfill_status",
+      "domain": "ops",
+      "default_service_object_id": "navly.service.ops.backfill_status",
+      "status": "published_not_ready_operator_surface",
+      "notes": "Operator-only capability published through the first-party host surface; runtime currently returns structured pending explanations."
+    },
+    {
+      "capability_id": "navly.ops.sync_rerun",
+      "document_short_name": "ops_sync_rerun",
+      "domain": "ops",
+      "default_service_object_id": "navly.service.ops.sync_rerun",
+      "status": "published_not_ready_operator_surface",
+      "notes": "Operator-only action capability published through the first-party host surface; runtime currently returns structured pending explanations."
+    },
+    {
+      "capability_id": "navly.ops.sync_backfill",
+      "document_short_name": "ops_sync_backfill",
+      "domain": "ops",
+      "default_service_object_id": "navly.service.ops.sync_backfill",
+      "status": "published_not_ready_operator_surface",
+      "notes": "Operator-only action capability published through the first-party host surface; runtime currently returns structured pending explanations."
+    },
+    {
+      "capability_id": "navly.ops.quality_report",
+      "document_short_name": "ops_quality_report",
+      "domain": "ops",
+      "default_service_object_id": "navly.service.ops.quality_report",
+      "status": "published_not_ready_operator_surface",
+      "notes": "Operator-only capability published through the first-party host surface; runtime currently returns structured pending explanations."
     }
   ]
 }

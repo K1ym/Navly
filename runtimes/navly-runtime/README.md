@@ -1,7 +1,7 @@
 # Navly_v1 thin runtime shell
 
-状态：milestone-b-guarded-execution-backbone  
-用途：在 `runtimes/navly-runtime/` 内推进 Phase-1 ASP-18 Milestone B：route closure + guarded execution + runtime result closure。
+状态：phase-1 host closeout runtime slice  
+用途：在 `runtimes/navly-runtime/` 内承接 first-party host capability publication后的 runtime execution、guarded execution 与 runtime result closure。
 
 ## 当前范围（ASP-18 / Milestone B）
 
@@ -16,6 +16,14 @@
 - theme service query wiring（消费 service truth）
 - owner-side auth/data adapter closure（可消费真实 owner surface）
   - `member_insight` 默认不再消费内部 summary/backbone shape，而是消费 data-platform formal owner-side readiness / theme service surface
+- first-party manager-facing capability surface
+  - `daily_overview` answered aggregate surface
+  - `member_insight` answered owner-side surface
+  - `finance_summary` / `staff_board` structured not-ready surfaces
+  - `capability_explanation` answered structured explanation surface
+- first-party operator capability route publication
+  - published through route registry
+  - default runtime behavior remains structured pending / fail-closed, not fake source results
 - `runtime_result_envelope` 主路径闭合（answered / fallback / escalated / rejected / runtime_error）
 - `runtime_outcome_event` 对齐输出
 - Milestone A/B 自检脚本与最小链路测试
@@ -38,15 +46,21 @@
 
 ## 最小 capability 闭环
 
-当前最小 capability：
+当前 fully served minimal capability：
 
 - `navly.store.member_insight`
 - 默认 `service_object_id = navly.service.store.member_insight`
 
-secondary entry（非当前最小闭环）：
+其余 first-party host surfaces：
 
 - `navly.store.daily_overview`
 - `navly.service.store.daily_overview`
+- `navly.store.finance_summary`
+- `navly.service.store.finance_summary`
+- `navly.store.staff_board`
+- `navly.service.store.staff_board`
+- `navly.system.capability_explanation`
+- `navly.service.system.capability_explanation`
 
 主链路：
 

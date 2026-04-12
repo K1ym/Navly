@@ -6,7 +6,7 @@
     {
       "service_object_id": "navly.service.store.member_insight",
       "document_short_name": "store_member_insight",
-      "status": "seeded_not_implemented",
+      "status": "implemented_owner_surface",
       "capability_id": "navly.store.member_insight",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -15,7 +15,7 @@
     {
       "service_object_id": "navly.service.store.daily_overview",
       "document_short_name": "store_daily_overview",
-      "status": "seeded_not_implemented",
+      "status": "implemented_host_surface",
       "capability_id": "navly.store.daily_overview",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -24,7 +24,7 @@
     {
       "service_object_id": "navly.service.store.staff_board",
       "document_short_name": "store_staff_board",
-      "status": "seeded_not_implemented",
+      "status": "published_not_ready_surface",
       "capability_id": "navly.store.staff_board",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -33,12 +33,66 @@
     {
       "service_object_id": "navly.service.store.finance_summary",
       "document_short_name": "store_finance_summary",
-      "status": "seeded_not_implemented",
+      "status": "published_not_ready_surface",
       "capability_id": "navly.store.finance_summary",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
+    },
+    {
+      "service_object_id": "navly.service.system.capability_explanation",
+      "document_short_name": "capability_explanation",
+      "status": "implemented_host_surface",
+      "capability_id": "navly.system.capability_explanation",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
+    },
+    {
+      "service_object_id": "navly.service.ops.sync_status",
+      "document_short_name": "ops_sync_status",
+      "status": "published_not_ready_operator_surface",
+      "capability_id": "navly.ops.sync_status",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
+    },
+    {
+      "service_object_id": "navly.service.ops.backfill_status",
+      "document_short_name": "ops_backfill_status",
+      "status": "published_not_ready_operator_surface",
+      "capability_id": "navly.ops.backfill_status",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
+    },
+    {
+      "service_object_id": "navly.service.ops.sync_rerun",
+      "document_short_name": "ops_sync_rerun",
+      "status": "published_not_ready_operator_surface",
+      "capability_id": "navly.ops.sync_rerun",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
+    },
+    {
+      "service_object_id": "navly.service.ops.sync_backfill",
+      "document_short_name": "ops_sync_backfill",
+      "status": "published_not_ready_operator_surface",
+      "capability_id": "navly.ops.sync_backfill",
+      "service_kind": "theme_service",
+      "is_default_binding": true,
+      "include_explanation_supported": true
+    },
+    {
+      "service_object_id": "navly.service.ops.quality_report",
+      "document_short_name": "ops_quality_report",
+      "status": "published_not_ready_operator_surface",
+      "capability_id": "navly.ops.quality_report",
       "service_kind": "theme_service",
       "is_default_binding": true,
       "include_explanation_supported": true
     }
   ],
-  "notes": "Milestone A seed for canonical capability -> service bindings only. Companion explanation objects are intentionally kept out until a dedicated owner-scope registry is introduced."
+  "notes": "Phase-1 closeout binding set for manager-facing and operator-facing first-party host publication. Companion explanation objects remain structured service responses rather than prompt-only text."
 }
