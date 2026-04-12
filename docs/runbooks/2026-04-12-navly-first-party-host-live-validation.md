@@ -67,6 +67,7 @@ systemctl restart openclaw-gateway.service
 - 命中 `navly-store-daily-overview`
 - 调用 `navly_daily_overview`
 - `capability_id = navly.store.daily_overview`
+- manager-facing 默认读 persisted owner-surface snapshot，而不是实时重跑 live source sync
 - runtime 返回 `result_status=answered`
 - reply 中包含 overview summary / key metrics / risk flags
 
@@ -78,6 +79,7 @@ systemctl restart openclaw-gateway.service
 - 命中 `navly-store-member-insight`
 - 调用 `navly_member_insight`
 - `capability_id = navly.store.member_insight`
+- manager-facing 默认读 persisted owner-surface snapshot，而不是实时重跑 live source sync
 - runtime 返回 `result_status=answered`
 - reply 中包含 formal service object，不暴露 source endpoint 名
 
@@ -89,6 +91,7 @@ systemctl restart openclaw-gateway.service
 - 命中 `navly-store-finance-summary`
 - 调用 `navly_finance_summary`
 - `capability_id = navly.store.finance_summary`
+- manager-facing 默认读 persisted owner-surface snapshot，而不是实时重跑 live source sync
 - 在 phase-1-ready data path 上，runtime 返回 `result_status=answered`
 - reply 中包含 `navly.service.store.finance_summary` formal service object
 - 若 live data 真实缺数，仍必须 fail-close 为结构化 fallback，不暴露 source endpoint / SQL
@@ -101,6 +104,7 @@ systemctl restart openclaw-gateway.service
 - 命中 `navly-store-staff-board`
 - 调用 `navly_staff_board`
 - `capability_id = navly.store.staff_board`
+- manager-facing 默认读 persisted owner-surface snapshot，而不是实时重跑 live source sync
 - 在 phase-1-ready data path 上，runtime 返回 `result_status=answered`
 - reply 中包含 `navly.service.store.staff_board` formal service object
 - 若 live data 真实缺数，仍必须返回结构化 not-ready explanation

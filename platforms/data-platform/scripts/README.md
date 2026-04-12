@@ -24,6 +24,7 @@
   - 回写 final cursor ledger
   - 支持 `--history-start-business-date` 自动展开历史窗口
   - 支持 `--max-backfill-dispatch-tasks` 在 currentness 之外额外给 backfill 预算
+  - 支持 `--persisted-serving-root`，把 manager-facing owner surfaces 物化到 persisted snapshot store
   - 输出 runtime result 与本轮 artifact
 - `run_nightly_sync_temporal_worker.py`
   - 暴露 Temporal worker bootstrap 入口

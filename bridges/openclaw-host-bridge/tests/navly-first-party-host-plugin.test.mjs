@@ -122,6 +122,8 @@ test('navly first-party host plugin tool execution maps OpenClaw runtime context
   assert.equal(captured.rawHostIngress.channel_kind, 'wecom');
   assert.equal(captured.rawHostIngress.peer_identity_evidence[0].alias_namespace, 'wecom_user_id');
   assert.equal(captured.rawHostIngress.peer_identity_evidence[0].alias_value, 'sample_manager_single_scope');
+  assert.equal(captured.runtimeDataContext.data_transport_kind, 'persisted');
+  assert.equal(captured.runtimeDataContext.data_persisted_serving_root, '/var/lib/navly/data-platform/serving-store');
   assert.equal(captured.runtimeDataContext.data_org_id, '627149864218629');
   assert.equal(captured.runtimeDataContext.data_app_secret, 'test-secret');
   assert.equal(

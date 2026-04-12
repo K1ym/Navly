@@ -57,6 +57,7 @@ class NightlySyncRuntimeTest(unittest.TestCase):
                 ],
                 max_dispatch_tasks=8,
                 output_root=Path(tmpdir) / 'artifacts',
+                persisted_serving_root=Path(tmpdir) / 'persisted-serving-store',
             )
 
             self.assertEqual(len(result['initial_snapshot']['dispatch_plan']), 8)
@@ -74,6 +75,11 @@ class NightlySyncRuntimeTest(unittest.TestCase):
                 if entry['endpoint_contract_id'] == 'qinqin.staff.get_tech_commission_set_list.v1_8'
             )
             self.assertEqual(commission['cursor_status'], 'current_and_complete')
+            persisted_root = Path(tmpdir) / 'persisted-serving-store' / 'demo-org-001' / '2026-04-11' / 'owner-surfaces'
+            self.assertTrue((persisted_root / 'navly.store.member_insight.json').exists())
+            self.assertTrue((persisted_root / 'navly.store.finance_summary.json').exists())
+            self.assertTrue((persisted_root / 'navly.store.staff_board.json').exists())
+            self.assertTrue((persisted_root / 'navly.store.daily_overview.json').exists())
 
     def test_runtime_cycle_carries_history_forward_across_target_dates(self) -> None:
         transport = self._fixture_transport()
@@ -91,6 +97,7 @@ class NightlySyncRuntimeTest(unittest.TestCase):
                 'max_backfill_dispatch_tasks': 1,
                 'history_start_business_date': '2026-04-09',
                 'output_root': Path(tmpdir) / 'artifacts',
+                'persisted_serving_root': Path(tmpdir) / 'persisted-serving-store',
             }
 
             first_day = run_nightly_sync_runtime_cycle(

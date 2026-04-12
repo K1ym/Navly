@@ -19,6 +19,7 @@ from workflows.nightly_sync_scheduler import build_nightly_sync_scheduler_snapsh
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_ROOT = DATA_PLATFORM_ROOT / 'output' / 'nightly-sync-runtime'
+DEFAULT_PERSISTED_SERVING_ROOT = Path('/var/lib/navly/data-platform/serving-store')
 
 MEMBER_ENDPOINTS = {
     'qinqin.member.get_customers_list.v1_1',
@@ -63,6 +64,21 @@ def build_live_transport_from_env() -> LiveQinqinTransport:
         authorization=_resolve_env('QINQIN_API_AUTHORIZATION'),
         token=_resolve_env('QINQIN_API_TOKEN', 'QINQIN_REAL_DATA_TOKEN'),
     )
+
+
+def resolve_persisted_serving_root(
+    *,
+    persisted_serving_root: str | Path | None,
+    output_root: str | Path | None,
+) -> Path:
+    if persisted_serving_root:
+        return Path(persisted_serving_root)
+    env_root = _resolve_env('NAVLY_DATA_PLATFORM_PERSISTED_SERVING_ROOT')
+    if env_root:
+        return Path(env_root)
+    if output_root:
+        return Path(output_root).parent / '_persisted-serving-store'
+    return DEFAULT_PERSISTED_SERVING_ROOT
 
 
 def _business_window(group: dict[str, Any]) -> tuple[str, str]:
@@ -209,6 +225,7 @@ def run_nightly_sync_runtime_cycle(
     max_dispatch_tasks: int = 8,
     max_backfill_dispatch_tasks: int | None = None,
     history_start_business_date: str | None = None,
+    persisted_serving_root: str | Path | None = None,
     output_root: str | Path | None = None,
 ) -> dict[str, Any]:
     from workflows.nightly_sync_worker import _load_store_module  # local import to keep scripts lean
@@ -245,6 +262,20 @@ def run_nightly_sync_runtime_cycle(
             transport=resolved_transport,
             output_root=output_root,
         )
+        from workflows.persisted_phase1_owner_surface_materializer import (
+            materialize_phase1_owner_surface_snapshots,
+        )
+
+        persisted_materialization = materialize_phase1_owner_surface_snapshots(
+            execution_results=execution['execution_results'],
+            org_id=org_id,
+            persisted_serving_root=str(
+                resolve_persisted_serving_root(
+                    persisted_serving_root=persisted_serving_root,
+                    output_root=output_root,
+                )
+            ),
+        )
         merged_latest_states = [
             *prior_latest_states,
             *execution['new_latest_usable_endpoint_states'],
@@ -266,6 +297,7 @@ def run_nightly_sync_runtime_cycle(
             'db_path': str(Path(db_path)),
             'initial_snapshot': initial_snapshot,
             'execution': execution,
+            'persisted_serving_materialization': persisted_materialization,
             'final_snapshot': final_snapshot,
         }
     finally:

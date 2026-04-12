@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -14,8 +15,27 @@ const defaultFixtureBundlePath = path.join(
   'member_insight',
   'qinqin_fixture_pages.bundle.json',
 );
+const defaultPersistedServingRoot = process.env.NAVLY_DATA_PLATFORM_PERSISTED_SERVING_ROOT
+  ?? '/var/lib/navly/data-platform/serving-store';
 
 const EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
+const DEFAULT_PERSISTED_REASON_CODES = ['latest_state_not_published'];
+const FALLBACK_ACTIONS = {
+  capability_scope_not_supported: 'adjust_requested_capability_or_scope',
+  latest_state_not_published: 'retry_after_latest_state_publish',
+  projection_not_available: 'wait_for_projection_publication',
+  required_dataset_missing: 'investigate_required_dataset_backfill',
+  upstream_error: 'retry_after_upstream_recovery',
+  dependency_failed: 'retry_after_dependency_recovery',
+};
+const RECHECK_HINTS = {
+  capability_scope_not_supported: 'recheck_not_required_until_request_changes',
+  latest_state_not_published: 'recheck_after_latest_state_publish',
+  projection_not_available: 'recheck_after_projection_publish',
+  required_dataset_missing: 'recheck_after_backfill_completion',
+  upstream_error: 'recheck_after_next_successful_sync',
+  dependency_failed: 'recheck_after_next_successful_sync',
+};
 
 const publishedCapabilitySurfaceCatalog = {
   'navly.store.member_insight': {
@@ -166,6 +186,271 @@ function resolveFixtureBundlePaths(capabilityId, contextFromQuery, adapterOption
   return [...(publishedCapabilitySurfaceCatalog[capabilityId]?.fixtureBundlePaths ?? [defaultFixtureBundlePath])];
 }
 
+function resolvePersistedServingRoot(contextFromQuery, adapterOptions) {
+  return asNonEmptyString(contextFromQuery.persisted_serving_root)
+    ?? asNonEmptyString(adapterOptions.persistedServingRoot)
+    ?? asNonEmptyString(process.env.NAVLY_DATA_PLATFORM_PERSISTED_SERVING_ROOT)
+    ?? defaultPersistedServingRoot;
+}
+
+function selectPersistedBusinessDate({ availableBusinessDates, targetBusinessDate, freshnessMode }) {
+  if (freshnessMode === 'strict_date') {
+    return availableBusinessDates.includes(targetBusinessDate) ? targetBusinessDate : null;
+  }
+
+  let selected = null;
+  for (const businessDate of availableBusinessDates) {
+    if (businessDate <= targetBusinessDate) {
+      selected = businessDate;
+    }
+  }
+  return selected;
+}
+
+function readJsonIfExists(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function loadPersistedCapabilitySnapshot({
+  persistedServingRoot,
+  orgId,
+  capabilityId,
+  targetBusinessDate,
+  freshnessMode,
+}) {
+  const indexPayload = readJsonIfExists(path.join(persistedServingRoot, orgId, 'index.json'));
+  const capabilityEntry = indexPayload?.capabilities?.[capabilityId];
+  if (!capabilityEntry) {
+    return null;
+  }
+
+  const availableBusinessDates = Array.isArray(capabilityEntry.available_business_dates)
+    ? capabilityEntry.available_business_dates
+        .filter((value) => typeof value === 'string' && value.trim().length > 0)
+        .sort()
+    : [];
+  const selectedBusinessDate = selectPersistedBusinessDate({
+    availableBusinessDates,
+    targetBusinessDate,
+    freshnessMode,
+  });
+  if (!selectedBusinessDate) {
+    return null;
+  }
+
+  const snapshotPayload = readJsonIfExists(
+    path.join(
+      persistedServingRoot,
+      orgId,
+      selectedBusinessDate,
+      'owner-surfaces',
+      `${capabilityId}.json`,
+    ),
+  );
+  if (!snapshotPayload) {
+    return null;
+  }
+
+  return {
+    ...snapshotPayload,
+    selected_business_date: selectedBusinessDate,
+    persisted_serving_root: persistedServingRoot,
+  };
+}
+
+function cloneJson(value) {
+  return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+}
+
+function pickReasonCodes(candidate, fallback = DEFAULT_PERSISTED_REASON_CODES) {
+  const reasonCodes = Array.isArray(candidate)
+    ? candidate.filter((value) => typeof value === 'string' && value.trim().length > 0)
+    : [];
+  return reasonCodes.length > 0 ? reasonCodes : [...fallback];
+}
+
+function buildPersistedUnavailableReadiness(query) {
+  return {
+    request_id: query.request_id,
+    trace_ref: query.trace_ref,
+    capability_id: query.capability_id,
+    readiness_status: 'pending',
+    evaluated_scope_ref: query.target_scope_ref,
+    requested_business_date: query.target_business_date,
+    latest_usable_business_date: query.target_business_date,
+    reason_codes: [...DEFAULT_PERSISTED_REASON_CODES],
+    blocking_dependencies: [
+      {
+        dependency_kind: 'projection',
+        dependency_ref: publishedCapabilitySurfaceCatalog[query.capability_id]?.defaultServiceObjectId ?? query.capability_id,
+        blocking_reason_code: 'latest_state_not_published',
+        state_trace_refs: [],
+        run_trace_refs: [],
+      },
+    ],
+    state_trace_refs: [],
+    run_trace_refs: [],
+    evaluated_at: new Date().toISOString(),
+    extensions: {
+      owner_surface: query.capability_id?.split('.')?.at(-1) ?? 'unknown',
+      data_source: 'persisted_owner_surface_snapshot',
+    },
+  };
+}
+
+function buildPersistedUnavailableThemeService(query, readinessResponse) {
+  const latestUsableBusinessDate = readinessResponse.latest_usable_business_date ?? query.target_business_date;
+  return {
+    request_id: query.request_id,
+    trace_ref: query.trace_ref,
+    capability_id: query.capability_id,
+    service_object_id: query.service_object_id,
+    service_status: 'not_ready',
+    service_object: {},
+    data_window: {
+      from: latestUsableBusinessDate,
+      to: latestUsableBusinessDate,
+    },
+    explanation_object: {
+      capability_id: query.capability_id,
+      explanation_scope: 'service',
+      reason_codes: pickReasonCodes(readinessResponse.reason_codes),
+      state_trace_refs: cloneJson(readinessResponse.state_trace_refs ?? []),
+      run_trace_refs: cloneJson(readinessResponse.run_trace_refs ?? []),
+      extensions: {
+        owner_surface: readinessResponse.extensions?.owner_surface ?? query.capability_id?.split('.')?.at(-1) ?? 'unknown',
+        latest_usable_business_date: latestUsableBusinessDate,
+      },
+    },
+    state_trace_refs: cloneJson(readinessResponse.state_trace_refs ?? []),
+    run_trace_refs: cloneJson(readinessResponse.run_trace_refs ?? []),
+    served_at: new Date().toISOString(),
+    extensions: {
+      owner_surface: readinessResponse.extensions?.owner_surface ?? query.capability_id?.split('.')?.at(-1) ?? 'unknown',
+      data_source: 'persisted_owner_surface_snapshot',
+    },
+  };
+}
+
+function recommendedFallbackAction(readinessStatus, reasonCodes) {
+  if (readinessStatus === 'ready') {
+    return 'consume_theme_service';
+  }
+  for (const reasonCode of reasonCodes) {
+    const action = FALLBACK_ACTIONS[reasonCode];
+    if (action) {
+      return action;
+    }
+  }
+  return 'inspect_trace_refs';
+}
+
+function nextRecheckHint(readinessStatus, reasonCodes) {
+  if (readinessStatus === 'ready') {
+    return 'recheck_not_required';
+  }
+  for (const reasonCode of reasonCodes) {
+    const hint = RECHECK_HINTS[reasonCode];
+    if (hint) {
+      return hint;
+    }
+  }
+  return 'recheck_after_manual_investigation';
+}
+
+function buildPersistedExplanationService({ query, readinessResponse, themeServiceResponse }) {
+  const latestUsableBusinessDate = readinessResponse.latest_usable_business_date ?? query.target_business_date;
+  const reasonCodes = pickReasonCodes(
+    themeServiceResponse?.explanation_object?.reason_codes ?? readinessResponse.reason_codes,
+  );
+  return {
+    request_id: query.request_id,
+    trace_ref: query.trace_ref,
+    capability_id: query.capability_id,
+    service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
+    service_status: 'served',
+    service_object: {
+      capability_id: query.capability_id,
+      service_object_id: EXPLANATION_SERVICE_OBJECT_ID,
+      target_scope_ref: query.target_scope_ref,
+      target_business_date: query.target_business_date,
+      latest_usable_business_date: latestUsableBusinessDate,
+      readiness_status: readinessResponse.readiness_status,
+      theme_service_status: themeServiceResponse?.service_status ?? null,
+      reason_codes: reasonCodes,
+      blocking_dependencies: cloneJson(readinessResponse.blocking_dependencies ?? []),
+      explanation_fragments: [
+        {
+          fragment_kind: 'readiness_status',
+          value: readinessResponse.readiness_status,
+        },
+        ...reasonCodes.map((reasonCode) => ({
+          fragment_kind: 'reason_code',
+          value: reasonCode,
+        })),
+      ],
+      recommended_fallback_action: recommendedFallbackAction(
+        readinessResponse.readiness_status,
+        reasonCodes,
+      ),
+      next_recheck_hint: nextRecheckHint(
+        readinessResponse.readiness_status,
+        reasonCodes,
+      ),
+    },
+    data_window: {
+      from: latestUsableBusinessDate,
+      to: latestUsableBusinessDate,
+    },
+    state_trace_refs: cloneJson(readinessResponse.state_trace_refs ?? []),
+    run_trace_refs: cloneJson(readinessResponse.run_trace_refs ?? []),
+    served_at: new Date().toISOString(),
+    extensions: {
+      owner_surface: 'capability_explanation',
+      data_source: 'persisted_owner_surface_snapshot',
+    },
+  };
+}
+
+function rehydratePersistedReadinessSnapshot(snapshot, query) {
+  const readinessResponse = cloneJson(snapshot.readiness_response);
+  readinessResponse.request_id = query.request_id;
+  readinessResponse.trace_ref = query.trace_ref;
+  readinessResponse.evaluated_scope_ref = query.target_scope_ref;
+  readinessResponse.requested_business_date = query.target_business_date;
+  readinessResponse.latest_usable_business_date = (
+    readinessResponse.latest_usable_business_date
+    ?? snapshot.selected_business_date
+    ?? query.target_business_date
+  );
+  readinessResponse.extensions = {
+    ...(readinessResponse.extensions ?? {}),
+    data_source: 'persisted_owner_surface_snapshot',
+    persisted_snapshot_business_date: snapshot.selected_business_date,
+    persisted_serving_root: snapshot.persisted_serving_root,
+  };
+  return readinessResponse;
+}
+
+function rehydratePersistedThemeServiceSnapshot(snapshot, query) {
+  const themeServiceResponse = cloneJson(snapshot.theme_service_response);
+  themeServiceResponse.request_id = query.request_id;
+  themeServiceResponse.trace_ref = query.trace_ref;
+  themeServiceResponse.extensions = {
+    ...(themeServiceResponse.extensions ?? {}),
+    data_source: 'persisted_owner_surface_snapshot',
+    persisted_snapshot_business_date: snapshot.selected_business_date,
+    persisted_serving_root: snapshot.persisted_serving_root,
+  };
+  if (themeServiceResponse.service_object && typeof themeServiceResponse.service_object === 'object') {
+    themeServiceResponse.service_object.target_scope_ref = query.target_scope_ref;
+  }
+  return themeServiceResponse;
+}
+
 function resolveDataContext(query, adapterOptions) {
   const contextFromQuery = query?.extensions?.data_adapter_context ?? {};
   const requestedCapabilityId = asNonEmptyString(query?.capability_id);
@@ -180,10 +465,21 @@ function resolveDataContext(query, adapterOptions) {
     throw new Error('owner-side data adapter requires org_id');
   }
 
+  const resolvedFixtureBundlePaths = resolveFixtureBundlePaths(requestedCapabilityId, contextFromQuery, adapterOptions);
+  const explicitTransportKind = asNonEmptyString(contextFromQuery.transport_kind)
+    ?? asNonEmptyString(adapterOptions.transportKind);
+  const transportKind = explicitTransportKind
+    ?? (
+      resolvedFixtureBundlePaths.length > 0
+        && !asNonEmptyString(contextFromQuery.live_base_url)
+        && !asNonEmptyString(adapterOptions.liveBaseUrl)
+      ? 'fixture'
+      : 'persisted'
+    );
   const appSecret = asNonEmptyString(contextFromQuery.app_secret)
     ?? asNonEmptyString(adapterOptions.defaultAppSecret)
     ?? asNonEmptyString(process.env.NAVLY_RUNTIME_DATA_APP_SECRET);
-  if (!appSecret) {
+  if (transportKind !== 'persisted' && !appSecret) {
     throw new Error('owner-side data adapter requires app_secret');
   }
 
@@ -206,8 +502,6 @@ function resolveDataContext(query, adapterOptions) {
       ?? process.env.QINQIN_API_REQUEST_TIMEOUT_MS
       ?? 15000,
   );
-  const transportKind = asNonEmptyString(contextFromQuery.transport_kind) ?? 'fixture';
-
   return {
     request_id: query.request_id,
     trace_ref: query.trace_ref,
@@ -219,8 +513,9 @@ function resolveDataContext(query, adapterOptions) {
     start_time: startTime,
     end_time: endTime,
     app_secret: appSecret,
-    fixture_bundle_paths: resolveFixtureBundlePaths(requestedCapabilityId, contextFromQuery, adapterOptions),
+    fixture_bundle_paths: resolvedFixtureBundlePaths,
     transport_kind: transportKind,
+    persisted_serving_root: resolvePersistedServingRoot(contextFromQuery, adapterOptions),
     live_base_url: liveBaseUrl,
     live_authorization: liveAuthorization,
     live_token: liveToken,
@@ -343,6 +638,8 @@ export function createOwnerSideDataPlatformAdapter({
   defaultAppSecret = null,
   fixtureBundlePath = defaultFixtureBundlePath,
   fixtureBundlePaths = null,
+  persistedServingRoot = defaultPersistedServingRoot,
+  transportKind = null,
   liveBaseUrl = null,
   liveAuthorization = null,
   liveToken = null,
@@ -359,6 +656,8 @@ export function createOwnerSideDataPlatformAdapter({
     defaultAppSecret,
     fixtureBundlePath,
     fixtureBundlePaths,
+    persistedServingRoot,
+    transportKind,
     liveBaseUrl,
     liveAuthorization,
     liveToken,
@@ -378,6 +677,7 @@ export function createOwnerSideDataPlatformAdapter({
       context.start_time,
       context.end_time,
       context.transport_kind,
+      context.persisted_serving_root,
       context.fixture_bundle_paths,
       context.live_base_url,
       context.live_authorization,
@@ -395,7 +695,35 @@ export function createOwnerSideDataPlatformAdapter({
     }
 
     let runPromise;
-    if (
+    if (context.transport_kind === 'persisted') {
+      runPromise = Promise.resolve().then(() => {
+        const snapshot = loadPersistedCapabilitySnapshot({
+          persistedServingRoot: context.persisted_serving_root,
+          orgId: context.org_id,
+          capabilityId: context.requested_capability_id,
+          targetBusinessDate: context.requested_business_date,
+          freshnessMode: query.freshness_mode ?? 'latest_usable',
+        });
+        const readinessResponse = snapshot
+          ? rehydratePersistedReadinessSnapshot(snapshot, query)
+          : buildPersistedUnavailableReadiness(query);
+        const themeServiceResponse = snapshot
+          ? rehydratePersistedThemeServiceSnapshot(snapshot, query)
+          : buildPersistedUnavailableThemeService(query, readinessResponse);
+        const serviceResponse = mode === 'explanation'
+          ? buildPersistedExplanationService({
+            query,
+            readinessResponse,
+            themeServiceResponse,
+          })
+          : themeServiceResponse;
+        return normalizeOwnerSurfacePayload({
+          readiness_response: readinessResponse,
+          theme_service_response: themeServiceResponse,
+          service_response: serviceResponse,
+        });
+      });
+    } else if (
       mode === 'base'
       && context.requested_capability_id === 'navly.store.member_insight'
       && typeof runMemberInsightOwnerSurfaceImpl === 'function'

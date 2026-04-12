@@ -135,6 +135,7 @@ function buildStructuredInputSlots({
     data_live_timeout_ms: normalizeOptionalString(runtimeDataContext.data_live_timeout_ms),
     data_org_id: normalizeOptionalString(runtimeDataContext.data_org_id),
     data_app_secret: normalizeOptionalString(runtimeDataContext.data_app_secret),
+    data_persisted_serving_root: normalizeOptionalString(runtimeDataContext.data_persisted_serving_root),
     data_fixture_bundle_path: normalizeOptionalString(runtimeDataContext.data_fixture_bundle_path),
     host_tool_name: publishedTool.tool_name,
     host_skill_ids: publishedTool.skill_ids,
