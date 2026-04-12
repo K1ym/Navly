@@ -73,6 +73,79 @@ class NightlySyncCursorLedgerStoreTest(unittest.TestCase):
             self.assertEqual(loaded[0]['pending_business_dates'], ['2026-04-10'])
             self.assertTrue(db_path.exists())
 
+    def test_store_loads_latest_effective_entries_across_target_dates(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / 'nightly-ledger.sqlite3'
+            store = self.store_module.NightlySyncCursorLedgerStore(db_path)
+            try:
+                store.save_ledger({
+                    'source_system_id': 'qinqin.v1_1',
+                    'org_id': 'demo-org-001',
+                    'target_business_date': '2026-04-11',
+                    'entry_count': 1,
+                    'entries': [
+                        {
+                            'ledger_entry_id': 'ledger_2026_04_11',
+                            'ledger_trace_ref': 'navly:state-trace:ledger:20260411',
+                            'source_system_id': 'qinqin.v1_1',
+                            'org_id': 'demo-org-001',
+                            'endpoint_contract_id': 'qinqin.member.get_recharge_bill_list.v1_3',
+                            'target_business_date': '2026-04-11',
+                            'cursor_status': 'backfill_pending',
+                            'last_completed_business_date': '2026-04-11',
+                            'last_attempted_business_date': '2026-04-10',
+                            'next_currentness_business_date': None,
+                            'next_backfill_business_date': '2026-04-10',
+                            'covered_business_dates': ['2026-04-11', '2026-04-10'],
+                            'pending_business_dates': ['2026-04-09'],
+                            'carry_forward_cursor': True,
+                            'backfill_fill_direction': 'latest_to_oldest',
+                            'updated_at': '2026-04-11T14:00:00Z',
+                        }
+                    ],
+                })
+                store.save_ledger({
+                    'source_system_id': 'qinqin.v1_1',
+                    'org_id': 'demo-org-001',
+                    'target_business_date': '2026-04-12',
+                    'entry_count': 1,
+                    'entries': [
+                        {
+                            'ledger_entry_id': 'ledger_2026_04_12',
+                            'ledger_trace_ref': 'navly:state-trace:ledger:20260412',
+                            'source_system_id': 'qinqin.v1_1',
+                            'org_id': 'demo-org-001',
+                            'endpoint_contract_id': 'qinqin.member.get_recharge_bill_list.v1_3',
+                            'target_business_date': '2026-04-12',
+                            'cursor_status': 'backfill_pending',
+                            'last_completed_business_date': '2026-04-12',
+                            'last_attempted_business_date': '2026-04-09',
+                            'next_currentness_business_date': None,
+                            'next_backfill_business_date': '2026-04-09',
+                            'covered_business_dates': ['2026-04-12', '2026-04-11', '2026-04-10'],
+                            'pending_business_dates': ['2026-04-09'],
+                            'carry_forward_cursor': True,
+                            'backfill_fill_direction': 'latest_to_oldest',
+                            'updated_at': '2026-04-12T14:00:00Z',
+                        }
+                    ],
+                })
+
+                loaded = store.load_effective_entries(
+                    source_system_id='qinqin.v1_1',
+                    org_id='demo-org-001',
+                    as_of_target_business_date='2026-04-12',
+                )
+            finally:
+                store.close()
+
+            self.assertEqual(len(loaded), 1)
+            self.assertEqual(loaded[0]['ledger_entry_id'], 'ledger_2026_04_12')
+            self.assertEqual(
+                loaded[0]['covered_business_dates'],
+                ['2026-04-12', '2026-04-11', '2026-04-10'],
+            )
+
 
 if __name__ == '__main__':
     unittest.main()

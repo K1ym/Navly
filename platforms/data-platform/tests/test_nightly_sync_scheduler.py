@@ -39,6 +39,45 @@ class NightlySyncSchedulerTest(unittest.TestCase):
         self.assertEqual(snapshot['deferred_currentness_tasks'], 1)
         self.assertGreaterEqual(snapshot['deferred_backfill_tasks'], 1)
 
+    def test_scheduler_dispatches_backfill_when_extra_backfill_budget_is_provided(self) -> None:
+        snapshot = build_nightly_sync_scheduler_snapshot(
+            source_system_id='qinqin.v1_1',
+            org_id='demo-org-001',
+            target_business_date='2026-04-11',
+            expected_business_dates=['2026-04-09', '2026-04-10'],
+            latest_usable_endpoint_states=[],
+            endpoint_contract_ids=[
+                'qinqin.member.get_recharge_bill_list.v1_3',
+                'qinqin.staff.get_tech_commission_set_list.v1_8',
+            ],
+            max_dispatch_tasks=2,
+            max_backfill_dispatch_tasks=2,
+        )
+
+        self.assertEqual(
+            [entry['dispatch_priority'] for entry in snapshot['dispatch_plan']],
+            ['currentness', 'currentness', 'backfill', 'backfill'],
+        )
+        self.assertEqual(snapshot['deferred_currentness_tasks'], 0)
+        self.assertEqual(snapshot['deferred_backfill_tasks'], 0)
+
+    def test_scheduler_history_start_business_date_expands_expected_window(self) -> None:
+        snapshot = build_nightly_sync_scheduler_snapshot(
+            source_system_id='qinqin.v1_1',
+            org_id='demo-org-001',
+            target_business_date='2026-04-11',
+            expected_business_dates=[],
+            history_start_business_date='2026-04-09',
+            latest_usable_endpoint_states=[],
+            endpoint_contract_ids=['qinqin.member.get_recharge_bill_list.v1_3'],
+            max_dispatch_tasks=1,
+        )
+
+        self.assertEqual(
+            snapshot['planner_output']['expected_business_dates'],
+            ['2026-04-09', '2026-04-10', '2026-04-11'],
+        )
+
     def test_scheduler_script_writes_snapshot_dispatch_and_ledger(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             latest_states_path = Path(tmpdir) / 'latest-states.json'

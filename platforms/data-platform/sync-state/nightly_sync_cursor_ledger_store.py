@@ -5,7 +5,6 @@ import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS nightly_sync_cursor_ledger_entries (
@@ -82,8 +81,45 @@ class NightlySyncCursorLedgerStore:
         self._connection.close()
 
     def ensure_schema(self) -> None:
-        self._connection.executescript(SCHEMA_SQL)
+        if self._backend == 'sqlite':
+            self._connection.executescript(SCHEMA_SQL)
+        else:
+            cursor = self._connection.cursor()
+            try:
+                for statement in [entry.strip() for entry in SCHEMA_SQL.split(';') if entry.strip()]:
+                    cursor.execute(statement)
+            finally:
+                cursor.close()
         self._connection.commit()
+
+    def _backend_sql(self, statement: str) -> str:
+        if self._backend == 'sqlite':
+            return statement
+        return statement.replace('?', '%s')
+
+    def _fetchall(self, statement: str, params: tuple[Any, ...]) -> list[Any]:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(self._backend_sql(statement), params)
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+
+    def _execute(self, statement: str, params: tuple[Any, ...]) -> None:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(self._backend_sql(statement), params)
+        finally:
+            cursor.close()
+
+    def _executemany(self, statement: str, params: list[tuple[Any, ...]]) -> None:
+        if not params:
+            return
+        cursor = self._connection.cursor()
+        try:
+            cursor.executemany(self._backend_sql(statement), params)
+        finally:
+            cursor.close()
 
     def load_entries(
         self,
@@ -93,7 +129,7 @@ class NightlySyncCursorLedgerStore:
         target_business_date: str,
     ) -> list[dict[str, Any]]:
         self.ensure_schema()
-        cursor = self._connection.execute(
+        rows = self._fetchall(
             """
             SELECT *
             FROM nightly_sync_cursor_ledger_entries
@@ -104,7 +140,36 @@ class NightlySyncCursorLedgerStore:
             """,
             (source_system_id, org_id, target_business_date),
         )
-        rows = cursor.fetchall()
+        return [self._row_to_entry(row) for row in rows]
+
+    def load_effective_entries(
+        self,
+        *,
+        source_system_id: str,
+        org_id: str,
+        as_of_target_business_date: str,
+    ) -> list[dict[str, Any]]:
+        self.ensure_schema()
+        rows = self._fetchall(
+            """
+            SELECT *
+            FROM (
+                SELECT
+                    nightly_sync_cursor_ledger_entries.*,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY endpoint_contract_id
+                        ORDER BY target_business_date DESC, updated_at DESC
+                    ) AS endpoint_rank
+                FROM nightly_sync_cursor_ledger_entries
+                WHERE source_system_id = ?
+                  AND org_id = ?
+                  AND target_business_date <= ?
+            ) ranked_entries
+            WHERE endpoint_rank = 1
+            ORDER BY endpoint_contract_id ASC
+            """,
+            (source_system_id, org_id, as_of_target_business_date),
+        )
         return [self._row_to_entry(row) for row in rows]
 
     def save_ledger(self, ledger: dict[str, Any]) -> None:
@@ -116,7 +181,7 @@ class NightlySyncCursorLedgerStore:
         keep_ids = {entry['ledger_entry_id'] for entry in entries}
 
         for entry in entries:
-            self._connection.execute(
+            self._execute(
                 """
                 INSERT INTO nightly_sync_cursor_ledger_entries (
                     ledger_entry_id,
@@ -158,7 +223,7 @@ class NightlySyncCursorLedgerStore:
 
         existing_ids = {
             row['ledger_entry_id']
-            for row in self._connection.execute(
+            for row in self._fetchall(
                 """
                 SELECT ledger_entry_id
                 FROM nightly_sync_cursor_ledger_entries
@@ -167,11 +232,11 @@ class NightlySyncCursorLedgerStore:
                   AND target_business_date = ?
                 """,
                 (source_system_id, org_id, target_business_date),
-            ).fetchall()
+            )
         }
         stale_ids = existing_ids.difference(keep_ids)
         if stale_ids:
-            self._connection.executemany(
+            self._executemany(
                 "DELETE FROM nightly_sync_cursor_ledger_entries WHERE ledger_entry_id = ?",
                 [(ledger_entry_id,) for ledger_entry_id in stale_ids],
             )

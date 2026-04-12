@@ -38,6 +38,8 @@ def run_temporal_nightly_sync_activity(payload: dict[str, Any]) -> dict[str, Any
         app_secret=payload['app_secret'],
         endpoint_contract_ids=payload.get('endpoint_contract_ids'),
         max_dispatch_tasks=payload.get('max_dispatch_tasks', 8),
+        max_backfill_dispatch_tasks=payload.get('max_backfill_dispatch_tasks'),
+        history_start_business_date=payload.get('history_start_business_date'),
         output_root=payload.get('output_root'),
     )
 
