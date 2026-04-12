@@ -101,11 +101,14 @@ function buildReadinessQuery({
   businessDate = '2026-03-23',
   orgId = 'demo-org-001',
   appSecret = 'test-secret',
+  capabilityId = 'navly.store.member_insight',
+  serviceObjectId = 'navly.service.store.member_insight',
+  explanationContext = {},
 } = {}) {
   return {
     request_id: requestId,
     trace_ref: traceRef,
-    capability_id: 'navly.store.member_insight',
+    capability_id: capabilityId,
     access_context: buildOwnerAccessContextEnvelope({
       request_id: requestId,
       trace_ref: traceRef,
@@ -115,11 +118,12 @@ function buildReadinessQuery({
     freshness_mode: 'latest_usable',
     extensions: {
       runtime_trace_ref: 'navly:runtime-trace:cache-sample',
-      selected_service_object_id: 'navly.service.store.member_insight',
+      selected_service_object_id: serviceObjectId,
       data_adapter_context: {
         org_id: orgId,
         app_secret: appSecret,
       },
+      explanation_context: explanationContext,
     },
   };
 }
@@ -129,14 +133,19 @@ function buildOwnerSurfaceResult({
   traceRef = 'navly:trace:req-owner-adapter-001',
   targetScopeRef = 'navly:scope:store:sample-store-001',
   businessDate = '2026-03-23',
+  capabilityId = 'navly.store.member_insight',
+  serviceObjectId = 'navly.service.store.member_insight',
   readinessStatus = 'ready',
   serviceStatus = 'served',
+  ownerSurface = 'member_insight',
+  serviceObject = null,
+  explanationReasonCodes = ['missing_dependency'],
 } = {}) {
   return {
     readiness_response: {
       request_id: requestId,
       trace_ref: traceRef,
-      capability_id: 'navly.store.member_insight',
+      capability_id: capabilityId,
       readiness_status: readinessStatus,
       evaluated_scope_ref: targetScopeRef,
       requested_business_date: businessDate,
@@ -155,19 +164,19 @@ function buildOwnerSurfaceResult({
       run_trace_refs: ['navly:run-trace:owner-surface:sample'],
       evaluated_at: FIXED_NOW,
       extensions: {
-        owner_surface: 'member_insight',
+        owner_surface: ownerSurface,
       },
     },
     theme_service_response: {
       request_id: requestId,
       trace_ref: traceRef,
-      capability_id: 'navly.store.member_insight',
-      service_object_id: 'navly.service.store.member_insight',
+      capability_id: capabilityId,
+      service_object_id: serviceObjectId,
       service_status: serviceStatus,
       service_object: serviceStatus === 'served'
-        ? {
-          capability_id: 'navly.store.member_insight',
-          service_object_id: 'navly.service.store.member_insight',
+        ? (serviceObject ?? {
+          capability_id: capabilityId,
+          service_object_id: serviceObjectId,
           target_scope_ref: targetScopeRef,
           target_business_date: businessDate,
           customer_count: 1,
@@ -175,7 +184,7 @@ function buildOwnerSurfaceResult({
           consume_bill_count: 1,
           consume_bill_payment_count: 1,
           consume_bill_info_count: 1,
-        }
+        })
         : {},
       data_window: {
         from: businessDate,
@@ -184,9 +193,9 @@ function buildOwnerSurfaceResult({
       explanation_object: serviceStatus === 'served'
         ? undefined
         : {
-          capability_id: 'navly.store.member_insight',
+          capability_id: capabilityId,
           explanation_scope: 'service',
-          reason_codes: ['missing_dependency'],
+          reason_codes: explanationReasonCodes,
           state_trace_refs: ['navly:state-trace:owner-surface:sample'],
           run_trace_refs: ['navly:run-trace:owner-surface:sample'],
         },
@@ -194,7 +203,7 @@ function buildOwnerSurfaceResult({
       run_trace_refs: ['navly:run-trace:owner-surface:sample'],
       served_at: FIXED_NOW,
       extensions: {
-        owner_surface: 'member_insight',
+        owner_surface: ownerSurface,
       },
     },
   };
@@ -274,12 +283,113 @@ test('default owner-side dependency clients are initialized once across repeated
   assert.equal(getDefaultOwnerSideDependencyClientInitCountForTest(), 1);
 });
 
+test('owner-side data adapter serves finance_summary through the explicit phase-1 service registry', async () => {
+  let capturedInput = null;
+  const adapter = createOwnerSideDataPlatformAdapter({
+    runPhase1OwnerSurfaceImpl: async ({ input }) => {
+      capturedInput = input;
+      return buildOwnerSurfaceResult({
+        requestId: input.request_id,
+        traceRef: input.trace_ref,
+        targetScopeRef: input.target_scope_ref,
+        businessDate: input.requested_business_date,
+        capabilityId: 'navly.store.finance_summary',
+        serviceObjectId: 'navly.service.store.finance_summary',
+        ownerSurface: 'finance_summary',
+        serviceObject: {
+          capability_id: 'navly.store.finance_summary',
+          service_object_id: 'navly.service.store.finance_summary',
+          target_scope_ref: input.target_scope_ref,
+          target_business_date: input.requested_business_date,
+          recharge_total_amount: 7,
+          account_trade_count: 2,
+        },
+      });
+    },
+  });
+
+  const readiness = await adapter.queryCapabilityReadiness(buildReadinessQuery({
+    capabilityId: 'navly.store.finance_summary',
+    serviceObjectId: 'navly.service.store.finance_summary',
+  }));
+  const service = await adapter.queryThemeService({
+    ...buildReadinessQuery({
+      capabilityId: 'navly.store.finance_summary',
+      serviceObjectId: 'navly.service.store.finance_summary',
+    }),
+    service_object_id: 'navly.service.store.finance_summary',
+  });
+
+  assert.equal(readiness.readiness_status, 'ready');
+  assert.equal(service.service_status, 'served');
+  assert.equal(service.service_object.recharge_total_amount, 7);
+  assert.equal(capturedInput.capability_id, 'navly.store.finance_summary');
+  assert.equal(capturedInput.service_object_id, 'navly.service.store.finance_summary');
+});
+
+test('owner-side data adapter serves capability_explanation without requiring org/app_secret', async () => {
+  let capturedInput = null;
+  const adapter = createOwnerSideDataPlatformAdapter({
+    runPhase1OwnerSurfaceImpl: async ({ input }) => {
+      capturedInput = input;
+      return buildOwnerSurfaceResult({
+        requestId: input.request_id,
+        traceRef: input.trace_ref,
+        targetScopeRef: input.target_scope_ref,
+        businessDate: input.requested_business_date,
+        capabilityId: 'navly.system.capability_explanation',
+        serviceObjectId: 'navly.service.system.capability_explanation',
+        ownerSurface: 'capability_explanation',
+        serviceObject: {
+          capability_id: 'navly.system.capability_explanation',
+          service_object_id: 'navly.service.system.capability_explanation',
+          explained_capability_id: 'navly.store.staff_board',
+          reason_codes: ['dependency_failed'],
+        },
+      });
+    },
+  });
+
+  const readinessQuery = {
+    ...buildReadinessQuery({
+      capabilityId: 'navly.system.capability_explanation',
+      serviceObjectId: 'navly.service.system.capability_explanation',
+      orgId: '',
+      appSecret: '',
+      explanationContext: {
+        explained_capability_id: 'navly.store.staff_board',
+        reason_codes: ['dependency_failed'],
+      },
+    }),
+    extensions: {
+      runtime_trace_ref: 'navly:runtime-trace:cache-sample',
+      selected_service_object_id: 'navly.service.system.capability_explanation',
+      explanation_context: {
+        explained_capability_id: 'navly.store.staff_board',
+        reason_codes: ['dependency_failed'],
+      },
+    },
+  };
+
+  const readiness = await adapter.queryCapabilityReadiness(readinessQuery);
+  const service = await adapter.queryThemeService({
+    ...readinessQuery,
+    service_object_id: 'navly.service.system.capability_explanation',
+  });
+
+  assert.equal(readiness.readiness_status, 'ready');
+  assert.equal(service.service_status, 'served');
+  assert.equal(service.service_object.explained_capability_id, 'navly.store.staff_board');
+  assert.equal(capturedInput.org_id, null);
+  assert.equal(capturedInput.app_secret, null);
+});
+
 test('owner-side data adapter cache is bounded by runCacheMaxEntries', async () => {
   let runCount = 0;
   const adapter = createOwnerSideDataPlatformAdapter({
     runCacheMaxEntries: 2,
     runCacheTtlMs: 0,
-    runMemberInsightOwnerSurfaceImpl: async ({ input }) => {
+    runPhase1OwnerSurfaceImpl: async ({ input }) => {
       runCount += 1;
       return buildOwnerSurfaceResult({
         requestId: input.request_id,
@@ -303,7 +413,7 @@ test('owner-side data adapter removes rejected promise entries so next attempt c
   const adapter = createOwnerSideDataPlatformAdapter({
     runCacheMaxEntries: 4,
     runCacheTtlMs: 0,
-    runMemberInsightOwnerSurfaceImpl: async ({ input }) => {
+    runPhase1OwnerSurfaceImpl: async ({ input }) => {
       runCount += 1;
       if (runCount === 1) {
         throw new Error(`synthetic failure for ${input.requested_business_date}`);
@@ -334,7 +444,7 @@ test('owner-side data adapter normalizes non-positive live timeout to the defaul
   let capturedInput = null;
   const adapter = createOwnerSideDataPlatformAdapter({
     liveTimeoutMs: 0,
-    runMemberInsightOwnerSurfaceImpl: async ({ input }) => {
+    runPhase1OwnerSurfaceImpl: async ({ input }) => {
       capturedInput = input;
       return buildOwnerSurfaceResult({
         requestId: input.request_id,

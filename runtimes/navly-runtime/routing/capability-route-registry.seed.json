@@ -21,7 +21,7 @@
       "status": "implemented_milestone_b_primary"
     },
     {
-      "route_id": "capability.navly.store.daily_overview.secondary",
+      "route_id": "capability.navly.store.daily_overview",
       "match_mode": "explicit_or_match_tokens",
       "match_tokens": [
         "daily_overview",
@@ -35,7 +35,59 @@
       "supported_service_object_ids": [
         "navly.service.store.daily_overview"
       ],
-      "status": "implemented_secondary_entry"
+      "status": "implemented_phase1_aggregate"
+    },
+    {
+      "route_id": "capability.navly.store.finance_summary",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "finance_summary",
+        "store_finance_summary",
+        "finance summary",
+        "财务汇总",
+        "充值汇总",
+        "流水汇总"
+      ],
+      "capability_id": "navly.store.finance_summary",
+      "default_service_object_id": "navly.service.store.finance_summary",
+      "supported_service_object_ids": [
+        "navly.service.store.finance_summary"
+      ],
+      "status": "implemented_phase1_owner_surface"
+    },
+    {
+      "route_id": "capability.navly.store.staff_board",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "staff_board",
+        "store_staff_board",
+        "staff board",
+        "员工看板",
+        "技师看板"
+      ],
+      "capability_id": "navly.store.staff_board",
+      "default_service_object_id": "navly.service.store.staff_board",
+      "supported_service_object_ids": [
+        "navly.service.store.staff_board"
+      ],
+      "status": "implemented_phase1_owner_surface"
+    },
+    {
+      "route_id": "capability.navly.system.capability_explanation",
+      "match_mode": "explicit_or_match_tokens",
+      "match_tokens": [
+        "capability_explanation",
+        "capability explanation",
+        "解释不可用",
+        "为什么答不了",
+        "缺数解释"
+      ],
+      "capability_id": "navly.system.capability_explanation",
+      "default_service_object_id": "navly.service.system.capability_explanation",
+      "supported_service_object_ids": [
+        "navly.service.system.capability_explanation"
+      ],
+      "status": "implemented_phase1_fallback_surface"
     }
   ],
   "default_fallback": {
@@ -45,5 +97,5 @@
     "fallback_capability_id": "navly.system.capability_explanation",
     "fallback_service_object_id": "navly.service.system.capability_explanation"
   },
-  "notes": "Milestone B keeps member_insight as canonical minimal slice and daily_overview as a secondary entry."
+  "notes": "ASP-49 closes the explicit phase-1 owner/service set for runtime default consumption: member_insight, daily_overview, finance_summary, staff_board, and capability_explanation."
 }

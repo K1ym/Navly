@@ -1,11 +1,11 @@
 {
   "registry_name": "capability_dependency_registry",
-  "status": "milestone_a_placeholder",
+  "status": "phase_1_owner_surface_dependencies",
   "entries": [
     {
       "capability_id": "navly.store.member_insight",
-      "dependency_status": "vertical_slice_seeded",
-      "notes": "Milestone B first vertical slice dependency seed for member insight backbone.",
+      "dependency_status": "implemented_phase1_owner_surface",
+      "notes": "Authoritative member insight owner surface dependency set.",
       "default_service_object_id": "navly.service.store.member_insight",
       "endpoint_contract_ids": [
         "qinqin.member.get_customers_list.v1_1",
@@ -20,18 +20,75 @@
     },
     {
       "capability_id": "navly.store.daily_overview",
-      "dependency_status": "not_yet_expanded",
-      "notes": "Dependency matrix is deferred beyond skeleton creation."
+      "dependency_status": "implemented_phase1_owner_surface",
+      "notes": "Aggregate owner surface over member, finance, and staff phase-1 surfaces.",
+      "default_service_object_id": "navly.service.store.daily_overview",
+      "dependency_capability_ids": [
+        "navly.store.member_insight",
+        "navly.store.finance_summary",
+        "navly.store.staff_board"
+      ],
+      "endpoint_contract_ids": [
+        "qinqin.member.get_customers_list.v1_1",
+        "qinqin.member.get_consume_bill_list.v1_2",
+        "qinqin.member.get_recharge_bill_list.v1_3",
+        "qinqin.member.get_user_trade_list.v1_4",
+        "qinqin.staff.get_person_list.v1_5",
+        "qinqin.staff.get_tech_up_clock_list.v1_6",
+        "qinqin.staff.get_tech_market_list.v1_7"
+      ],
+      "required_canonical_datasets": [
+        "customer",
+        "consume_bill",
+        "recharge_bill",
+        "account_trade",
+        "staff",
+        "tech_shift_item",
+        "sales_commission"
+      ]
     },
     {
       "capability_id": "navly.store.staff_board",
-      "dependency_status": "not_yet_expanded",
-      "notes": "Dependency matrix is deferred beyond skeleton creation."
+      "dependency_status": "implemented_phase1_owner_surface",
+      "notes": "Staff board owner surface dependency set.",
+      "default_service_object_id": "navly.service.store.staff_board",
+      "endpoint_contract_ids": [
+        "qinqin.staff.get_person_list.v1_5",
+        "qinqin.staff.get_tech_up_clock_list.v1_6",
+        "qinqin.staff.get_tech_market_list.v1_7"
+      ],
+      "required_canonical_datasets": [
+        "staff",
+        "staff_item",
+        "tech_shift_item",
+        "tech_shift_summary",
+        "sales_commission"
+      ]
     },
     {
       "capability_id": "navly.store.finance_summary",
-      "dependency_status": "not_yet_expanded",
-      "notes": "Dependency matrix is deferred beyond skeleton creation."
+      "dependency_status": "implemented_phase1_owner_surface",
+      "notes": "Finance summary owner surface dependency set.",
+      "default_service_object_id": "navly.service.store.finance_summary",
+      "endpoint_contract_ids": [
+        "qinqin.member.get_recharge_bill_list.v1_3",
+        "qinqin.member.get_user_trade_list.v1_4"
+      ],
+      "required_canonical_datasets": [
+        "recharge_bill",
+        "recharge_bill_payment",
+        "recharge_bill_ticket",
+        "recharge_bill_sales",
+        "account_trade"
+      ]
+    },
+    {
+      "capability_id": "navly.system.capability_explanation",
+      "dependency_status": "implemented_phase1_owner_surface",
+      "notes": "Formal fallback surface; no source endpoint dependencies.",
+      "default_service_object_id": "navly.service.system.capability_explanation",
+      "endpoint_contract_ids": [],
+      "required_canonical_datasets": []
     }
   ],
   "shared_contract_owner_path": "shared/contracts"

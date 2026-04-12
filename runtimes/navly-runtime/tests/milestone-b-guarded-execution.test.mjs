@@ -196,6 +196,39 @@ test('happy path without route or dependency warnings preserves empty reason_cod
   assert.deepEqual(result.runtime_result_envelope.reason_codes, []);
 });
 
+test('explicit phase-1 service set routes all supported owner surfaces through the default runtime path', async () => {
+  const supportedPairs = [
+    ['navly.store.daily_overview', 'navly.service.store.daily_overview'],
+    ['navly.store.finance_summary', 'navly.service.store.finance_summary'],
+    ['navly.store.staff_board', 'navly.service.store.staff_board'],
+    ['navly.system.capability_explanation', 'navly.service.system.capability_explanation'],
+  ];
+
+  for (const [capabilityId, serviceObjectId] of supportedPairs) {
+    const authKernelClient = createAuthKernelClient();
+    const dataPlatformClient = createDataPlatformClient();
+    const result = await runMilestoneBGuardedExecutionChain({
+      runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+        requested_capability_id: capabilityId,
+        requested_service_object_id: serviceObjectId,
+        access_context_envelope: buildAccessContextEnvelope({
+          granted_capability_ids: [capabilityId],
+        }),
+      }),
+      authKernelClient,
+      dataPlatformClient,
+      now: FIXED_NOW,
+    });
+
+    assert.equal(result.capability_route_result.route_status, 'resolved');
+    assert.equal(result.runtime_execution_plan.selected_capability_id, capabilityId);
+    assert.equal(result.runtime_execution_plan.selected_service_object_id, serviceObjectId);
+    assert.equal(result.runtime_result_envelope.result_status, 'answered');
+    assert.equal(result.runtime_result_envelope.selected_capability_id, capabilityId);
+    assert.equal(result.runtime_result_envelope.selected_service_object_id, serviceObjectId);
+  }
+});
+
 test('unresolved route returns fallback without dependency calls', async () => {
   const authKernelClient = createAuthKernelClient();
   const dataPlatformClient = createDataPlatformClient();

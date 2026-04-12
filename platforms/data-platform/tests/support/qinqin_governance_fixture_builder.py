@@ -90,11 +90,18 @@ def build_aligned_response_bundle(*, value_suffix: str = 'sample') -> dict[str, 
                 continue
             value = 1 if field['path_kind'] == 'page_total' else _sample_value(field['data_type'], field['field_path'], value_suffix)
             _set_path_value(response_envelope, field['field_path'], value, replace=True)
-        response_envelope.setdefault('Code', 200)
-        response_envelope.setdefault('Msg', '操作成功')
+        response_envelope['Code'] = 200
+        response_envelope['Msg'] = '操作成功'
         bundle[entry['endpoint_contract_id']] = response_envelope
 
     return bundle
+
+
+def build_aligned_fixture_pages_by_endpoint(*, value_suffix: str = 'sample') -> dict[str, list[dict[str, Any]]]:
+    return {
+        endpoint_contract_id: [response_envelope]
+        for endpoint_contract_id, response_envelope in build_aligned_response_bundle(value_suffix=value_suffix).items()
+    }
 
 
 def build_raw_pages_by_endpoint(
@@ -156,4 +163,3 @@ def build_endpoint_runs(
             **override,
         })
     return endpoint_runs
-
