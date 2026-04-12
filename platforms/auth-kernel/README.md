@@ -14,6 +14,8 @@
 - Gate 0 closure
 - capability access decision skeleton
 - access_context_envelope owner-side consumption mapping
+- optional local override layer for production actor / alias / role / scope mapping
+  - default override dir: `/etc/navly/auth-kernel`
 - milestone A / B 自检脚本与最小测试
 
 本轮**不**实现：

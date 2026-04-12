@@ -8,6 +8,7 @@ import {
   buildSessionRef,
   sharedPatterns,
 } from '../contracts/shared-contract-alignment.mjs';
+import { mergeArrayByKey, readOptionalOverrideSeed } from '../local-overrides/seed-override-loader.mjs';
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -40,10 +41,28 @@ export function computeBindingSnapshotRef(bindingSnapshot) {
 }
 
 export function loadBindingBackbone() {
+  const roleBindingSeed = readJsonSeed('role-binding.seed.json');
+  const scopeBindingSeed = readJsonSeed('scope-binding.seed.json');
+  const conversationBindingSeed = readJsonSeed('conversation-binding.seed.json');
+  const roleBindingOverride = readOptionalOverrideSeed('role-binding.override.json');
+  const scopeBindingOverride = readOptionalOverrideSeed('scope-binding.override.json');
+  const conversationBindingOverride = readOptionalOverrideSeed('conversation-binding.override.json');
+
   return {
-    roleBindings: readJsonSeed('role-binding.seed.json').bindings ?? [],
-    scopeBindings: readJsonSeed('scope-binding.seed.json').bindings ?? [],
-    conversationBindingProfile: readJsonSeed('conversation-binding.seed.json'),
+    roleBindings: mergeArrayByKey(
+      roleBindingSeed.bindings ?? [],
+      roleBindingOverride?.bindings ?? [],
+      (entry) => `${entry.actor_ref}:${entry.role_id}`,
+    ),
+    scopeBindings: mergeArrayByKey(
+      scopeBindingSeed.bindings ?? [],
+      scopeBindingOverride?.bindings ?? [],
+      (entry) => `${entry.actor_ref}:${entry.tenant_ref}:${entry.scope_ref}`,
+    ),
+    conversationBindingProfile: {
+      ...conversationBindingSeed,
+      ...(conversationBindingOverride ?? {}),
+    },
   };
 }
 
