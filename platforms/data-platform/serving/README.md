@@ -17,8 +17,13 @@
   - 在 service object 中显式携带 governed business-day boundary policy
 - `capability_explanation_service_surface.py`
   - 为 `navly.service.system.capability_explanation` 发布 companion explanation service surface
+- `persisted_owner_surface_snapshot_store.py`
+  - 为 manager-facing capability / service object 提供 persisted snapshot store
+  - nightly runtime 将 member_insight / finance_summary / staff_board / daily_overview 物化到该 store
+  - owner-side runtime 默认从该 store 读取 latest-usable readiness / service snapshots
 
 当前边界：
 
+- Copilot / runtime 默认不再实时重跑 live vertical slice；默认消费 persisted owner-surface snapshots
 - Copilot / runtime 仍不应默认穿透内部目录读 canonical/raw/state
 - serving surface 表达的是 owner-governed service truth，不是最终自然语言回答

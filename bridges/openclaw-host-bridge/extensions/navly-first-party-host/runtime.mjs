@@ -234,12 +234,20 @@ function resolveOrgId({ scopeRef, pluginConfig, envConfig }) {
     ?? normalizeOptionalString(envConfig.QINQIN_API_ORG_ID);
 }
 
-function buildRuntimeDataContext({ toolInput, pluginConfig, envConfig, nowFactory }) {
+function defaultTransportKindForTool({ publishedTool, pluginConfig }) {
+  return normalizeOptionalString(pluginConfig.transportKind)
+    ?? (publishedTool?.host_agent_id === 'ops' ? 'live' : 'persisted');
+}
+
+function buildRuntimeDataContext({ toolInput, publishedTool, pluginConfig, envConfig, nowFactory }) {
   const businessDate = resolveBusinessDate(toolInput, pluginConfig, nowFactory);
   const scopeRef = resolveScopeRef(toolInput, pluginConfig);
 
   return {
-    data_transport_kind: normalizeOptionalString(pluginConfig.transportKind) ?? 'live',
+    data_transport_kind: defaultTransportKindForTool({ publishedTool, pluginConfig }),
+    data_persisted_serving_root: normalizeOptionalString(pluginConfig.persistedServingRoot)
+      ?? normalizeOptionalString(process.env.NAVLY_DATA_PLATFORM_PERSISTED_SERVING_ROOT)
+      ?? '/var/lib/navly/data-platform/serving-store',
     data_live_base_url: normalizeOptionalString(envConfig.QINQIN_API_BASE_URL)
       ?? normalizeOptionalString(envConfig.QINQIN_REAL_DATA_URL),
     data_live_authorization: normalizeOptionalString(envConfig.QINQIN_API_AUTHORIZATION),
@@ -371,6 +379,7 @@ export function createNavlyFirstPartyTools({
         },
         runtimeDataContext: buildRuntimeDataContext({
           toolInput: normalizedToolInput,
+          publishedTool: tool,
           pluginConfig,
           envConfig,
           nowFactory,

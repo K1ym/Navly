@@ -46,6 +46,7 @@ function buildDataAdapterContext(interactionContext) {
     start_time: pickString(slots.data_window_start_time),
     end_time: pickString(slots.data_window_end_time),
     app_secret: pickString(slots.data_app_secret),
+    persisted_serving_root: pickString(slots.data_persisted_serving_root),
     fixture_bundle_path: pickString(slots.data_fixture_bundle_path),
     fixture_bundle_paths: Array.isArray(slots.data_fixture_bundle_paths)
       ? slots.data_fixture_bundle_paths.filter((value) => typeof value === 'string' && value.trim().length > 0)

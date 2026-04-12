@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runMilestoneBGuardedExecutionChain } from '../execution/runtime-chain-backbone.mjs';
@@ -228,6 +230,54 @@ function buildOwnerSurfaceResult({
       },
     },
   };
+}
+
+function writePersistedOwnerSurfaceSnapshot({
+  rootDir,
+  orgId = 'demo-org-001',
+  businessDate = '2026-03-23',
+  capabilityId = 'navly.store.member_insight',
+  serviceObjectId = 'navly.service.store.member_insight',
+  readinessStatus = 'ready',
+  serviceStatus = 'served',
+}) {
+  const snapshot = {
+    org_id: orgId,
+    target_scope_ref: `navly:scope:store:${orgId}`,
+    snapshot_business_date: businessDate,
+    capability_id: capabilityId,
+    service_object_id: serviceObjectId,
+    ...buildOwnerSurfaceResult({
+      requestId: `persisted-${businessDate}`,
+      traceRef: `navly:trace:persisted-${businessDate}`,
+      targetScopeRef: `navly:scope:store:${orgId}`,
+      businessDate,
+      readinessStatus,
+      serviceStatus,
+    }),
+  };
+  const orgRoot = path.join(rootDir, orgId, businessDate, 'owner-surfaces');
+  fs.mkdirSync(orgRoot, { recursive: true });
+  fs.writeFileSync(
+    path.join(orgRoot, `${capabilityId}.json`),
+    `${JSON.stringify(snapshot, null, 2)}\n`,
+    'utf8',
+  );
+  fs.writeFileSync(
+    path.join(rootDir, orgId, 'index.json'),
+    `${JSON.stringify({
+      snapshot_version: 'navly.phase1_owner_surface_snapshot.v1',
+      org_id: orgId,
+      capabilities: {
+        [capabilityId]: {
+          service_object_id: serviceObjectId,
+          available_business_dates: [businessDate],
+          latest_persisted_business_date: businessDate,
+        },
+      },
+    }, null, 2)}\n`,
+    'utf8',
+  );
 }
 
 test('owner-side adapter closure serves member_insight without mocked clients', async () => {
@@ -477,4 +527,85 @@ test('owner-side data adapter normalizes non-positive live timeout to the defaul
   });
 
   assert.equal(capturedInput.live_timeout_ms, 15000);
+});
+
+test('owner-side data adapter prefers persisted snapshots for latest_usable manager queries', async () => {
+  const persistedRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'navly-persisted-owner-surface-'));
+  try {
+    writePersistedOwnerSurfaceSnapshot({
+      rootDir: persistedRoot,
+      businessDate: '2026-03-23',
+    });
+    const adapter = createOwnerSideDataPlatformAdapter({
+      persistedServingRoot: persistedRoot,
+      fixtureBundlePath: null,
+      fixtureBundlePaths: null,
+    });
+
+    const readinessResponse = await adapter.queryCapabilityReadiness({
+      ...buildReadinessQuery({ requestId: 'req-persisted-001', businessDate: '2026-03-24' }),
+      extensions: {
+        runtime_trace_ref: 'navly:runtime-trace:persisted-001',
+        selected_service_object_id: 'navly.service.store.member_insight',
+        data_adapter_context: {
+          org_id: 'demo-org-001',
+          transport_kind: 'persisted',
+          persisted_serving_root: persistedRoot,
+        },
+      },
+    });
+
+    assert.equal(readinessResponse.readiness_status, 'ready');
+    assert.equal(readinessResponse.latest_usable_business_date, '2026-03-23');
+    assert.equal(readinessResponse.request_id, 'req-persisted-001');
+    assert.equal(readinessResponse.extensions.data_source, 'persisted_owner_surface_snapshot');
+  } finally {
+    fs.rmSync(persistedRoot, { recursive: true, force: true });
+  }
+});
+
+test('owner-side data adapter fail-closes when persisted snapshot is unavailable', async () => {
+  const persistedRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'navly-persisted-owner-surface-miss-'));
+  try {
+    const adapter = createOwnerSideDataPlatformAdapter({
+      persistedServingRoot: persistedRoot,
+      fixtureBundlePath: null,
+      fixtureBundlePaths: null,
+    });
+
+    const readinessResponse = await adapter.queryCapabilityReadiness({
+      ...buildReadinessQuery({ requestId: 'req-persisted-miss-001', businessDate: '2026-03-24' }),
+      extensions: {
+        runtime_trace_ref: 'navly:runtime-trace:persisted-miss-001',
+        selected_service_object_id: 'navly.service.store.member_insight',
+        data_adapter_context: {
+          org_id: 'demo-org-001',
+          transport_kind: 'persisted',
+          persisted_serving_root: persistedRoot,
+        },
+      },
+    });
+    const serviceResponse = await adapter.queryThemeService({
+      request_id: 'req-persisted-miss-001',
+      trace_ref: 'navly:trace:req-persisted-miss-001',
+      capability_id: 'navly.store.member_insight',
+      service_object_id: 'navly.service.store.member_insight',
+      target_scope_ref: 'navly:scope:store:demo-org-001',
+      target_business_date: '2026-03-24',
+      extensions: {
+        data_adapter_context: {
+          org_id: 'demo-org-001',
+          transport_kind: 'persisted',
+          persisted_serving_root: persistedRoot,
+        },
+      },
+    });
+
+    assert.equal(readinessResponse.readiness_status, 'pending');
+    assert.deepEqual(readinessResponse.reason_codes, ['latest_state_not_published']);
+    assert.equal(serviceResponse.service_status, 'not_ready');
+    assert.deepEqual(serviceResponse.explanation_object.reason_codes, ['latest_state_not_published']);
+  } finally {
+    fs.rmSync(persistedRoot, { recursive: true, force: true });
+  }
 });

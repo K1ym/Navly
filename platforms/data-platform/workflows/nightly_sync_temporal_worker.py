@@ -40,6 +40,7 @@ def run_temporal_nightly_sync_activity(payload: dict[str, Any]) -> dict[str, Any
         max_dispatch_tasks=payload.get('max_dispatch_tasks', 8),
         max_backfill_dispatch_tasks=payload.get('max_backfill_dispatch_tasks'),
         history_start_business_date=payload.get('history_start_business_date'),
+        persisted_serving_root=payload.get('persisted_serving_root'),
         output_root=payload.get('output_root'),
     )
 

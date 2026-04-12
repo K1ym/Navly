@@ -32,6 +32,7 @@ def main() -> int:
     parser.add_argument('--output-dir')
     parser.add_argument('--max-dispatch-tasks', type=int, default=8)
     parser.add_argument('--max-backfill-dispatch-tasks', type=int)
+    parser.add_argument('--persisted-serving-root')
     args = parser.parse_args()
 
     if not args.temporal_server_url:
@@ -50,6 +51,7 @@ def main() -> int:
         'output_root': args.output_dir,
         'max_dispatch_tasks': args.max_dispatch_tasks,
         'max_backfill_dispatch_tasks': args.max_backfill_dispatch_tasks,
+        'persisted_serving_root': args.persisted_serving_root,
     }
     runtime = run_temporal_worker(
         temporal_server_url=args.temporal_server_url,
