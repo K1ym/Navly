@@ -1,0 +1,19 @@
+{
+  "contract_name": "schema_alignment_snapshot_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "snapshot_id",
+    "snapshot_trace_ref",
+    "endpoint_contract_id",
+    "org_id",
+    "requested_business_date",
+    "alignment_status",
+    "mismatch_count",
+    "mismatch_details",
+    "endpoint_run_id",
+    "run_trace_ref",
+    "updated_at"
+  ],
+  "notes": "Endpoint-scoped machine-readable schema alignment proof."
+}

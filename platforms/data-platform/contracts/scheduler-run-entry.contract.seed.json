@@ -1,0 +1,23 @@
+{
+  "contract_name": "scheduler_run_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "scheduler_run_id",
+    "scheduler_trace_ref",
+    "workflow_id",
+    "workflow_kind",
+    "org_id",
+    "target_business_date",
+    "planner_mode",
+    "task_queue",
+    "scheduler_status",
+    "plan_task_count",
+    "dispatched_task_count",
+    "failure_budget",
+    "execution_trace_refs",
+    "started_at",
+    "completed_at"
+  ],
+  "notes": "Scheduler / workflow execution truth. systemd or wrapper processes may bootstrap workers but must not replace this semantic layer."
+}

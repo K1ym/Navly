@@ -14,3 +14,7 @@
 - Qinqin v1.1 contract governance registry completeness
 - field catalog / landing policy / variance register consistency
 - member insight owner-side readiness / theme service surface
+- PostgreSQL truth substrate persistence model
+- non-empty historical backfill planning when older gaps exist
+- carry-forward cursor continuation across nightly runs
+- Temporal-style nightly / retry / rerun workflow trace linkage

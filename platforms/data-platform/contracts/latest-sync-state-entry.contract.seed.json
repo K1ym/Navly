@@ -1,0 +1,23 @@
+{
+  "contract_name": "latest_sync_state_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "state_id",
+    "state_trace_ref",
+    "capability_id",
+    "source_system_id",
+    "endpoint_contract_id",
+    "org_id",
+    "latest_usable_business_date",
+    "availability_status",
+    "latest_run_trace_ref",
+    "latest_endpoint_run_id",
+    "latest_endpoint_status",
+    "last_attempted_business_date",
+    "last_attempted_status",
+    "last_attempted_run_trace_ref",
+    "updated_at"
+  ],
+  "notes": "Latest usable state truth. latest usable date and last attempted date must remain separate so historical backfill cannot overwrite currentness truth."
+}

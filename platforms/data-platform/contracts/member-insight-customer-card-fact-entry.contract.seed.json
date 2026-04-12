@@ -1,0 +1,13 @@
+{
+  "contract_name": "member_insight_customer_card_fact_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "fact_id",
+    "fact_trace_ref",
+    "org_id",
+    "requested_business_date",
+    "customer_card_id",
+    "payload_json"
+  ]
+}

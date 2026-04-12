@@ -31,33 +31,47 @@ from connectors.qinqin.qinqin_substrate import (
     FixtureQinqinTransport,
     LiveQinqinTransport,
 )
-from workflows.member_insight_owner_surface import build_member_insight_owner_surface
+from workflows.member_insight_owner_surface import (
+    build_member_insight_owner_surface,
+    build_member_insight_owner_surface_from_snapshot,
+)
 
 args = json.loads(sys.argv[2])
-transport_kind = args.get("transport_kind") or "fixture"
-if transport_kind == "fixture":
-    fixture_bundle = json.loads(Path(args["fixture_bundle_path"]).read_text(encoding="utf-8"))
-    transport = FixtureQinqinTransport(fixture_bundle)
-else:
-    live_timeout_ms = args.get("live_timeout_ms") or DEFAULT_LIVE_TIMEOUT_MS
-    transport = LiveQinqinTransport(
-        base_url=args["live_base_url"],
-        timeout_ms=int(live_timeout_ms),
-        authorization=args.get("live_authorization"),
-        token=args.get("live_token"),
+state_snapshot_path = args.get("state_snapshot_path")
+if state_snapshot_path:
+    result = build_member_insight_owner_surface_from_snapshot(
+        request_id=args["request_id"],
+        trace_ref=args["trace_ref"],
+        target_scope_ref=args["target_scope_ref"],
+        target_business_date=args["requested_business_date"],
+        org_id=args["org_id"],
+        state_snapshot_path=state_snapshot_path,
     )
+else:
+    transport_kind = args.get("transport_kind") or "fixture"
+    if transport_kind == "fixture":
+        fixture_bundle = json.loads(Path(args["fixture_bundle_path"]).read_text(encoding="utf-8"))
+        transport = FixtureQinqinTransport(fixture_bundle)
+    else:
+        live_timeout_ms = args.get("live_timeout_ms") or DEFAULT_LIVE_TIMEOUT_MS
+        transport = LiveQinqinTransport(
+            base_url=args["live_base_url"],
+            timeout_ms=int(live_timeout_ms),
+            authorization=args.get("live_authorization"),
+            token=args.get("live_token"),
+        )
 
-result = build_member_insight_owner_surface(
-    request_id=args["request_id"],
-    trace_ref=args["trace_ref"],
-    target_scope_ref=args["target_scope_ref"],
-    target_business_date=args["requested_business_date"],
-    org_id=args["org_id"],
-    start_time=args["start_time"],
-    end_time=args["end_time"],
-    app_secret=args["app_secret"],
-    transport=transport,
-)
+    result = build_member_insight_owner_surface(
+        request_id=args["request_id"],
+        trace_ref=args["trace_ref"],
+        target_scope_ref=args["target_scope_ref"],
+        target_business_date=args["requested_business_date"],
+        org_id=args["org_id"],
+        start_time=args["start_time"],
+        end_time=args["end_time"],
+        app_secret=args["app_secret"],
+        transport=transport,
+    )
 print(json.dumps({
     "readiness_response": result["readiness_response"],
     "theme_service_response": result["theme_service_response"],
@@ -82,7 +96,10 @@ function resolveDataContext(query, adapterOptions) {
   const appSecret = asNonEmptyString(contextFromQuery.app_secret)
     ?? asNonEmptyString(adapterOptions.defaultAppSecret)
     ?? asNonEmptyString(process.env.NAVLY_RUNTIME_DATA_APP_SECRET);
-  if (!appSecret) {
+  const stateSnapshotPath = asNonEmptyString(contextFromQuery.state_snapshot_path)
+    ?? asNonEmptyString(adapterOptions.stateSnapshotPath)
+    ?? asNonEmptyString(process.env.NAVLY_RUNTIME_DATA_STATE_SNAPSHOT);
+  if (!appSecret && !stateSnapshotPath) {
     throw new Error('owner-side data adapter requires app_secret');
   }
 
@@ -122,6 +139,7 @@ function resolveDataContext(query, adapterOptions) {
     app_secret: appSecret,
     fixture_bundle_path: fixtureBundlePath,
     transport_kind: transportKind,
+    state_snapshot_path: stateSnapshotPath,
     live_base_url: liveBaseUrl,
     live_authorization: liveAuthorization,
     live_token: liveToken,
@@ -235,6 +253,7 @@ export function createOwnerSideDataPlatformAdapter({
   defaultOrgId = null,
   defaultAppSecret = null,
   fixtureBundlePath = defaultFixtureBundlePath,
+  stateSnapshotPath = null,
   liveBaseUrl = null,
   liveAuthorization = null,
   liveToken = null,
@@ -251,6 +270,7 @@ export function createOwnerSideDataPlatformAdapter({
       defaultOrgId,
       defaultAppSecret,
       fixtureBundlePath,
+      stateSnapshotPath,
       liveBaseUrl,
       liveAuthorization,
       liveToken,
@@ -267,6 +287,7 @@ export function createOwnerSideDataPlatformAdapter({
       context.end_time,
       context.fixture_bundle_path,
       context.transport_kind,
+      context.state_snapshot_path,
       context.live_base_url,
       context.live_authorization,
       context.live_token,

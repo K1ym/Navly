@@ -1,6 +1,6 @@
 # Navly Data Platform
 
-状态：milestone-b backbone
+状态：phase-1 closeout lane with retained milestone-b diagnostic backbone
 
 本目录是 `Navly_v1` 数据中台的实现骨架与 backbone 入口。
 
@@ -30,12 +30,19 @@
   - `serving/member_insight_theme_service_surface.py`
 - 基础单测与 CLI runner
 - Qinqin v1.1 contract governance consistency tests
+- PostgreSQL-first closeout substrate in repo code
+  - `migration/sql/2026-04-12-navly-v1-phase1-postgres-truth-substrate.sql`
+  - `backbone_support/postgres_truth_substrate.py`
+- Temporal-native nightly/backfill workflow plane in repo code
+  - `workflows/postgres_temporal_nightly_sync.py`
+  - nightly scheduler / execution / retry / rerun path
+  - expected business date set + carry-forward cursor + latest-to-oldest backfill planning
 
 当前**未完成**：
 
 - live connector / real HTTP transport / 完整错误分类治理
 - 全量 endpoint 铺开
-- PostgreSQL / dbt / 持久化模型落地
+- live PostgreSQL adapter / dbt runtime / 真实 Temporal worker deployment 绑定
 - 完整 latest state / quality / readiness / projection runtime 逻辑
 - rich serving / UI / 多消费端接口
 - phase-1 全链路闭合
@@ -44,9 +51,12 @@
 
 - 跨模块 shared contracts owner：`shared/contracts`
 - `platforms/data-platform/contracts/`：只保留 data-platform owner contracts
-- `platforms/data-platform/directory/`：承载 data-platform 当前纳管 registry；Qinqin v1.1 contract governance 已进入 formal registry，其余对象仍可能是 seed / placeholder
+- `platforms/data-platform/directory/`：承载 data-platform 当前纳管 registry；Qinqin v1.1 contract governance 已进入 formal registry，`member_insight` 的 capability / binding / dependency registry 也已进入 authoritative path，其余 capability 仍可能保持 deferred seed 状态
+- `member_insight` 对应的 capability / service binding / dependency registry 现已进入 closeout authoritative seed path
 - data-platform 不拥有 access truth
 - data-platform 当前实现仍然只是在自身 owner scope 内推进 raw truth / canonical fact truth / latest state backbone
+- `platforms/data-platform/` 现在已经给出 PostgreSQL-first / Temporal-first 的 authoritative repo path；
+  runtime artifact tree 与本地 owner-side workflow 只允许作为 diagnostics、replay、smoke path
 
 ## C0-L3 目录映射
 
@@ -72,9 +82,13 @@
   - `projections/`
 - 当前 milestone B 已具备 backbone，但这**不等于** ready / service runtime 已完成
 - 当前已对 `member_insight` 发布 formal owner-side readiness / theme service surface，但 runtime 还未在默认路径消费该 surface
+- nightly truth / backfill / orchestration 的 authoritative path 现在应指向：
+  - PostgreSQL truth substrate SQL
+  - `PostgresTruthSubstrate`
+  - `postgres_temporal_nightly_sync.py`
 
 ## 重要说明
 
 - 当前已不再只是 milestone A skeleton / seed only
-- 当前状态更准确地说是：**milestone B backbone 已建立，但 phase-1 远未完成**
-- 现阶段不能把本目录描述成“完整 ingestion / readiness / serving / persistence 已完成”
+- 当前状态更准确地说是：**phase-1 closeout 的 PostgreSQL/Temporal 主路径已在 repo code 内冻结，并保留 milestone-B diagnostics/backbone 作为受控过渡层**
+- 现阶段仍不能把本目录描述成“8 端点、live infra、full serving 已完成”

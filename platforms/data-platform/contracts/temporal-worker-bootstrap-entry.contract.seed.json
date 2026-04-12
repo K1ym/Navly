@@ -1,0 +1,15 @@
+{
+  "contract_name": "temporal_worker_bootstrap_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "namespace",
+    "task_queue",
+    "retry_max_attempts",
+    "start_to_close_timeout_seconds",
+    "cron_schedule",
+    "workflow_names",
+    "activity_names"
+  ],
+  "notes": "Repo-governed worker bootstrap surface for the Temporal-native nightly execution plane."
+}

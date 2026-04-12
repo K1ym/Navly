@@ -1,0 +1,21 @@
+{
+  "contract_name": "nightly_run_summary_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "request_id",
+    "trace_ref",
+    "scheduler_trace_ref",
+    "workflow_kind",
+    "effective_policy",
+    "worker_bootstrap",
+    "org_count",
+    "org_executions",
+    "scheduler_runs",
+    "ingestion_runs",
+    "backfill_progress_states",
+    "latest_sync_states",
+    "service_projections"
+  ],
+  "notes": "Top-level summary artifact emitted by the repo-controlled nightly runner. Output-dir and state-snapshot are optional runtime extensions, not required contract fields."
+}

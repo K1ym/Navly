@@ -1,0 +1,12 @@
+{
+  "contract_name": "operator_backfill_status_report_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "org_id",
+    "backfill_progress_states",
+    "remaining_gap_count_total",
+    "pending_endpoint_count"
+  ],
+  "notes": "Operator-facing backfill status report built from PostgreSQL truth substrate state. Intended for backfill_status-style operational surfaces."
+}

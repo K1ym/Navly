@@ -1,19 +1,24 @@
 {
   "contract_name": "ingestion_endpoint_run_entry",
   "owner": "data-platform",
-  "status": "milestone_b_seed",
+  "status": "phase_1_closeout_contract_frozen",
   "fields": [
     "endpoint_run_id",
     "endpoint_run_trace_ref",
     "ingestion_run_id",
     "endpoint_contract_id",
     "org_id",
+    "requested_business_date",
     "endpoint_status",
     "page_count",
     "record_count",
+    "transport_kind",
+    "error_taxonomy",
     "started_at",
     "completed_at",
     "error_code",
-    "error_message"
-  ]
+    "error_message",
+    "retryable"
+  ],
+  "notes": "Endpoint execution truth is endpoint-scoped and date-scoped. Latest usable state must not be inferred directly from this record without reconcile rules."
 }
