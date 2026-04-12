@@ -1,0 +1,11 @@
+{
+  "contract_name": "member_insight_owner_surface_snapshot_cli_bundle_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "state_snapshot",
+    "readiness_response",
+    "theme_service_response"
+  ],
+  "notes": "Snapshot-backed member_insight owner-surface CLI bundle. `output_dir` is an optional runtime extension when file export is enabled."
+}

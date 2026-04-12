@@ -1,0 +1,19 @@
+{
+  "contract_name": "member_insight_customer_canonical_row_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "customer_id",
+    "org_id",
+    "phone",
+    "name",
+    "stored_amount",
+    "consume_amount",
+    "last_consume_time",
+    "registered_at",
+    "marketer_id",
+    "marketer_name",
+    "source_endpoint_contract_id",
+    "requested_business_date"
+  ]
+}

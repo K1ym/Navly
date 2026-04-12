@@ -1,7 +1,7 @@
 # Member Insight Live Transport
 
 日期：2026-04-09  
-状态：active-minimal-slice  
+状态：active-minimal-slice-diagnostics  
 适用范围：`platforms/data-platform/` 的 `member_insight` 最小 live transport vertical slice
 
 ## 1. 目的
@@ -12,6 +12,12 @@
 - 写出 raw replay / endpoint run / ingestion run
 - 在失败时给出明确 error taxonomy
 - 在不暴露真实 secrets 的前提下完成最小 live 调试
+
+重要说明：
+
+- 本手册描述的是 live transport / replay diagnostics path
+- 自 2026-04-12 closeout lane 起，artifact 输出不再是 intended production primary truth path
+- 生产主语义应指向 PostgreSQL substrate + Temporal nightly plane
 
 ## 2. 当前范围
 
@@ -32,6 +38,8 @@
 
 ```bash
 python3 platforms/data-platform/scripts/run_member_insight_vertical_slice.py \
+  --request-id req-member-insight-slice-001 \
+  --trace-ref navly:trace:req-member-insight-slice-001 \
   --transport fixture \
   --org-id demo-org-001 \
   --start-time '2026-03-20 09:00:00' \
@@ -51,6 +59,8 @@ QINQIN_API_REQUEST_TIMEOUT_MS='15000' \
 QINQIN_API_AUTHORIZATION='Bearer <redacted-access-token>' \
 QINQIN_API_TOKEN='<redacted-token>' \
 python3 platforms/data-platform/scripts/run_member_insight_vertical_slice.py \
+  --request-id req-member-insight-live-001 \
+  --trace-ref navly:trace:req-member-insight-live-001 \
   --transport live \
   --org-id demo-org-001 \
   --start-time '2026-03-20 09:00:00' \
@@ -72,6 +82,9 @@ python3 platforms/data-platform/scripts/run_member_insight_vertical_slice.py \
 
 - `historical-run-truth/ingestion-runs.json`
 - `historical-run-truth/endpoint-runs.json`
+- `vertical-slice-summary.json`
+  - 当前 diagnostic runner 的顶层摘要输出
+  - 会保留 CLI 提供的 `request_id` / `trace_ref`
 
 ### 4.2 Raw Replay
 
@@ -89,6 +102,11 @@ python3 platforms/data-platform/scripts/run_member_insight_vertical_slice.py \
 - `canonical/consume_bill_info.json`
 - `latest-state/latest-usable-endpoint-state.json`
 - `latest-state/vertical-slice-backbone-state.json`
+
+这些文件的定位：
+
+- diagnostics / replay / smoke artifacts
+- 不等于 production authoritative persistence
 
 ## 5. Error Taxonomy
 

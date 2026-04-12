@@ -64,6 +64,8 @@ def main() -> int:
     parser.add_argument('--live-timeout-ms', type=int)
     parser.add_argument('--live-authorization')
     parser.add_argument('--live-token')
+    parser.add_argument('--request-id', default='req-member-insight-vertical-slice-cli')
+    parser.add_argument('--trace-ref', default='navly:trace:req-member-insight-vertical-slice-cli')
     parser.add_argument('--output-dir', required=True)
     args = parser.parse_args()
 
@@ -82,7 +84,9 @@ def main() -> int:
         transport=transport,
         output_root=args.output_dir,
     )
-    print(json.dumps({
+    payload = {
+        'request_id': args.request_id,
+        'trace_ref': args.trace_ref,
         'transport_kind': result['transport_kind'],
         'capability_id': result['capability_id'],
         'service_object_id': result['service_object_id'],
@@ -94,7 +98,12 @@ def main() -> int:
         'consume_bill_count': len(result['canonical_artifacts']['consume_bill']),
         'latest_usable_endpoint_states': len(result['latest_state_artifacts']['latest_usable_endpoint_states']),
         'output_dir': args.output_dir,
-    }, ensure_ascii=False, indent=2))
+    }
+    Path(args.output_dir, 'vertical-slice-summary.json').write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + '\n',
+        encoding='utf-8',
+    )
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
     return 0
 
 

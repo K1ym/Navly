@@ -1,10 +1,13 @@
 {
   "contract_name": "ingestion_run_entry",
   "owner": "data-platform",
-  "status": "milestone_b_seed",
+  "status": "phase_1_closeout_contract_frozen",
   "fields": [
     "ingestion_run_id",
     "run_trace_ref",
+    "scheduler_trace_ref",
+    "workflow_id",
+    "task_kind",
     "capability_id",
     "service_object_id",
     "source_system_id",
@@ -13,7 +16,9 @@
     "window_start_at",
     "window_end_at",
     "run_status",
+    "transport_kind",
     "started_at",
     "completed_at"
-  ]
+  ],
+  "notes": "Closeout authoritative shape for PostgreSQL-first historical execution truth. Artifact trees may still emit a subset, but production semantics must preserve scheduler linkage, task kind, and transport kind."
 }

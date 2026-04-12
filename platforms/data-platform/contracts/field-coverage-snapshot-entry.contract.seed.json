@@ -1,0 +1,20 @@
+{
+  "contract_name": "field_coverage_snapshot_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "snapshot_id",
+    "snapshot_trace_ref",
+    "endpoint_contract_id",
+    "org_id",
+    "requested_business_date",
+    "documented_field_count",
+    "observed_field_count",
+    "missing_field_paths",
+    "coverage_status",
+    "endpoint_run_id",
+    "run_trace_ref",
+    "updated_at"
+  ],
+  "notes": "Endpoint-scoped machine-readable field governance proof."
+}
