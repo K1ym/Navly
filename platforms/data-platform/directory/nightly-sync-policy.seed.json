@@ -1,0 +1,19 @@
+{
+  "registry_name": "nightly_sync_policy_registry",
+  "status": "phase_1_closeout_frozen",
+  "entries": [
+    {
+      "policy_id": "navly.phase1.member_insight.nightly_sync",
+      "capability_id": "navly.store.member_insight",
+      "planner_mode": "currentness_first",
+      "backfill_order": "latest_to_oldest",
+      "cursor_mode": "carry_forward_cursor",
+      "max_backfill_tasks_per_run": 3,
+      "task_queue": "navly-data-platform-nightly",
+      "retry_max_attempts": 3,
+      "start_to_close_timeout_seconds": 900,
+      "cron_schedule": "0 0 19 * * *",
+      "notes": "Repo-governed nightly sync policy for phase-1 closeout. Runtime callers still provide the historical backfill floor explicitly."
+    }
+  ]
+}

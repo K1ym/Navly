@@ -1,0 +1,20 @@
+{
+  "contract_name": "capability_readiness_snapshot_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "snapshot_id",
+    "state_trace_ref",
+    "capability_id",
+    "org_id",
+    "requested_business_date",
+    "latest_usable_business_date",
+    "readiness_status",
+    "reason_codes",
+    "blocking_dependencies",
+    "run_trace_refs",
+    "state_trace_refs",
+    "evaluated_at"
+  ],
+  "notes": "Persisted readiness truth for operator surfaces and runtime explanation."
+}

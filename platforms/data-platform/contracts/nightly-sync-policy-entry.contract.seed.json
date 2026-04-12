@@ -1,0 +1,19 @@
+{
+  "contract_name": "nightly_sync_policy_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "policy_id",
+    "capability_id",
+    "planner_mode",
+    "backfill_order",
+    "cursor_mode",
+    "max_backfill_tasks_per_run",
+    "task_queue",
+    "retry_max_attempts",
+    "start_to_close_timeout_seconds",
+    "cron_schedule",
+    "notes"
+  ],
+  "notes": "Repo-governed scheduling semantics for the authoritative nightly sync plane. Historical backfill floor remains an explicit runtime-supplied operational input."
+}

@@ -1,0 +1,18 @@
+{
+  "contract_name": "artifact_bridge_summary_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "request_id",
+    "trace_ref",
+    "bridge_kind",
+    "artifact_root",
+    "ingestion_runs",
+    "endpoint_runs",
+    "page_runs",
+    "raw_replay_artifacts",
+    "latest_sync_states",
+    "service_projections"
+  ],
+  "notes": "Top-level summary emitted by the transitional artifact-to-truth import bridge."
+}

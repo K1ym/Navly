@@ -1,0 +1,14 @@
+{
+  "contract_name": "member_insight_consume_bill_payment_fact_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "fact_id",
+    "fact_trace_ref",
+    "org_id",
+    "requested_business_date",
+    "settle_id",
+    "payment_index",
+    "payload_json"
+  ]
+}

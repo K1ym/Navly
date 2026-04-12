@@ -1,0 +1,12 @@
+{
+  "contract_name": "member_insight_consume_bill_info_canonical_row_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "consume_bill_id",
+    "info_sequence",
+    "payload",
+    "source_endpoint_contract_id",
+    "requested_business_date"
+  ]
+}

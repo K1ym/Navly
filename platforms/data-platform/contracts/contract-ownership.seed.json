@@ -1,6 +1,6 @@
 {
-  "schema_version": "navly.data_platform.contract_ownership.seed.v1",
-  "status": "phase_1_contract_frozen",
+  "schema_version": "navly.data_platform.contract_ownership.seed.v2",
+  "status": "phase_1_closeout_contract_frozen",
   "module": "data-platform",
   "ownership_scope": "data-platform-only",
   "shared_contract_owner_path": "shared/contracts",
@@ -25,10 +25,45 @@
     "endpoint_field_catalog_entry",
     "field_landing_policy_entry",
     "source_variance_entry",
+    "nightly_sync_policy_entry",
+    "scheduler_run_entry",
     "ingestion_run_entry",
     "ingestion_endpoint_run_entry",
+    "ingestion_page_run_entry",
     "raw_response_page_entry",
+    "raw_replay_artifact_entry",
     "latest_usable_endpoint_state_entry"
+    ,
+    "vertical_slice_backbone_state_entry",
+    "member_insight_customer_fact_entry",
+    "member_insight_customer_card_fact_entry",
+    "member_insight_consume_bill_fact_entry",
+    "member_insight_consume_bill_payment_fact_entry",
+    "member_insight_consume_bill_info_fact_entry",
+    "member_insight_customer_canonical_row_entry",
+    "member_insight_customer_card_canonical_row_entry",
+    "member_insight_consume_bill_canonical_row_entry",
+    "member_insight_consume_bill_payment_canonical_row_entry",
+    "member_insight_consume_bill_info_canonical_row_entry",
+    "latest_sync_state_entry",
+    "backfill_progress_state_entry",
+    "field_coverage_snapshot_entry",
+    "schema_alignment_snapshot_entry",
+    "quality_issue_entry",
+    "capability_readiness_snapshot_entry",
+    "service_projection_entry"
+    ,
+    "temporal_worker_bootstrap_entry",
+    "nightly_run_summary_entry",
+    "truth_store_snapshot_entry",
+    "artifact_bridge_summary_entry",
+    "member_insight_vertical_slice_summary_entry",
+    "member_insight_owner_surface_snapshot_bundle_entry",
+    "member_insight_owner_surface_snapshot_cli_bundle_entry",
+    "operator_status_bundle_entry",
+    "operator_sync_status_report_entry",
+    "operator_backfill_status_report_entry",
+    "operator_quality_report_entry"
   ],
   "canonical_id_rules": {
     "capability_id": "navly.<domain>.<capability_name>",
@@ -41,5 +76,5 @@
       "capability_explanation"
     ]
   },
-  "note": "Phase-1 contract governance freeze for Qinqin v1.1. No shared contract definitions are duplicated here."
+  "note": "Phase-1 closeout contract governance freeze. No shared contract definitions are duplicated here; PostgreSQL-first truth substrate and Temporal workflow state are now part of the owned contract surface."
 }

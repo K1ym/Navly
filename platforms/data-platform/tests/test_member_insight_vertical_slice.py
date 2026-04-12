@@ -105,6 +105,9 @@ class MemberInsightVerticalSliceTest(unittest.TestCase):
             'app_secret': 'test-secret',
         }
 
+    def _load_contract(self, filename: str) -> dict:
+        return json.loads((DATA_PLATFORM_ROOT / 'contracts' / filename).read_text(encoding='utf-8'))
+
     def test_qinqin_substrate_uses_registry_preferred_wire_names(self) -> None:
         request = build_signed_request(
             endpoint_contract_id='qinqin.member.get_customers_list.v1_1',
@@ -316,6 +319,145 @@ class MemberInsightVerticalSliceTest(unittest.TestCase):
             self.assertEqual(payload['transport_replay_artifacts'], 2)
             self.assertTrue(Path(tmpdir, 'raw-replay', 'raw-response-pages.json').exists())
             self.assertTrue(Path(tmpdir, 'raw-replay', 'transport-replay-artifacts.json').exists())
+
+    def test_cli_runner_summary_matches_governed_vertical_slice_contract(self) -> None:
+        contract = self._load_contract('member-insight-vertical-slice-summary-entry.contract.seed.json')
+        with tempfile.TemporaryDirectory() as tmpdir:
+            script_path = DATA_PLATFORM_ROOT / 'scripts' / 'run_member_insight_vertical_slice.py'
+            fixture_path = DATA_PLATFORM_ROOT / 'tests' / 'fixtures' / 'member_insight' / 'qinqin_fixture_pages.bundle.json'
+            env = dict(os.environ)
+            env['PYTHONPATH'] = str(DATA_PLATFORM_ROOT)
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    str(script_path),
+                    '--org-id', 'demo-org-001',
+                    '--start-time', '2026-03-20 09:00:00',
+                    '--end-time', '2026-03-24 09:00:00',
+                    '--requested-business-date', '2026-03-23',
+                    '--app-secret', 'test-secret',
+                    '--fixtures', str(fixture_path),
+                    '--output-dir', tmpdir,
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+            payload = json.loads(completed.stdout)
+            summary_file_payload = json.loads(Path(tmpdir, 'vertical-slice-summary.json').read_text(encoding='utf-8'))
+
+        self.assertEqual(contract['status'], 'phase_1_closeout_contract_frozen')
+        for field_name in contract['fields']:
+            self.assertIn(field_name, payload)
+            self.assertIn(field_name, summary_file_payload)
+
+    def test_cli_runner_summary_preserves_request_and_trace_refs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            script_path = DATA_PLATFORM_ROOT / 'scripts' / 'run_member_insight_vertical_slice.py'
+            fixture_path = DATA_PLATFORM_ROOT / 'tests' / 'fixtures' / 'member_insight' / 'qinqin_fixture_pages.bundle.json'
+            env = dict(os.environ)
+            env['PYTHONPATH'] = str(DATA_PLATFORM_ROOT)
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    str(script_path),
+                    '--request-id', 'req-member-insight-summary-custom-001',
+                    '--trace-ref', 'navly:trace:member-insight-summary-custom-001',
+                    '--org-id', 'demo-org-001',
+                    '--start-time', '2026-03-20 09:00:00',
+                    '--end-time', '2026-03-24 09:00:00',
+                    '--requested-business-date', '2026-03-23',
+                    '--app-secret', 'test-secret',
+                    '--fixtures', str(fixture_path),
+                    '--output-dir', tmpdir,
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+            payload = json.loads(completed.stdout)
+            summary_file_payload = json.loads(Path(tmpdir, 'vertical-slice-summary.json').read_text(encoding='utf-8'))
+
+        self.assertEqual(payload['request_id'], 'req-member-insight-summary-custom-001')
+        self.assertEqual(payload['trace_ref'], 'navly:trace:member-insight-summary-custom-001')
+        self.assertEqual(summary_file_payload['request_id'], payload['request_id'])
+        self.assertEqual(summary_file_payload['trace_ref'], payload['trace_ref'])
+
+    def test_cli_runner_artifact_files_match_governed_contracts(self) -> None:
+        ingestion_run_contract = self._load_contract('ingestion-run-entry.contract.seed.json')
+        endpoint_run_contract = self._load_contract('ingestion-endpoint-run-entry.contract.seed.json')
+        raw_page_contract = self._load_contract('raw-response-page-entry.contract.seed.json')
+        latest_state_contract = self._load_contract('latest-usable-endpoint-state-entry.contract.seed.json')
+        raw_replay_contract = self._load_contract('raw-replay-artifact-entry.contract.seed.json')
+        backbone_state_contract = self._load_contract('vertical-slice-backbone-state-entry.contract.seed.json')
+        customer_contract = self._load_contract('member-insight-customer-canonical-row-entry.contract.seed.json')
+        customer_card_contract = self._load_contract('member-insight-customer-card-canonical-row-entry.contract.seed.json')
+        consume_bill_contract = self._load_contract('member-insight-consume-bill-canonical-row-entry.contract.seed.json')
+        consume_bill_payment_contract = self._load_contract('member-insight-consume-bill-payment-canonical-row-entry.contract.seed.json')
+        consume_bill_info_contract = self._load_contract('member-insight-consume-bill-info-canonical-row-entry.contract.seed.json')
+        with tempfile.TemporaryDirectory() as tmpdir:
+            script_path = DATA_PLATFORM_ROOT / 'scripts' / 'run_member_insight_vertical_slice.py'
+            fixture_path = DATA_PLATFORM_ROOT / 'tests' / 'fixtures' / 'member_insight' / 'qinqin_fixture_pages.bundle.json'
+            env = dict(os.environ)
+            env['PYTHONPATH'] = str(DATA_PLATFORM_ROOT)
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(script_path),
+                    '--org-id', 'demo-org-001',
+                    '--start-time', '2026-03-20 09:00:00',
+                    '--end-time', '2026-03-24 09:00:00',
+                    '--requested-business-date', '2026-03-23',
+                    '--app-secret', 'test-secret',
+                    '--fixtures', str(fixture_path),
+                    '--output-dir', tmpdir,
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+            ingestion_runs = json.loads(Path(tmpdir, 'historical-run-truth', 'ingestion-runs.json').read_text(encoding='utf-8'))
+            endpoint_runs = json.loads(Path(tmpdir, 'historical-run-truth', 'endpoint-runs.json').read_text(encoding='utf-8'))
+            raw_response_pages = json.loads(Path(tmpdir, 'raw-replay', 'raw-response-pages.json').read_text(encoding='utf-8'))
+            transport_replay_artifacts = json.loads(Path(tmpdir, 'raw-replay', 'transport-replay-artifacts.json').read_text(encoding='utf-8'))
+            latest_states = json.loads(Path(tmpdir, 'latest-state', 'latest-usable-endpoint-state.json').read_text(encoding='utf-8'))
+            backbone_state = json.loads(Path(tmpdir, 'latest-state', 'vertical-slice-backbone-state.json').read_text(encoding='utf-8'))
+            customers = json.loads(Path(tmpdir, 'canonical', 'customer.json').read_text(encoding='utf-8'))
+            customer_cards = json.loads(Path(tmpdir, 'canonical', 'customer_card.json').read_text(encoding='utf-8'))
+            consume_bills = json.loads(Path(tmpdir, 'canonical', 'consume_bill.json').read_text(encoding='utf-8'))
+            consume_bill_payments = json.loads(Path(tmpdir, 'canonical', 'consume_bill_payment.json').read_text(encoding='utf-8'))
+            consume_bill_infos = json.loads(Path(tmpdir, 'canonical', 'consume_bill_info.json').read_text(encoding='utf-8'))
+
+        for record in ingestion_runs:
+            for field_name in ingestion_run_contract['fields']:
+                self.assertIn(field_name, record)
+        for record in endpoint_runs:
+            for field_name in endpoint_run_contract['fields']:
+                self.assertIn(field_name, record)
+        for record in raw_response_pages:
+            for field_name in raw_page_contract['fields']:
+                self.assertIn(field_name, record)
+        for record in transport_replay_artifacts:
+            for field_name in raw_replay_contract['fields']:
+                self.assertIn(field_name, record)
+        for record in latest_states:
+            for field_name in latest_state_contract['fields']:
+                self.assertIn(field_name, record)
+        for field_name in backbone_state_contract['fields']:
+            self.assertIn(field_name, backbone_state)
+        for field_name in customer_contract['fields']:
+            self.assertIn(field_name, customers[0])
+        for field_name in customer_card_contract['fields']:
+            self.assertIn(field_name, customer_cards[0])
+        for field_name in consume_bill_contract['fields']:
+            self.assertIn(field_name, consume_bills[0])
+        for field_name in consume_bill_payment_contract['fields']:
+            self.assertIn(field_name, consume_bill_payments[0])
+        for field_name in consume_bill_info_contract['fields']:
+            self.assertIn(field_name, consume_bill_infos[0])
 
 
 if __name__ == '__main__':

@@ -1,0 +1,13 @@
+{
+  "contract_name": "operator_quality_report_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "org_id",
+    "field_coverage_snapshots",
+    "schema_alignment_snapshots",
+    "quality_issues",
+    "quality_issue_count"
+  ],
+  "notes": "Operator-facing quality report built from the PostgreSQL truth substrate governance objects."
+}

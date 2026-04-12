@@ -1,0 +1,23 @@
+{
+  "contract_name": "member_insight_consume_bill_canonical_row_entry",
+  "owner": "data-platform",
+  "status": "phase_1_closeout_contract_frozen",
+  "fields": [
+    "consume_bill_id",
+    "settle_no",
+    "org_id",
+    "consume_amount",
+    "pay_amount",
+    "discount_amount",
+    "deduction_amount",
+    "ticket_amount",
+    "created_at",
+    "settled_at",
+    "room_code",
+    "hand_card_code",
+    "operator_code",
+    "operator_name",
+    "source_endpoint_contract_id",
+    "requested_business_date"
+  ]
+}
