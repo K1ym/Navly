@@ -22,6 +22,8 @@
 - `run_nightly_sync_runtime.py`
   - 执行 dispatch plan 对应的 actual nightly sync slice
   - 回写 final cursor ledger
+  - 支持 `--history-start-business-date` 自动展开历史窗口
+  - 支持 `--max-backfill-dispatch-tasks` 在 currentness 之外额外给 backfill 预算
   - 输出 runtime result 与本轮 artifact
 - `run_nightly_sync_temporal_worker.py`
   - 暴露 Temporal worker bootstrap 入口
@@ -37,4 +39,5 @@
 - nightly sync scheduler helper 当前只做 planning / ledger / dispatch snapshot，不直接发起真实 source sync
 - nightly sync worker helper 当前已持久化 cursor ledger，但仍是本地 worker slice，不是完整 Temporal runtime
 - nightly sync runtime helper 已可本地执行实际 slice，但仍未接到正式 Temporal cluster / deployed scheduler
+- 如果要让 nightly runtime 真正自动补历史，生产 wrapper 必须传入 history start，并给 backfill 独立预算
 - temporal worker helper 已提供 SDK 对接入口，但需要外部 Temporal server/namespace 才能真正常驻运行

@@ -60,6 +60,11 @@
 - `next_backfill_business_date`
 - `cursor_status`
 
+生产 runtime 还必须满足两个条件，history 才会真的继续往前补：
+
+- 调度入口要把 `history_start_business_date -> target_business_date` 的完整业务日窗口传给 planner，而不是只传 target day
+- dispatch budget 不能只够 currentness；要额外给 backfill 独立预算，否则会出现“每天都只保最新、历史永远不推进”的饥饿状态
+
 ## 5. 当前非目标
 
 这份 planner 目前只是 governed planning slice。

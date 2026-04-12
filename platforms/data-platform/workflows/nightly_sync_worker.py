@@ -34,14 +34,16 @@ def run_nightly_sync_worker(
     latest_usable_endpoint_states: list[dict[str, Any]] | None = None,
     endpoint_contract_ids: list[str] | None = None,
     max_dispatch_tasks: int = 8,
+    max_backfill_dispatch_tasks: int | None = None,
+    history_start_business_date: str | None = None,
 ) -> dict[str, Any]:
     store_module = _load_store_module()
     store = store_module.NightlySyncCursorLedgerStore(db_path)
     try:
-        prior_ledger_entries = store.load_entries(
+        prior_ledger_entries = store.load_effective_entries(
             source_system_id=source_system_id,
             org_id=org_id,
-            target_business_date=target_business_date,
+            as_of_target_business_date=target_business_date,
         )
         snapshot = build_nightly_sync_scheduler_snapshot(
             source_system_id=source_system_id,
@@ -52,6 +54,8 @@ def run_nightly_sync_worker(
             endpoint_contract_ids=endpoint_contract_ids,
             prior_ledger_entries=prior_ledger_entries,
             max_dispatch_tasks=max_dispatch_tasks,
+            max_backfill_dispatch_tasks=max_backfill_dispatch_tasks,
+            history_start_business_date=history_start_business_date,
         )
         store.save_ledger(snapshot['cursor_ledger'])
         return {

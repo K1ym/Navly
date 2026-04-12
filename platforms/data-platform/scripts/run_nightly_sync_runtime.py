@@ -42,8 +42,10 @@ def main() -> int:
     parser.add_argument('--org-id', default=os.environ.get('QINQIN_API_ORG_ID'), required=False)
     parser.add_argument('--target-business-date', required=True)
     parser.add_argument('--expected-business-date', action='append', default=[])
+    parser.add_argument('--history-start-business-date')
     parser.add_argument('--endpoint-contract-id', action='append', default=[])
     parser.add_argument('--max-dispatch-tasks', type=int, default=8)
+    parser.add_argument('--max-backfill-dispatch-tasks', type=int)
     parser.add_argument('--app-secret', default=os.environ.get('QINQIN_API_APP_SECRET'), required=False)
     parser.add_argument('--transport', choices=('live', 'fixture'), default='live')
     parser.add_argument('--fixture-bundle-json')
@@ -66,6 +68,8 @@ def main() -> int:
         transport=transport,
         endpoint_contract_ids=args.endpoint_contract_id or None,
         max_dispatch_tasks=args.max_dispatch_tasks,
+        max_backfill_dispatch_tasks=args.max_backfill_dispatch_tasks,
+        history_start_business_date=args.history_start_business_date,
         output_root=args.output_dir,
     )
 

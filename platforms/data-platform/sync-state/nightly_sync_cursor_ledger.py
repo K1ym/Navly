@@ -120,25 +120,37 @@ def build_latest_usable_states_from_cursor_ledger_entries(
 ) -> list[dict[str, Any]]:
     states: list[dict[str, Any]] = []
     for entry in ledger_entries:
-        latest_usable_business_date = entry.get('last_completed_business_date')
-        if not latest_usable_business_date:
-            continue
-        state_id = (
-            f"{entry['endpoint_contract_id']}::{entry['org_id']}::{entry['target_business_date']}"
+        covered_business_dates = sorted(
+            set(
+                [
+                    *list(entry.get('covered_business_dates', [])),
+                    *(
+                        [entry['last_completed_business_date']]
+                        if entry.get('last_completed_business_date')
+                        else []
+                    ),
+                ]
+            )
         )
-        states.append({
-            'state_id': state_id,
-            'state_trace_ref': build_state_trace_ref('latest-usable-endpoint-state', state_id),
-            'source_system_id': entry['source_system_id'],
-            'endpoint_contract_id': entry['endpoint_contract_id'],
-            'org_id': entry['org_id'],
-            'latest_usable_business_date': latest_usable_business_date,
-            'availability_status': 'available',
-            'latest_run_trace_ref': entry['ledger_trace_ref'],
-            'latest_endpoint_run_id': entry['ledger_entry_id'],
-            'latest_endpoint_status': 'completed',
-            'updated_at': entry['updated_at'],
-        })
+        if not covered_business_dates:
+            continue
+        for covered_business_date in covered_business_dates:
+            state_id = (
+                f"{entry['endpoint_contract_id']}::{entry['org_id']}::{covered_business_date}"
+            )
+            states.append({
+                'state_id': state_id,
+                'state_trace_ref': build_state_trace_ref('latest-usable-endpoint-state', state_id),
+                'source_system_id': entry['source_system_id'],
+                'endpoint_contract_id': entry['endpoint_contract_id'],
+                'org_id': entry['org_id'],
+                'latest_usable_business_date': covered_business_date,
+                'availability_status': 'available',
+                'latest_run_trace_ref': entry['ledger_trace_ref'],
+                'latest_endpoint_run_id': entry['ledger_entry_id'],
+                'latest_endpoint_status': 'completed',
+                'updated_at': entry['updated_at'],
+            })
     return states
 
 

@@ -27,8 +27,11 @@ def main() -> int:
     parser.add_argument('--org-id', required=True)
     parser.add_argument('--target-business-date', required=True)
     parser.add_argument('--expected-business-date', action='append', default=[])
+    parser.add_argument('--history-start-business-date')
     parser.add_argument('--app-secret', default=os.environ.get('QINQIN_API_APP_SECRET'))
     parser.add_argument('--output-dir')
+    parser.add_argument('--max-dispatch-tasks', type=int, default=8)
+    parser.add_argument('--max-backfill-dispatch-tasks', type=int)
     args = parser.parse_args()
 
     if not args.temporal_server_url:
@@ -42,8 +45,11 @@ def main() -> int:
         'org_id': args.org_id,
         'target_business_date': args.target_business_date,
         'expected_business_dates': args.expected_business_date or [args.target_business_date],
+        'history_start_business_date': args.history_start_business_date,
         'app_secret': args.app_secret,
         'output_root': args.output_dir,
+        'max_dispatch_tasks': args.max_dispatch_tasks,
+        'max_backfill_dispatch_tasks': args.max_backfill_dispatch_tasks,
     }
     runtime = run_temporal_worker(
         temporal_server_url=args.temporal_server_url,

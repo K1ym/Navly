@@ -31,10 +31,12 @@ def main() -> int:
     parser.add_argument('--org-id', required=True)
     parser.add_argument('--target-business-date', required=True)
     parser.add_argument('--expected-business-date', action='append', default=[])
+    parser.add_argument('--history-start-business-date')
     parser.add_argument('--latest-usable-states-json')
     parser.add_argument('--prior-ledger-json')
     parser.add_argument('--endpoint-contract-id', action='append', default=[])
     parser.add_argument('--max-dispatch-tasks', type=int, default=8)
+    parser.add_argument('--max-backfill-dispatch-tasks', type=int)
     parser.add_argument('--output-dir', required=True)
     args = parser.parse_args()
 
@@ -47,6 +49,8 @@ def main() -> int:
         endpoint_contract_ids=args.endpoint_contract_id or None,
         prior_ledger_entries=_load_json_list(args.prior_ledger_json),
         max_dispatch_tasks=args.max_dispatch_tasks,
+        max_backfill_dispatch_tasks=args.max_backfill_dispatch_tasks,
+        history_start_business_date=args.history_start_business_date,
     )
 
     output_dir = Path(args.output_dir)

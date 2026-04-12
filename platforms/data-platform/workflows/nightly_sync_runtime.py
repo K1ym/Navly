@@ -207,6 +207,8 @@ def run_nightly_sync_runtime_cycle(
     transport: Any | None = None,
     endpoint_contract_ids: list[str] | None = None,
     max_dispatch_tasks: int = 8,
+    max_backfill_dispatch_tasks: int | None = None,
+    history_start_business_date: str | None = None,
     output_root: str | Path | None = None,
 ) -> dict[str, Any]:
     from workflows.nightly_sync_worker import _load_store_module  # local import to keep scripts lean
@@ -215,10 +217,10 @@ def run_nightly_sync_runtime_cycle(
     store_module = _load_store_module()
     store = store_module.NightlySyncCursorLedgerStore(db_path)
     try:
-        prior_ledger_entries = store.load_entries(
+        prior_ledger_entries = store.load_effective_entries(
             source_system_id=source_system_id,
             org_id=org_id,
-            target_business_date=target_business_date,
+            as_of_target_business_date=target_business_date,
         )
         cursor_ledger_module = _load_cursor_ledger_module()
         prior_latest_states = cursor_ledger_module.build_latest_usable_states_from_cursor_ledger_entries(
@@ -233,6 +235,8 @@ def run_nightly_sync_runtime_cycle(
             endpoint_contract_ids=endpoint_contract_ids,
             prior_ledger_entries=prior_ledger_entries,
             max_dispatch_tasks=max_dispatch_tasks,
+            max_backfill_dispatch_tasks=max_backfill_dispatch_tasks,
+            history_start_business_date=history_start_business_date,
         )
         execution = execute_dispatch_plan(
             dispatch_plan=initial_snapshot['dispatch_plan'],
@@ -254,6 +258,8 @@ def run_nightly_sync_runtime_cycle(
             endpoint_contract_ids=endpoint_contract_ids,
             prior_ledger_entries=prior_ledger_entries,
             max_dispatch_tasks=max_dispatch_tasks,
+            max_backfill_dispatch_tasks=max_backfill_dispatch_tasks,
+            history_start_business_date=history_start_business_date,
         )
         store.save_ledger(final_snapshot['cursor_ledger'])
         return {
