@@ -13,6 +13,27 @@
 - 店长在 WeCom 中是否能直接使用 manager-facing surface
 - `agent_id` 是否只影响 host isolation，而不影响最终授权真相
 
+## 1.1 Live Cutover
+
+先把 Navly first-party host plugin 安装到 OpenClaw profile：
+
+```bash
+node bridges/openclaw-host-bridge/scripts/install-navly-first-party-host-plugin.mjs \
+  --repoRoot /opt/navly \
+  --profileDir /root/.openclaw-prod \
+  --dataPlatformEnvPath /etc/navly/data-platform.env \
+  --defaultChannel wecom \
+  --channelAccountRef openclaw-host-bridge:channel-account:wecom-main
+
+systemctl restart openclaw-gateway.service
+```
+
+安装后应检查：
+
+- `~/.openclaw-prod/extensions/navly-first-party-host` 已存在
+- `~/.openclaw-prod/openclaw.json` 中 `plugins.allow` 包含 `navly-first-party-host`
+- `plugins.entries.navly-first-party-host.enabled = true`
+
 ## 2. First-Party Skill List
 
 - `navly-store-daily-overview`
@@ -68,8 +89,9 @@
 - 命中 `navly-store-finance-summary`
 - 调用 `navly_finance_summary`
 - `capability_id = navly.store.finance_summary`
-- 若 owner surface 尚未 ready，则 runtime 返回 `result_status=fallback`
-- fallback 必须给出结构化 reason codes，不暴露 source endpoint / SQL
+- 在 phase-1-ready data path 上，runtime 返回 `result_status=answered`
+- reply 中包含 `navly.service.store.finance_summary` formal service object
+- 若 live data 真实缺数，仍必须 fail-close 为结构化 fallback，不暴露 source endpoint / SQL
 
 问题 4：
 `看看员工看板`
@@ -79,7 +101,9 @@
 - 命中 `navly-store-staff-board`
 - 调用 `navly_staff_board`
 - `capability_id = navly.store.staff_board`
-- 若 owner surface 尚未 ready，则 runtime 返回结构化 not-ready explanation
+- 在 phase-1-ready data path 上，runtime 返回 `result_status=answered`
+- reply 中包含 `navly.service.store.staff_board` formal service object
+- 若 live data 真实缺数，仍必须返回结构化 not-ready explanation
 
 问题 5：
 `为什么我现在拿不到财务汇总？`
@@ -106,7 +130,8 @@
 ## 6. Regression Command
 
 ```bash
-node --test bridges/openclaw-host-bridge/tests/first-party-host-surface.test.mjs \
+node --test bridges/openclaw-host-bridge/tests/navly-first-party-host-plugin.test.mjs \
+  bridges/openclaw-host-bridge/tests/first-party-host-surface.test.mjs \
   bridges/openclaw-host-bridge/tests/first-party-live-handoff.test.mjs \
   bridges/openclaw-host-bridge/tests/milestone-b-auth-linkage.test.mjs \
   runtimes/navly-runtime/tests/milestone-b-guarded-execution.test.mjs \

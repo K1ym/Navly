@@ -119,3 +119,4 @@ def is_data_backed_capability(capability_id: str, *, data_platform_root: Path = 
 
 def owner_surface_name(capability_id: str) -> str:
     return capability_id.split('.')[-1].replace('-', '_')
+
