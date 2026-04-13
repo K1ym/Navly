@@ -19,6 +19,17 @@ const defaultPersistedServingRoot = process.env.NAVLY_DATA_PLATFORM_PERSISTED_SE
   ?? '/var/lib/navly/data-platform/serving-store';
 
 const EXPLANATION_SERVICE_OBJECT_ID = 'navly.service.system.capability_explanation';
+const OPERATOR_CAPABILITY_IDS = new Set([
+  'navly.ops.sync_status',
+  'navly.ops.backfill_status',
+  'navly.ops.sync_rerun',
+  'navly.ops.sync_backfill',
+  'navly.ops.quality_report',
+]);
+const OPERATOR_ACTION_CAPABILITY_IDS = new Set([
+  'navly.ops.sync_rerun',
+  'navly.ops.sync_backfill',
+]);
 const DEFAULT_PERSISTED_REASON_CODES = ['latest_state_not_published'];
 const FALLBACK_ACTIONS = {
   capability_scope_not_supported: 'adjust_requested_capability_or_scope',
@@ -35,6 +46,24 @@ const RECHECK_HINTS = {
   required_dataset_missing: 'recheck_after_backfill_completion',
   upstream_error: 'recheck_after_next_successful_sync',
   dependency_failed: 'recheck_after_next_successful_sync',
+};
+
+const publishedOperatorSurfaceCatalog = {
+  'navly.ops.sync_status': {
+    defaultServiceObjectId: 'navly.service.ops.sync_status',
+  },
+  'navly.ops.backfill_status': {
+    defaultServiceObjectId: 'navly.service.ops.backfill_status',
+  },
+  'navly.ops.sync_rerun': {
+    defaultServiceObjectId: 'navly.service.ops.sync_rerun',
+  },
+  'navly.ops.sync_backfill': {
+    defaultServiceObjectId: 'navly.service.ops.sync_backfill',
+  },
+  'navly.ops.quality_report': {
+    defaultServiceObjectId: 'navly.service.ops.quality_report',
+  },
 };
 
 const publishedCapabilitySurfaceCatalog = {
@@ -152,8 +181,72 @@ print(json.dumps({
     "service_response": service_response,
 }, ensure_ascii=False))`;
 
+const operatorSurfaceCode = String.raw`import json
+import sys
+from pathlib import Path
+
+data_platform_root = Path(sys.argv[1]).resolve()
+if str(data_platform_root) not in sys.path:
+    sys.path.insert(0, str(data_platform_root))
+
+from connectors.qinqin.qinqin_substrate import (
+    DEFAULT_LIVE_TIMEOUT_MS,
+    FixtureQinqinTransport,
+    LiveQinqinTransport,
+)
+from tests.support.qinqin_governance_fixture_builder import build_aligned_fixture_pages_by_endpoint
+from workflows.postgres_temporal_operator_surface import run_operator_surface
+
+args = json.loads(sys.argv[2])
+capability_id = args.get("capability_id") or args["requested_capability_id"]
+service_object_id = args.get("service_object_id") or args.get("requested_service_object_id")
+transport = None
+if capability_id in {"navly.ops.sync_rerun", "navly.ops.sync_backfill"}:
+    transport_kind = args.get("transport_kind") or "fixture"
+    if transport_kind == "fixture":
+        fixture_bundle_path = args.get("fixture_bundle_path")
+        if fixture_bundle_path:
+            fixture_bundle = json.loads(Path(fixture_bundle_path).read_text(encoding="utf-8"))
+        else:
+            fixture_bundle = build_aligned_fixture_pages_by_endpoint(value_suffix="runtime")
+        transport = FixtureQinqinTransport(fixture_bundle)
+    else:
+        live_timeout_ms = args.get("live_timeout_ms") or DEFAULT_LIVE_TIMEOUT_MS
+        transport = LiveQinqinTransport(
+            base_url=args["live_base_url"],
+            timeout_ms=int(live_timeout_ms),
+            authorization=args.get("live_authorization"),
+            token=args.get("live_token"),
+        )
+
+result = run_operator_surface(
+    request_id=args["request_id"],
+    trace_ref=args["trace_ref"],
+    target_scope_ref=args["target_scope_ref"],
+    target_business_date=args["requested_business_date"],
+    capability_id=capability_id,
+    service_object_id=service_object_id,
+    org_id=args.get("org_id"),
+    state_snapshot_path=args.get("state_snapshot_path"),
+    freshness_mode=args.get("freshness_mode"),
+    backfill_from=args.get("backfill_from"),
+    backfill_to=args.get("backfill_to"),
+    rerun_mode=args.get("rerun_mode"),
+    transport=transport,
+    app_secret=args.get("app_secret"),
+)
+print(json.dumps(result, ensure_ascii=False))`;
+
 function asNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function isOperatorCapability(capabilityId) {
+  return OPERATOR_CAPABILITY_IDS.has(capabilityId);
+}
+
+function isOperatorActionCapability(capabilityId) {
+  return OPERATOR_ACTION_CAPABILITY_IDS.has(capabilityId);
 }
 
 function asNonEmptyStringArray(value) {
@@ -465,21 +558,32 @@ function resolveDataContext(query, adapterOptions) {
     throw new Error('owner-side data adapter requires org_id');
   }
 
-  const resolvedFixtureBundlePaths = resolveFixtureBundlePaths(requestedCapabilityId, contextFromQuery, adapterOptions);
+  const operatorCapability = isOperatorCapability(requestedCapabilityId);
+  const operatorActionCapability = isOperatorActionCapability(requestedCapabilityId);
+  const resolvedFixtureBundlePaths = operatorCapability
+    ? []
+    : resolveFixtureBundlePaths(requestedCapabilityId, contextFromQuery, adapterOptions);
+  const resolvedFixtureBundlePath = asNonEmptyString(contextFromQuery.fixture_bundle_path)
+    ?? asNonEmptyString(adapterOptions.fixtureBundlePath)
+    ?? null;
   const explicitTransportKind = asNonEmptyString(contextFromQuery.transport_kind)
     ?? asNonEmptyString(adapterOptions.transportKind);
   const transportKind = explicitTransportKind
     ?? (
-      resolvedFixtureBundlePaths.length > 0
-        && !asNonEmptyString(contextFromQuery.live_base_url)
-        && !asNonEmptyString(adapterOptions.liveBaseUrl)
-      ? 'fixture'
-      : 'persisted'
+      operatorCapability
+        ? (operatorActionCapability ? 'fixture' : 'persisted')
+        : (
+          resolvedFixtureBundlePaths.length > 0
+            && !asNonEmptyString(contextFromQuery.live_base_url)
+            && !asNonEmptyString(adapterOptions.liveBaseUrl)
+          ? 'fixture'
+          : 'persisted'
+        )
     );
   const appSecret = asNonEmptyString(contextFromQuery.app_secret)
     ?? asNonEmptyString(adapterOptions.defaultAppSecret)
     ?? asNonEmptyString(process.env.NAVLY_RUNTIME_DATA_APP_SECRET);
-  if (transportKind !== 'persisted' && !appSecret) {
+  if ((transportKind !== 'persisted' || operatorActionCapability) && !appSecret) {
     throw new Error('owner-side data adapter requires app_secret');
   }
 
@@ -502,6 +606,11 @@ function resolveDataContext(query, adapterOptions) {
       ?? process.env.QINQIN_API_REQUEST_TIMEOUT_MS
       ?? 15000,
   );
+  const stateSnapshotPath = asNonEmptyString(contextFromQuery.state_snapshot_path)
+    ?? asNonEmptyString(adapterOptions.stateSnapshotPath)
+    ?? asNonEmptyString(process.env.NAVLY_RUNTIME_STATE_SNAPSHOT_PATH)
+    ?? asNonEmptyString(process.env.NAVLY_DATA_PLATFORM_STATE_SNAPSHOT_PATH)
+    ?? null;
   return {
     request_id: query.request_id,
     trace_ref: query.trace_ref,
@@ -513,6 +622,7 @@ function resolveDataContext(query, adapterOptions) {
     start_time: startTime,
     end_time: endTime,
     app_secret: appSecret,
+    fixture_bundle_path: resolvedFixtureBundlePath,
     fixture_bundle_paths: resolvedFixtureBundlePaths,
     transport_kind: transportKind,
     persisted_serving_root: resolvePersistedServingRoot(contextFromQuery, adapterOptions),
@@ -520,6 +630,11 @@ function resolveDataContext(query, adapterOptions) {
     live_authorization: liveAuthorization,
     live_token: liveToken,
     live_timeout_ms: (Number.isFinite(liveTimeoutMs) && liveTimeoutMs > 0) ? liveTimeoutMs : 15000,
+    state_snapshot_path: stateSnapshotPath,
+    freshness_mode: asNonEmptyString(query?.freshness_mode),
+    backfill_from: asNonEmptyString(contextFromQuery.backfill_from),
+    backfill_to: asNonEmptyString(contextFromQuery.backfill_to),
+    rerun_mode: asNonEmptyString(contextFromQuery.rerun_mode),
   };
 }
 
@@ -549,6 +664,37 @@ async function runPublishedOwnerSurface({
   const payloadText = String(stdout ?? '').trim();
   if (!payloadText) {
     throw new Error(`owner-side data adapter returned empty payload: ${String(stderr ?? '').trim()}`);
+  }
+
+  return JSON.parse(payloadText);
+}
+
+async function runOperatorSurface({
+  pythonExecutable,
+  dataPlatformRoot,
+  input,
+}) {
+  const pythonPath = [dataPlatformRoot, process.env.PYTHONPATH].filter(Boolean).join(path.delimiter);
+  const { stdout, stderr } = await execFileAsync(
+    pythonExecutable,
+    [
+      '-c',
+      operatorSurfaceCode,
+      dataPlatformRoot,
+      JSON.stringify(input),
+    ],
+    {
+      maxBuffer: 16 * 1024 * 1024,
+      env: {
+        ...process.env,
+        PYTHONPATH: pythonPath,
+      },
+    },
+  );
+
+  const payloadText = String(stdout ?? '').trim();
+  if (!payloadText) {
+    throw new Error(`operator-side data adapter returned empty payload: ${String(stderr ?? '').trim()}`);
   }
 
   return JSON.parse(payloadText);
@@ -639,6 +785,7 @@ export function createOwnerSideDataPlatformAdapter({
   fixtureBundlePath = defaultFixtureBundlePath,
   fixtureBundlePaths = null,
   persistedServingRoot = defaultPersistedServingRoot,
+  stateSnapshotPath = null,
   transportKind = null,
   liveBaseUrl = null,
   liveAuthorization = null,
@@ -649,6 +796,7 @@ export function createOwnerSideDataPlatformAdapter({
   nowEpochMsFactory = () => Date.now(),
   runMemberInsightOwnerSurfaceImpl = null,
   runCapabilityExplanationOwnerSurfaceImpl = null,
+  runOperatorSurfaceImpl = runOperatorSurface,
 } = {}) {
   const runCache = new Map();
   const adapterOptions = {
@@ -657,6 +805,7 @@ export function createOwnerSideDataPlatformAdapter({
     fixtureBundlePath,
     fixtureBundlePaths,
     persistedServingRoot,
+    stateSnapshotPath,
     transportKind,
     liveBaseUrl,
     liveAuthorization,
@@ -683,6 +832,10 @@ export function createOwnerSideDataPlatformAdapter({
       context.live_authorization,
       context.live_token,
       context.live_timeout_ms,
+      context.state_snapshot_path,
+      context.backfill_from,
+      context.backfill_to,
+      context.rerun_mode,
     ]);
 
     const nowEpochMsCandidate = Number(nowEpochMsFactory());
@@ -695,7 +848,13 @@ export function createOwnerSideDataPlatformAdapter({
     }
 
     let runPromise;
-    if (context.transport_kind === 'persisted') {
+    if (isOperatorCapability(context.requested_capability_id)) {
+      runPromise = runOperatorSurfaceImpl({
+        pythonExecutable,
+        dataPlatformRoot,
+        input: context,
+      }).then(normalizeOwnerSurfacePayload);
+    } else if (context.transport_kind === 'persisted') {
       runPromise = Promise.resolve().then(() => {
         const snapshot = loadPersistedCapabilitySnapshot({
           persistedServingRoot: context.persisted_serving_root,
@@ -774,7 +933,7 @@ export function createOwnerSideDataPlatformAdapter({
 
   return {
     async queryCapabilityReadiness(query) {
-      if (!publishedCapabilitySurfaceCatalog[query.capability_id]) {
+      if (!publishedCapabilitySurfaceCatalog[query.capability_id] && !publishedOperatorSurfaceCatalog[query.capability_id]) {
         return buildUnsupportedReadiness(query);
       }
 
@@ -783,6 +942,18 @@ export function createOwnerSideDataPlatformAdapter({
     },
 
     async queryThemeService(query) {
+      if (isOperatorCapability(query.capability_id)) {
+        const operatorSurface = publishedOperatorSurfaceCatalog[query.capability_id];
+        if (!operatorSurface) {
+          return buildScopeMismatchService(query, ['capability_scope_not_supported']);
+        }
+        if (query.service_object_id !== operatorSurface.defaultServiceObjectId) {
+          return buildScopeMismatchService(query);
+        }
+        const ownerSurface = await loadPublishedOwnerSurface(query, 'base');
+        return ownerSurface.service_response;
+      }
+
       if (query.service_object_id === EXPLANATION_SERVICE_OBJECT_ID) {
         const explanationSurface = await loadPublishedOwnerSurface(query, 'explanation');
         return explanationSurface.service_response;

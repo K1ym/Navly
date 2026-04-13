@@ -106,7 +106,7 @@
       "supported_service_object_ids": [
         "navly.service.ops.sync_status"
       ],
-      "status": "published_not_ready_operator_surface"
+      "status": "implemented_phase1_operator_surface"
     },
     {
       "route_id": "capability.navly.ops.backfill_status",
@@ -121,7 +121,7 @@
       "supported_service_object_ids": [
         "navly.service.ops.backfill_status"
       ],
-      "status": "published_not_ready_operator_surface"
+      "status": "implemented_phase1_operator_surface"
     },
     {
       "route_id": "capability.navly.ops.sync_rerun",
@@ -136,7 +136,7 @@
       "supported_service_object_ids": [
         "navly.service.ops.sync_rerun"
       ],
-      "status": "published_not_ready_operator_surface"
+      "status": "implemented_phase1_operator_surface"
     },
     {
       "route_id": "capability.navly.ops.sync_backfill",
@@ -151,7 +151,7 @@
       "supported_service_object_ids": [
         "navly.service.ops.sync_backfill"
       ],
-      "status": "published_not_ready_operator_surface"
+      "status": "implemented_phase1_operator_surface"
     },
     {
       "route_id": "capability.navly.ops.quality_report",
@@ -166,7 +166,7 @@
       "supported_service_object_ids": [
         "navly.service.ops.quality_report"
       ],
-      "status": "published_not_ready_operator_surface"
+      "status": "implemented_phase1_operator_surface"
     }
   ],
   "default_fallback": {
@@ -176,5 +176,5 @@
     "fallback_capability_id": "navly.system.capability_explanation",
     "fallback_service_object_id": "navly.service.system.capability_explanation"
   },
-  "notes": "Phase-1 host closeout route registry: manager-facing owner/service surfaces resolve through formal owner surfaces, while operator-facing publication remains structured pending."
+  "notes": "Phase-1 host closeout route registry: manager-facing owner/service surfaces and operator-facing sync/backfill/quality surfaces resolve through formal runtime paths."
 }

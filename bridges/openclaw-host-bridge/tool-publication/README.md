@@ -24,6 +24,13 @@
 - manager-facing `daily_overview` / `member_insight` / `finance_summary` / `staff_board` / `capability_explanation`
 - operator-facing `sync_status` / `backfill_status` / `rerun_sync` / `trigger_backfill` / `quality_report`
 
+当前语义：
+
+- manager-facing 5 能力默认走 persisted owner surface / aggregate / fallback surface
+- operator-facing 5 能力默认走 formal operator surface
+- `sync_status` / `backfill_status` / `quality_report` 读取 persisted PostgreSQL truth snapshot
+- `rerun_sync` / `trigger_backfill` 执行 repo-authoritative Temporal workflow semantics，并回写 persisted truth snapshot
+
 当前不做：
 
 - upstream OpenClaw patch

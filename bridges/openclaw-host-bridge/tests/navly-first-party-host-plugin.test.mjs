@@ -131,3 +131,67 @@ test('navly first-party host plugin tool execution maps OpenClaw runtime context
     'navly.store.daily_overview',
   );
 });
+
+test('navly first-party host plugin maps backfill_to into target business date and state snapshot runtime context', async () => {
+  let captured = null;
+  const tools = createNavlyFirstPartyTools({
+    repoRoot,
+    pluginConfig: {
+      defaultScopeRef: 'navly:scope:store:sample-store-001',
+      defaultOrgId: '627149864218629',
+      defaultAppSecret: 'test-secret',
+      stateSnapshotPath: '/tmp/navly-truth-store-snapshot.json',
+      fixtureBundlePath: '/tmp/navly-fixtures.json',
+      transportKind: 'fixture',
+    },
+    context: buildContext({
+      agentId: 'ops',
+      sessionKey: 'agent:ops:wecom:direct:test-user',
+    }),
+    nowFactory: () => new Date('2026-04-12T15:00:00.000Z'),
+    liveHandoffRunner: async (payload) => {
+      captured = payload;
+      return {
+        published_tool: {
+          tool_name: payload.toolName,
+          capability_id: 'navly.ops.sync_backfill',
+          service_object_id: 'navly.service.ops.sync_backfill',
+        },
+        gate0_enforcement: {
+          reason_codes: [],
+        },
+        runtime_pipeline: {
+          runtime_result_envelope: {
+            result_status: 'answered',
+            selected_capability_id: 'navly.ops.sync_backfill',
+            selected_service_object_id: 'navly.service.ops.sync_backfill',
+            reason_codes: [],
+          },
+        },
+        host_dispatch_result: {
+          dispatch_status: 'ready_for_runtime_dispatch',
+          reply_blocks: [
+            {
+              fragment_type: 'service_object',
+              service_object: {
+                capability_id: 'navly.ops.sync_backfill',
+              },
+            },
+          ],
+          trace_refs: ['navly:runtime-trace:test'],
+        },
+      };
+    },
+  });
+
+  const backfillTool = tools.find((tool) => tool.name === 'navly_trigger_backfill');
+  await backfillTool.execute('tool-call-backfill-1', {
+    backfill_from: '2026-04-10',
+    backfill_to: '2026-04-11',
+  });
+
+  assert.equal(captured.toolName, 'navly_trigger_backfill');
+  assert.equal(captured.rawHostIngress.target_business_date_hint, '2026-04-11');
+  assert.equal(captured.runtimeDataContext.data_state_snapshot_path, '/tmp/navly-truth-store-snapshot.json');
+  assert.equal(captured.runtimeDataContext.data_fixture_bundle_path, '/tmp/navly-fixtures.json');
+});

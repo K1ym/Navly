@@ -45,7 +45,16 @@ test('first-party host surface publishes the closeout skill list, tool list, and
     manifest.tools.every((tool) => !/(Get[A-Z]|qinqin|sql|table)/i.test(tool.tool_name)),
     'host-visible tools must stay capability-oriented',
   );
+  assert.ok(
+    manifest.tools.every((tool) => tool.capability_status !== 'published_not_ready_operator_surface'),
+    'no first-party host tool should remain published_not_ready once operator surfaces are implemented',
+  );
+  assert.deepEqual(
+    manifest.tools
+      .filter((tool) => ['navly_rerun_sync', 'navly_trigger_backfill'].includes(tool.tool_name))
+      .map((tool) => tool.capability_kind),
+    ['runtime_action', 'runtime_action'],
+  );
 
   assert.deepEqual(committedManifest, manifest);
 });
-

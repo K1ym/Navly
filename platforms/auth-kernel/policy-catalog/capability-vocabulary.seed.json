@@ -49,13 +49,13 @@
     {
       "capability_id": "navly.ops.sync_rerun",
       "owner_module": "data-platform",
-      "capability_kind": "data_read",
+      "capability_kind": "runtime_action",
       "description": "Canonical operator rerun capability published through the first-party host surface."
     },
     {
       "capability_id": "navly.ops.sync_backfill",
       "owner_module": "data-platform",
-      "capability_kind": "data_read",
+      "capability_kind": "runtime_action",
       "description": "Canonical operator backfill trigger capability published through the first-party host surface."
     },
     {

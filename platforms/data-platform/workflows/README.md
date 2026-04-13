@@ -29,8 +29,15 @@
   - 读取 persisted cursor ledger
   - 执行 scheduler snapshot 构建
   - 回写最新 ledger 状态
+- `postgres_temporal_nightly_sync.py`
+  - 提供 repo-authoritative nightly / retry / rerun / manual backfill workflow plane
+  - 持有 PostgreSQL-first truth substrate 下的 scheduler / carry-forward cursor / backfill semantics
+- `postgres_temporal_operator_surface.py`
+  - 提供 operator-facing `sync_status` / `backfill_status` / `quality_report` persisted read surface
+  - 提供 operator-facing `sync_rerun` / `sync_backfill` action surface
+  - 动作完成后回写 persisted truth snapshot，并返回 post-action status reports
 
 当前边界：
 
-- 当前仍是本地 owner-side workflow，不是 Temporal / production scheduler 落地
+- 当前 workflow 仍是 repo-controlled implementation，不直接替代 live Temporal worker binding
 - 不在这里实现 runtime / bridge 接面代码

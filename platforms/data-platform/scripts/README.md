@@ -30,6 +30,10 @@
   - 暴露 Temporal worker bootstrap 入口
   - 把 nightly runtime cycle 注册为 workflow/activity
   - 面向真正的 deployed scheduler / worker 进程
+- `query_postgres_temporal_status.py`
+  - 从 persisted truth snapshot 中读取 operator sync/backfill/quality status
+  - 为 `sync_status` / `backfill_status` / `quality_report` 类 operator surface 提供 repo-controlled query path
+  - 可通过 `--output-dir` 写出 `operator-status-bundle.json` 及分拆后的 report files
 
 当前边界：
 
@@ -42,3 +46,5 @@
 - nightly sync runtime helper 已可本地执行实际 slice，但仍未接到正式 Temporal cluster / deployed scheduler
 - 如果要让 nightly runtime 真正自动补历史，生产 wrapper 必须传入 history start，并给 backfill 独立预算
 - temporal worker helper 已提供 SDK 对接入口，但需要外部 Temporal server/namespace 才能真正常驻运行
+- operator status 查询应优先读取 persisted truth snapshot / PostgreSQL truth substrate，而不是重新触发 nightly 调度
+- operator action surface 应复用 repo-authoritative Temporal workflow semantics，并在动作完成后回写 persisted truth snapshot

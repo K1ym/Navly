@@ -56,7 +56,20 @@ function buildDataAdapterContext(interactionContext) {
     live_authorization: pickString(slots.data_live_authorization),
     live_token: pickString(slots.data_live_token),
     live_timeout_ms: slots.data_live_timeout_ms ?? null,
+    state_snapshot_path: pickString(slots.data_state_snapshot_path),
+    rerun_mode: pickString(slots.rerun_mode),
+    backfill_from: pickString(slots.backfill_from),
+    backfill_to: pickString(slots.backfill_to),
   };
+}
+
+function resolveOperationKind(selectedCapabilityId) {
+  return (
+    selectedCapabilityId === 'navly.ops.sync_rerun'
+    || selectedCapabilityId === 'navly.ops.sync_backfill'
+  )
+    ? 'write'
+    : 'read';
 }
 
 function buildCapabilityAccessRequest({ interactionContext, executionPlan }) {
@@ -72,7 +85,7 @@ function buildCapabilityAccessRequest({ interactionContext, executionPlan }) {
     requested_scope_ref: executionPlan.target_scope_ref,
     requested_service_object_id: executionPlan.selected_service_object_id,
     access_context_envelope: interactionContext.access_context_envelope,
-    operation_kind: 'read',
+    operation_kind: resolveOperationKind(executionPlan.selected_capability_id),
     runtime_trace_ref: interactionContext.runtime_trace_ref,
     extensions: buildAuthAdapterContext(interactionContext),
   };

@@ -426,6 +426,35 @@ test('finance_summary can explicitly request the capability_explanation companio
   assert.equal(dataPlatformClient.serviceCalls[0].service_object_id, EXPLANATION_SERVICE_OBJECT_ID);
 });
 
+test('operator action capabilities issue capability_access_request with operation_kind=write', async () => {
+  const authKernelClient = createAuthKernelClient();
+  const dataPlatformClient = createDataPlatformClient();
+
+  const result = await runMilestoneBGuardedExecutionChain({
+    runtimeRequestEnvelope: buildRuntimeRequestEnvelope({
+      requested_capability_id: 'navly.ops.sync_backfill',
+      requested_service_object_id: 'navly.service.ops.sync_backfill',
+      access_context_envelope: buildAccessContextEnvelope({
+        granted_capability_ids: ['navly.ops.sync_backfill'],
+      }),
+      structured_input_slots: {
+        backfill_from: '2026-04-04',
+        backfill_to: '2026-04-05',
+        data_state_snapshot_path: '/tmp/navly-truth-store-snapshot.json',
+        data_org_id: 'demo-org-001',
+        data_app_secret: 'test-secret',
+      },
+    }),
+    authKernelClient,
+    dataPlatformClient,
+    now: FIXED_NOW,
+  });
+
+  assert.equal(result.runtime_result_envelope.result_status, 'answered');
+  assert.equal(authKernelClient.calls.length, 1);
+  assert.equal(authKernelClient.calls[0].operation_kind, 'write');
+});
+
 test('unresolved route returns fallback without dependency calls', async () => {
   const authKernelClient = createAuthKernelClient();
   const dataPlatformClient = createDataPlatformClient();

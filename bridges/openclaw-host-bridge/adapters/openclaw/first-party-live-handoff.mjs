@@ -121,7 +121,9 @@ function buildStructuredInputSlots({
     rerun_mode: normalizeOptionalString(normalizedToolInput.rerun_mode),
     backfill_from: normalizeOptionalString(normalizedToolInput.backfill_from),
     backfill_to: normalizeOptionalString(normalizedToolInput.backfill_to),
-    target_business_date: normalizeOptionalString(normalizedToolInput.business_date),
+    target_business_date: normalizeOptionalString(normalizedToolInput.business_date)
+      ?? normalizeOptionalString(normalizedToolInput.backfill_to)
+      ?? normalizeOptionalString(normalizedToolInput.backfill_from),
     data_window_start_time: normalizeOptionalString(
       timeWindow?.start_time ?? timeWindow?.start ?? timeWindow?.from ?? runtimeDataContext.data_window_start_time,
     ),
@@ -133,6 +135,7 @@ function buildStructuredInputSlots({
     data_live_authorization: normalizeOptionalString(runtimeDataContext.data_live_authorization),
     data_live_token: normalizeOptionalString(runtimeDataContext.data_live_token),
     data_live_timeout_ms: normalizeOptionalString(runtimeDataContext.data_live_timeout_ms),
+    data_state_snapshot_path: normalizeOptionalString(runtimeDataContext.data_state_snapshot_path),
     data_org_id: normalizeOptionalString(runtimeDataContext.data_org_id),
     data_app_secret: normalizeOptionalString(runtimeDataContext.data_app_secret),
     data_persisted_serving_root: normalizeOptionalString(runtimeDataContext.data_persisted_serving_root),
@@ -158,6 +161,8 @@ export function buildToolAwareRawHostIngress({
     requested_service_object_id: publishedTool.service_object_id,
     target_scope_hint: normalizeOptionalString(normalizedToolInput.scope_ref) ?? normalizeOptionalString(baseIngress.target_scope_hint),
     target_business_date_hint: normalizeOptionalString(normalizedToolInput.business_date)
+      ?? normalizeOptionalString(normalizedToolInput.backfill_to)
+      ?? normalizeOptionalString(normalizedToolInput.backfill_from)
       ?? normalizeOptionalString(baseIngress.target_business_date_hint),
     structured_input_slots: buildStructuredInputSlots({
       rawHostIngress: baseIngress,

@@ -440,6 +440,232 @@ test('default owner-side dependency clients are initialized once across repeated
   assert.equal(getDefaultOwnerSideDependencyClientInitCountForTest(), 1);
 });
 
+test('owner-side data adapter serves operator sync status through the operator surface path', async () => {
+  let capturedInput = null;
+  const adapter = createOwnerSideDataPlatformAdapter({
+    runOperatorSurfaceImpl: async ({ input }) => {
+      capturedInput = input;
+      return {
+        readiness_response: {
+          request_id: input.request_id,
+          trace_ref: input.trace_ref,
+          capability_id: 'navly.ops.sync_status',
+          readiness_status: 'ready',
+          evaluated_scope_ref: input.target_scope_ref,
+          requested_business_date: input.requested_business_date,
+          latest_usable_business_date: input.requested_business_date,
+          reason_codes: [],
+          blocking_dependencies: [],
+          state_trace_refs: ['navly:state-trace:operator-sync-status'],
+          run_trace_refs: ['navly:run-trace:operator-sync-status'],
+          evaluated_at: FIXED_NOW,
+        },
+        theme_service_response: {
+          request_id: input.request_id,
+          trace_ref: input.trace_ref,
+          capability_id: 'navly.ops.sync_status',
+          service_object_id: 'navly.service.ops.sync_status',
+          service_status: 'served',
+          service_object: {
+            capability_id: 'navly.ops.sync_status',
+            service_object_id: 'navly.service.ops.sync_status',
+            org_id: input.org_id,
+            state_snapshot: input.state_snapshot_path,
+            report: {
+              org_id: input.org_id,
+              scheduler_runs: [],
+              latest_sync_states: [],
+              service_projection_count: 1,
+            },
+          },
+          data_window: {
+            from: input.requested_business_date,
+            to: input.requested_business_date,
+          },
+          state_trace_refs: ['navly:state-trace:operator-sync-status'],
+          run_trace_refs: ['navly:run-trace:operator-sync-status'],
+          served_at: FIXED_NOW,
+        },
+      };
+    },
+  });
+
+  const readiness = await adapter.queryCapabilityReadiness({
+    request_id: 'req-ops-sync-status-001',
+    trace_ref: 'navly:trace:req-ops-sync-status-001',
+    capability_id: 'navly.ops.sync_status',
+    access_context: buildOwnerAccessContextEnvelope(),
+    target_scope_ref: 'navly:scope:store:sample-store-001',
+    target_business_date: '2026-03-23',
+    freshness_mode: 'latest_usable',
+    extensions: {
+      runtime_trace_ref: 'navly:runtime-trace:ops-sync-status-001',
+      selected_service_object_id: 'navly.service.ops.sync_status',
+      data_adapter_context: {
+        org_id: 'demo-org-001',
+        state_snapshot_path: '/tmp/navly-truth-store-snapshot.json',
+      },
+    },
+  });
+  const service = await adapter.queryThemeService({
+    request_id: 'req-ops-sync-status-001',
+    trace_ref: 'navly:trace:req-ops-sync-status-001',
+    capability_id: 'navly.ops.sync_status',
+    service_object_id: 'navly.service.ops.sync_status',
+    target_scope_ref: 'navly:scope:store:sample-store-001',
+    target_business_date: '2026-03-23',
+    extensions: {
+      data_adapter_context: {
+        org_id: 'demo-org-001',
+        state_snapshot_path: '/tmp/navly-truth-store-snapshot.json',
+      },
+    },
+  });
+
+  assert.equal(readiness.readiness_status, 'ready');
+  assert.equal(service.service_status, 'served');
+  assert.equal(service.service_object.report.service_projection_count, 1);
+  assert.equal(capturedInput.state_snapshot_path, '/tmp/navly-truth-store-snapshot.json');
+  assert.equal(capturedInput.org_id, 'demo-org-001');
+});
+
+test('owner-side data adapter passes backfill action inputs through the operator surface path', async () => {
+  let capturedInput = null;
+  const adapter = createOwnerSideDataPlatformAdapter({
+    runOperatorSurfaceImpl: async ({ input }) => {
+      capturedInput = input;
+      return {
+        readiness_response: {
+          request_id: input.request_id,
+          trace_ref: input.trace_ref,
+          capability_id: 'navly.ops.sync_backfill',
+          readiness_status: 'ready',
+          evaluated_scope_ref: input.target_scope_ref,
+          requested_business_date: input.requested_business_date,
+          latest_usable_business_date: input.requested_business_date,
+          reason_codes: [],
+          blocking_dependencies: [],
+          state_trace_refs: [],
+          run_trace_refs: ['navly:run-trace:operator-backfill-action'],
+          evaluated_at: FIXED_NOW,
+        },
+        theme_service_response: {
+          request_id: input.request_id,
+          trace_ref: input.trace_ref,
+          capability_id: 'navly.ops.sync_backfill',
+          service_object_id: 'navly.service.ops.sync_backfill',
+          service_status: 'served',
+          service_object: {
+            capability_id: 'navly.ops.sync_backfill',
+            service_object_id: 'navly.service.ops.sync_backfill',
+            requested_window: {
+              from: input.backfill_from,
+              to: input.backfill_to,
+            },
+            state_snapshot: input.state_snapshot_path,
+          },
+          data_window: {
+            from: input.backfill_from,
+            to: input.backfill_to,
+          },
+          state_trace_refs: [],
+          run_trace_refs: ['navly:run-trace:operator-backfill-action'],
+          served_at: FIXED_NOW,
+        },
+      };
+    },
+  });
+
+  const readiness = await adapter.queryCapabilityReadiness({
+    request_id: 'req-ops-backfill-001',
+    trace_ref: 'navly:trace:req-ops-backfill-001',
+    capability_id: 'navly.ops.sync_backfill',
+    access_context: buildOwnerAccessContextEnvelope(),
+    target_scope_ref: 'navly:scope:store:sample-store-001',
+    target_business_date: '2026-03-22',
+    freshness_mode: 'latest_usable',
+    extensions: {
+      runtime_trace_ref: 'navly:runtime-trace:ops-backfill-001',
+      selected_service_object_id: 'navly.service.ops.sync_backfill',
+      data_adapter_context: {
+        org_id: 'demo-org-001',
+        app_secret: 'test-secret',
+        state_snapshot_path: '/tmp/navly-truth-store-snapshot.json',
+        fixture_bundle_path: fixtureBundlePath,
+        transport_kind: 'fixture',
+        backfill_from: '2026-03-21',
+        backfill_to: '2026-03-22',
+      },
+    },
+  });
+  const service = await adapter.queryThemeService({
+    request_id: 'req-ops-backfill-001',
+    trace_ref: 'navly:trace:req-ops-backfill-001',
+    capability_id: 'navly.ops.sync_backfill',
+    service_object_id: 'navly.service.ops.sync_backfill',
+    target_scope_ref: 'navly:scope:store:sample-store-001',
+    target_business_date: '2026-03-22',
+    extensions: {
+      data_adapter_context: {
+        org_id: 'demo-org-001',
+        app_secret: 'test-secret',
+        state_snapshot_path: '/tmp/navly-truth-store-snapshot.json',
+        fixture_bundle_path: fixtureBundlePath,
+        transport_kind: 'fixture',
+        backfill_from: '2026-03-21',
+        backfill_to: '2026-03-22',
+      },
+    },
+  });
+
+  assert.equal(readiness.readiness_status, 'ready');
+  assert.equal(service.service_status, 'served');
+  assert.deepEqual(service.service_object.requested_window, {
+    from: '2026-03-21',
+    to: '2026-03-22',
+  });
+  assert.equal(capturedInput.backfill_from, '2026-03-21');
+  assert.equal(capturedInput.backfill_to, '2026-03-22');
+});
+
+test('owner-side data adapter fails closed for operator surfaces when state snapshot path is missing', async () => {
+  const adapter = createOwnerSideDataPlatformAdapter();
+  const readiness = await adapter.queryCapabilityReadiness({
+    request_id: 'req-ops-quality-missing-001',
+    trace_ref: 'navly:trace:req-ops-quality-missing-001',
+    capability_id: 'navly.ops.quality_report',
+    access_context: buildOwnerAccessContextEnvelope(),
+    target_scope_ref: 'navly:scope:store:sample-store-001',
+    target_business_date: '2026-03-23',
+    freshness_mode: 'latest_usable',
+    extensions: {
+      runtime_trace_ref: 'navly:runtime-trace:ops-quality-missing-001',
+      selected_service_object_id: 'navly.service.ops.quality_report',
+      data_adapter_context: {
+        org_id: 'demo-org-001',
+      },
+    },
+  });
+  const service = await adapter.queryThemeService({
+    request_id: 'req-ops-quality-missing-001',
+    trace_ref: 'navly:trace:req-ops-quality-missing-001',
+    capability_id: 'navly.ops.quality_report',
+    service_object_id: 'navly.service.ops.quality_report',
+    target_scope_ref: 'navly:scope:store:sample-store-001',
+    target_business_date: '2026-03-23',
+    extensions: {
+      data_adapter_context: {
+        org_id: 'demo-org-001',
+      },
+    },
+  });
+
+  assert.equal(readiness.readiness_status, 'pending');
+  assert.deepEqual(readiness.reason_codes, ['missing_persisted_state_path']);
+  assert.equal(service.service_status, 'not_ready');
+  assert.deepEqual(service.explanation_object.reason_codes, ['missing_persisted_state_path']);
+});
+
 test('owner-side data adapter cache is bounded by runCacheMaxEntries', async () => {
   let runCount = 0;
   const adapter = createOwnerSideDataPlatformAdapter({

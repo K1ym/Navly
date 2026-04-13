@@ -254,9 +254,14 @@ function buildRuntimeDataContext({ toolInput, publishedTool, pluginConfig, envCo
     data_live_token: normalizeOptionalString(envConfig.QINQIN_API_TOKEN)
       ?? normalizeOptionalString(envConfig.QINQIN_REAL_DATA_TOKEN),
     data_live_timeout_ms: normalizeOptionalString(envConfig.QINQIN_API_REQUEST_TIMEOUT_MS),
+    data_state_snapshot_path: normalizeOptionalString(pluginConfig.stateSnapshotPath)
+      ?? normalizeOptionalString(envConfig.NAVLY_RUNTIME_STATE_SNAPSHOT_PATH)
+      ?? normalizeOptionalString(envConfig.NAVLY_DATA_PLATFORM_STATE_SNAPSHOT_PATH),
     data_org_id: resolveOrgId({ scopeRef, pluginConfig, envConfig }),
     data_app_secret: normalizeOptionalString(pluginConfig.defaultAppSecret)
       ?? normalizeOptionalString(envConfig.QINQIN_API_APP_SECRET),
+    data_fixture_bundle_path: normalizeOptionalString(pluginConfig.fixtureBundlePath)
+      ?? normalizeOptionalString(envConfig.NAVLY_RUNTIME_FIXTURE_BUNDLE_PATH),
     data_window_start_time: `${businessDate} 00:00:00`,
     data_window_end_time: `${businessDate} 23:59:59`,
   };
@@ -275,6 +280,10 @@ function buildRawHostIngress({ toolName, toolInput, context, pluginConfig, nowFa
   const hostRefs = deriveHostRefs({ requestId, context, channelKind, toolName });
   const scopeRef = resolveScopeRef(toolInput, pluginConfig);
   const businessDate = resolveBusinessDate(toolInput, pluginConfig, nowFactory);
+  const targetBusinessDateHint = normalizeOptionalString(toolInput.business_date)
+    ?? normalizeOptionalString(toolInput.backfill_to)
+    ?? normalizeOptionalString(toolInput.backfill_from)
+    ?? businessDate;
 
   return {
     request_id: requestId,
@@ -291,7 +300,7 @@ function buildRawHostIngress({ toolName, toolInput, context, pluginConfig, nowFa
     ],
     message_text: `Navly first-party host tool ${toolName}`,
     target_scope_hint: scopeRef,
-    target_business_date_hint: businessDate,
+    target_business_date_hint: targetBusinessDateHint,
     response_channel_capabilities: {
       supports_text_reply: true,
       supports_private_reply: true,

@@ -48,40 +48,40 @@
       "document_short_name": "ops_sync_status",
       "domain": "ops",
       "default_service_object_id": "navly.service.ops.sync_status",
-      "status": "published_not_ready_operator_surface",
-      "notes": "Operator-only capability published through the first-party host surface; runtime currently returns structured pending explanations."
+      "status": "implemented_phase1_operator_surface",
+      "notes": "Operator sync status surface reads persisted PostgreSQL/Temporal truth state through the formal runtime path."
     },
     {
       "capability_id": "navly.ops.backfill_status",
       "document_short_name": "ops_backfill_status",
       "domain": "ops",
       "default_service_object_id": "navly.service.ops.backfill_status",
-      "status": "published_not_ready_operator_surface",
-      "notes": "Operator-only capability published through the first-party host surface; runtime currently returns structured pending explanations."
+      "status": "implemented_phase1_operator_surface",
+      "notes": "Operator backfill status surface reads persisted carry-forward cursor and backlog state through the formal runtime path."
     },
     {
       "capability_id": "navly.ops.sync_rerun",
       "document_short_name": "ops_sync_rerun",
       "domain": "ops",
       "default_service_object_id": "navly.service.ops.sync_rerun",
-      "status": "published_not_ready_operator_surface",
-      "notes": "Operator-only action capability published through the first-party host surface; runtime currently returns structured pending explanations."
+      "status": "implemented_phase1_operator_surface",
+      "notes": "Operator rerun surface executes the repo-authoritative Temporal rerun workflow and persists the updated truth snapshot."
     },
     {
       "capability_id": "navly.ops.sync_backfill",
       "document_short_name": "ops_sync_backfill",
       "domain": "ops",
       "default_service_object_id": "navly.service.ops.sync_backfill",
-      "status": "published_not_ready_operator_surface",
-      "notes": "Operator-only action capability published through the first-party host surface; runtime currently returns structured pending explanations."
+      "status": "implemented_phase1_operator_surface",
+      "notes": "Operator backfill trigger surface executes the repo-authoritative Temporal backfill workflow and persists the updated truth snapshot."
     },
     {
       "capability_id": "navly.ops.quality_report",
       "document_short_name": "ops_quality_report",
       "domain": "ops",
       "default_service_object_id": "navly.service.ops.quality_report",
-      "status": "published_not_ready_operator_surface",
-      "notes": "Operator-only capability published through the first-party host surface; runtime currently returns structured pending explanations."
+      "status": "implemented_phase1_operator_surface",
+      "notes": "Operator quality report surface reads persisted field-coverage, schema-alignment, and quality-issue state through the formal runtime path."
     }
   ]
 }

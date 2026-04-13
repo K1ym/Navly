@@ -51,7 +51,7 @@
     {
       "service_object_id": "navly.service.ops.sync_status",
       "document_short_name": "ops_sync_status",
-      "status": "published_not_ready_operator_surface",
+      "status": "implemented_phase1_operator_surface",
       "capability_id": "navly.ops.sync_status",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -60,7 +60,7 @@
     {
       "service_object_id": "navly.service.ops.backfill_status",
       "document_short_name": "ops_backfill_status",
-      "status": "published_not_ready_operator_surface",
+      "status": "implemented_phase1_operator_surface",
       "capability_id": "navly.ops.backfill_status",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -69,7 +69,7 @@
     {
       "service_object_id": "navly.service.ops.sync_rerun",
       "document_short_name": "ops_sync_rerun",
-      "status": "published_not_ready_operator_surface",
+      "status": "implemented_phase1_operator_surface",
       "capability_id": "navly.ops.sync_rerun",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -78,7 +78,7 @@
     {
       "service_object_id": "navly.service.ops.sync_backfill",
       "document_short_name": "ops_sync_backfill",
-      "status": "published_not_ready_operator_surface",
+      "status": "implemented_phase1_operator_surface",
       "capability_id": "navly.ops.sync_backfill",
       "service_kind": "theme_service",
       "is_default_binding": true,
@@ -87,12 +87,12 @@
     {
       "service_object_id": "navly.service.ops.quality_report",
       "document_short_name": "ops_quality_report",
-      "status": "published_not_ready_operator_surface",
+      "status": "implemented_phase1_operator_surface",
       "capability_id": "navly.ops.quality_report",
       "service_kind": "theme_service",
       "is_default_binding": true,
       "include_explanation_supported": true
     }
   ],
-  "notes": "Phase-1 host closeout binding set: manager-facing owner surfaces are now formal default runtime reads, while operator-facing publication remains structured pending."
+  "notes": "Phase-1 host closeout binding set: manager-facing owner surfaces and operator-facing sync/backfill/quality surfaces now resolve through formal runtime service bindings."
 }
