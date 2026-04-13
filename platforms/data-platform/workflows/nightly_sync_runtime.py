@@ -114,7 +114,14 @@ def _group_dispatch_plan(dispatch_plan: list[dict[str, Any]]) -> list[dict[str, 
     grouped: dict[tuple[str, str], dict[str, Any]] = {}
     for entry in dispatch_plan:
         slice_id = _slice_id_for_endpoint(entry['endpoint_contract_id'])
-        key = (entry['dispatch_priority'], slice_id)
+        if entry['dispatch_priority'] == 'backfill':
+            key = (
+                entry['dispatch_priority'],
+                slice_id,
+                entry.get('business_date') or entry.get('window_end_business_date') or '',
+            )
+        else:
+            key = (entry['dispatch_priority'], slice_id)
         grouped.setdefault(key, {
             'slice_id': slice_id,
             'dispatch_priority': entry['dispatch_priority'],

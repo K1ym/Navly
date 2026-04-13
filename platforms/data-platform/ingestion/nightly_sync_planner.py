@@ -78,6 +78,7 @@ def build_nightly_sync_plan(
     currentness_tasks: list[dict[str, Any]] = []
     backfill_tasks: list[dict[str, Any]] = []
     endpoint_plans: list[dict[str, Any]] = []
+    backfill_dates_by_endpoint: dict[str, list[str]] = {}
 
     for endpoint_contract_id in selected_endpoint_ids:
         entry = endpoint_entries[endpoint_contract_id]
@@ -139,19 +140,12 @@ def build_nightly_sync_plan(
                 'complete' if not older_missing_business_dates else 'incomplete'
             )
             if older_missing_business_dates:
-                recommended_next_backfill_business_date = max(older_missing_business_dates)
-                backfill_tasks.append({
-                    'task_kind': 'historical_backfill_sync',
-                    'endpoint_contract_id': endpoint_contract_id,
-                    'display_name': entry['display_name'],
-                    'business_date': recommended_next_backfill_business_date,
-                    'remaining_business_dates': sorted(
-                        older_missing_business_dates,
-                        reverse=True,
-                    ),
-                    'carry_forward_cursor': bool(policy_entry['carry_forward_cursor']),
-                    'structured_targets': entry['structured_targets'],
-                })
+                descending_missing_business_dates = sorted(
+                    older_missing_business_dates,
+                    reverse=True,
+                )
+                recommended_next_backfill_business_date = descending_missing_business_dates[0]
+                backfill_dates_by_endpoint[endpoint_contract_id] = descending_missing_business_dates
 
         endpoint_plans.append({
             'endpoint_contract_id': endpoint_contract_id,
@@ -167,6 +161,25 @@ def build_nightly_sync_plan(
             'recommended_next_currentness_task': currentness_task,
             'recommended_next_backfill_business_date': recommended_next_backfill_business_date,
         })
+
+    if backfill_dates_by_endpoint:
+        max_backfill_depth = max(len(dates) for dates in backfill_dates_by_endpoint.values())
+        for backfill_depth in range(max_backfill_depth):
+            for endpoint_contract_id in selected_endpoint_ids:
+                candidate_dates = backfill_dates_by_endpoint.get(endpoint_contract_id, [])
+                if backfill_depth >= len(candidate_dates):
+                    continue
+                entry = endpoint_entries[endpoint_contract_id]
+                backfill_tasks.append({
+                    'task_kind': 'historical_backfill_sync',
+                    'endpoint_contract_id': endpoint_contract_id,
+                    'display_name': entry['display_name'],
+                    'business_date': candidate_dates[backfill_depth],
+                    'remaining_business_dates': candidate_dates[backfill_depth:],
+                    'carry_forward_cursor': bool(policy_entry['carry_forward_cursor']),
+                    'structured_targets': entry['structured_targets'],
+                    'backfill_depth': backfill_depth + 1,
+                })
 
     return {
         'plan_id': f'{source_system_id}::{org_id}::{target_business_date}::nightly-sync-plan',

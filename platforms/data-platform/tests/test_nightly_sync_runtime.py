@@ -121,6 +121,37 @@ class NightlySyncRuntimeTest(unittest.TestCase):
                 ['2026-04-09', '2026-04-10', '2026-04-11', '2026-04-12'],
             )
 
+    def test_runtime_cycle_uses_extra_backfill_budget_to_advance_multiple_days_in_one_run(self) -> None:
+        transport = self._fixture_transport()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = run_nightly_sync_runtime_cycle(
+                db_path=Path(tmpdir) / 'nightly-runtime.sqlite3',
+                source_system_id='qinqin.v1_1',
+                org_id='demo-org-001',
+                target_business_date='2026-04-12',
+                expected_business_dates=[],
+                app_secret='test-secret',
+                transport=transport,
+                endpoint_contract_ids=['qinqin.staff.get_tech_commission_set_list.v1_8'],
+                max_dispatch_tasks=1,
+                max_backfill_dispatch_tasks=2,
+                history_start_business_date='2026-04-09',
+                output_root=Path(tmpdir) / 'artifacts',
+                persisted_serving_root=Path(tmpdir) / 'persisted-serving-store',
+            )
+
+            backfill_dispatches = [
+                entry for entry in result['initial_snapshot']['dispatch_plan']
+                if entry['dispatch_priority'] == 'backfill'
+            ]
+            self.assertEqual(
+                [entry['business_date'] for entry in backfill_dispatches],
+                ['2026-04-11', '2026-04-10'],
+            )
+            ledger_entry = result['final_snapshot']['cursor_ledger']['entries'][0]
+            self.assertEqual(ledger_entry['next_backfill_business_date'], '2026-04-09')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -51,15 +51,19 @@ class NightlySyncSchedulerTest(unittest.TestCase):
                 'qinqin.staff.get_tech_commission_set_list.v1_8',
             ],
             max_dispatch_tasks=2,
-            max_backfill_dispatch_tasks=2,
+            max_backfill_dispatch_tasks=4,
         )
 
         self.assertEqual(
             [entry['dispatch_priority'] for entry in snapshot['dispatch_plan']],
-            ['currentness', 'currentness', 'backfill', 'backfill'],
+            ['currentness', 'currentness', 'backfill', 'backfill', 'backfill', 'backfill'],
         )
         self.assertEqual(snapshot['deferred_currentness_tasks'], 0)
         self.assertEqual(snapshot['deferred_backfill_tasks'], 0)
+        self.assertEqual(
+            [entry['business_date'] for entry in snapshot['dispatch_plan'] if entry['dispatch_priority'] == 'backfill'],
+            ['2026-04-10', '2026-04-10', '2026-04-09', '2026-04-09'],
+        )
 
     def test_scheduler_history_start_business_date_expands_expected_window(self) -> None:
         snapshot = build_nightly_sync_scheduler_snapshot(

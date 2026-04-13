@@ -30,10 +30,9 @@ class NightlySyncPlannerTest(unittest.TestCase):
             entry['endpoint_contract_id']: entry
             for entry in plan['currentness_tasks']
         }
-        backfill_by_endpoint = {
-            entry['endpoint_contract_id']: entry
-            for entry in plan['backfill_tasks']
-        }
+        backfill_by_endpoint = {}
+        for entry in plan['backfill_tasks']:
+            backfill_by_endpoint.setdefault(entry['endpoint_contract_id'], []).append(entry)
 
         self.assertEqual(
             currentness_by_endpoint['qinqin.member.get_recharge_bill_list.v1_3']['business_date'],
@@ -49,18 +48,22 @@ class NightlySyncPlannerTest(unittest.TestCase):
         )
 
         self.assertEqual(
-            backfill_by_endpoint['qinqin.member.get_recharge_bill_list.v1_3']['business_date'],
+            backfill_by_endpoint['qinqin.member.get_recharge_bill_list.v1_3'][0]['business_date'],
             '2026-04-10',
         )
         self.assertEqual(
-            backfill_by_endpoint['qinqin.member.get_recharge_bill_list.v1_3']['remaining_business_dates'],
+            backfill_by_endpoint['qinqin.member.get_recharge_bill_list.v1_3'][0]['remaining_business_dates'],
             ['2026-04-10', '2026-04-09'],
         )
         self.assertEqual(
-            backfill_by_endpoint['qinqin.staff.get_tech_commission_set_list.v1_8']['business_date'],
+            backfill_by_endpoint['qinqin.staff.get_tech_commission_set_list.v1_8'][0]['business_date'],
             '2026-04-10',
         )
         self.assertNotIn('qinqin.member.get_customers_list.v1_1', backfill_by_endpoint)
+        self.assertEqual(
+            [entry['business_date'] for entry in plan['backfill_tasks']],
+            ['2026-04-10', '2026-04-10', '2026-04-09', '2026-04-09'],
+        )
 
     def test_followup_run_keeps_latest_current_and_continues_older_cursor(self) -> None:
         latest_states = [
@@ -97,10 +100,9 @@ class NightlySyncPlannerTest(unittest.TestCase):
             entry['endpoint_contract_id']
             for entry in plan['currentness_tasks']
         }
-        backfill_by_endpoint = {
-            entry['endpoint_contract_id']: entry
-            for entry in plan['backfill_tasks']
-        }
+        backfill_by_endpoint = {}
+        for entry in plan['backfill_tasks']:
+            backfill_by_endpoint.setdefault(entry['endpoint_contract_id'], []).append(entry)
 
         self.assertNotIn('qinqin.member.get_recharge_bill_list.v1_3', currentness_endpoints)
         self.assertEqual(
@@ -112,7 +114,7 @@ class NightlySyncPlannerTest(unittest.TestCase):
             '2026-04-09',
         )
         self.assertEqual(
-            backfill_by_endpoint['qinqin.member.get_recharge_bill_list.v1_3']['remaining_business_dates'],
+            backfill_by_endpoint['qinqin.member.get_recharge_bill_list.v1_3'][0]['remaining_business_dates'],
             ['2026-04-09'],
         )
 
@@ -121,8 +123,12 @@ class NightlySyncPlannerTest(unittest.TestCase):
             '2026-04-10',
         )
         self.assertEqual(
-            backfill_by_endpoint['qinqin.staff.get_tech_commission_set_list.v1_8']['remaining_business_dates'],
+            backfill_by_endpoint['qinqin.staff.get_tech_commission_set_list.v1_8'][0]['remaining_business_dates'],
             ['2026-04-10', '2026-04-09'],
+        )
+        self.assertEqual(
+            [entry['business_date'] for entry in plan['backfill_tasks']],
+            ['2026-04-09', '2026-04-10', '2026-04-09'],
         )
 
 
