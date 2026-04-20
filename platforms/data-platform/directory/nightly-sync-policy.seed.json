@@ -13,6 +13,11 @@
       "backfill_fill_direction": "latest_to_oldest",
       "carry_forward_cursor": true,
       "default_page_size": 200,
+      "default_history_start_business_date": null,
+      "runtime_history_start_business_date_env_var": "QINQIN_HISTORY_START_BUSINESS_DATE",
+      "operator_backfill_defaults_to_full_history": true,
+      "max_concurrent_endpoint_fetches": 3,
+      "runtime_max_concurrent_endpoint_fetches_env_var": "NAVLY_QINQIN_MAX_CONCURRENT_ENDPOINT_FETCHES",
       "increment_strategy_policies": {
         "business_window_incremental": {
           "currentness_window_business_days": 1,
@@ -30,7 +35,7 @@
           "backfill_order": "not_applicable"
         }
       },
-      "notes": "Currentness must be protected first inside the 03:00-04:00 access window. Historical backlog then continues from the newest missing business date toward older dates without resetting the cursor every night."
+      "notes": "Currentness must be protected first inside the 03:00-04:00 access window. Historical backlog then continues from the newest missing business date toward older dates without resetting the cursor every night. Full-history crawling can default from runtime config via QINQIN_HISTORY_START_BUSINESS_DATE, and live endpoint execution may fan out up to three concurrent endpoint fetches unless overridden."
     }
   ]
 }

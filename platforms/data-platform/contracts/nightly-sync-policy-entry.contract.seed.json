@@ -13,8 +13,13 @@
     "backfill_fill_direction",
     "carry_forward_cursor",
     "default_page_size",
+    "default_history_start_business_date",
+    "runtime_history_start_business_date_env_var",
+    "operator_backfill_defaults_to_full_history",
+    "max_concurrent_endpoint_fetches",
+    "runtime_max_concurrent_endpoint_fetches_env_var",
     "increment_strategy_policies",
     "notes"
   ],
-  "notes": "Nightly sync policy freezes the governed activation window plus currentness/backfill planning semantics for a source system."
+  "notes": "Nightly sync policy freezes the governed activation window, full-history backfill defaults, and endpoint fetch concurrency semantics for a source system."
 }

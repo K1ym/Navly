@@ -43,6 +43,9 @@
 - backfill fill direction：`latest_to_oldest`
 - carry-forward cursor：`true`
 - default page size：`200`
+- default history start：`runtime-config-resolved`
+- operator backfill default：`full_history_when_history_start_is_available`
+- max concurrent endpoint fetches：`3`
 
 增量策略差异：
 
@@ -74,6 +77,7 @@ planner 的输入：
 - latest usable endpoint states
 - endpoint increment strategies
 - governed nightly sync policy
+- optional runtime-config history start override
 
 planner 的输出：
 
@@ -92,6 +96,13 @@ planner 的输出：
    - 历史 backlog 从上次 newest missing date 继续往前
 3. profile endpoints：
    - 当前只做近窗口刷新，不默认进入深历史补数
+4. full-history bootstrap：
+   - 如果 scheduler / runtime / operator 没有显式传 `history_start_business_date`
+   - 则允许通过 nightly sync policy 声明的 `QINQIN_HISTORY_START_BUSINESS_DATE` 读取受控历史起点
+   - `sync_backfill` 在未显式给出 backfill window 时，会默认从该历史起点补到请求目标日
+5. endpoint execution fanout：
+   - live endpoint sync 允许按 policy 指定的并发度并行抓取多个 endpoint
+   - raw replay / endpoint runs 仍按 registry 顺序写回，避免审计语义漂移
 
 cursor state 回答：
 

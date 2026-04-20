@@ -194,9 +194,14 @@ class Phase1LiveTransportValidationMatrixTest(unittest.TestCase):
 
         self.assertEqual(result['transport_kind'], 'live')
         self.assertEqual(len(server.requests), 3)
-        self.assertEqual(server.requests[0]['path'], '/api/thirdparty/GetPersonList')
-        self.assertEqual(server.requests[1]['path'], '/api/thirdparty/GetTechUpClockList')
-        self.assertEqual(server.requests[2]['path'], '/api/thirdparty/GetTechMarketList')
+        self.assertEqual(
+            {request['path'] for request in server.requests},
+            {
+                '/api/thirdparty/GetPersonList',
+                '/api/thirdparty/GetTechUpClockList',
+                '/api/thirdparty/GetTechMarketList',
+            },
+        )
 
         endpoint_runs = {
             item['endpoint_contract_id']: item

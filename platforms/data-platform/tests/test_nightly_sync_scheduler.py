@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
@@ -80,6 +81,24 @@ class NightlySyncSchedulerTest(unittest.TestCase):
         self.assertEqual(
             snapshot['planner_output']['expected_business_dates'],
             ['2026-04-09', '2026-04-10', '2026-04-11'],
+        )
+
+    def test_scheduler_resolves_history_start_from_runtime_config_when_not_explicit(self) -> None:
+        with patch.dict('os.environ', {'QINQIN_HISTORY_START_BUSINESS_DATE': '2026-04-08'}, clear=False):
+            snapshot = build_nightly_sync_scheduler_snapshot(
+                source_system_id='qinqin.v1_1',
+                org_id='demo-org-001',
+                target_business_date='2026-04-11',
+                expected_business_dates=[],
+                latest_usable_endpoint_states=[],
+                endpoint_contract_ids=['qinqin.member.get_recharge_bill_list.v1_3'],
+                max_dispatch_tasks=1,
+            )
+
+        self.assertEqual(snapshot['history_start_business_date'], '2026-04-08')
+        self.assertEqual(
+            snapshot['planner_output']['expected_business_dates'],
+            ['2026-04-08', '2026-04-09', '2026-04-10', '2026-04-11'],
         )
 
     def test_scheduler_script_writes_snapshot_dispatch_and_ledger(self) -> None:

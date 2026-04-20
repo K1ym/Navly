@@ -128,9 +128,11 @@ flowchart LR
 
 - Qinqin v1.1 formal registry
 - `member_insight` fixture / live transport vertical slice
+- governed nightly sync planner / carry-forward backfill cursor / full-history bootstrap default
 - raw response page capture / replay artifact
 - historical run truth 与 latest usable state 分离
 - formal owner-side readiness / theme service surface
+- live endpoint-level concurrent fetch fanout for Qinqin owner surfaces
 
 当前范围请以 [platforms/data-platform/README.md](platforms/data-platform/README.md) 为准。
 
@@ -256,6 +258,8 @@ python3 platforms/data-platform/scripts/run_member_insight_vertical_slice.py \
 | `QINQIN_API_AUTHORIZATION` | 可选 / 条件必需 | 某些接口的 header 授权 |
 | `QINQIN_API_TOKEN` | 可选 / 条件必需 | 某些接口的 header token |
 | `QINQIN_API_REQUEST_TIMEOUT_MS` | 可选 | 请求超时 |
+| `QINQIN_HISTORY_START_BUSINESS_DATE` | 可选 | 未显式指定 backfill window 时的受控全历史起点 |
+| `NAVLY_QINQIN_MAX_CONCURRENT_ENDPOINT_FETCHES` | 可选 | live Qinqin endpoint 抓取并发度覆盖值 |
 
 配置原则：
 

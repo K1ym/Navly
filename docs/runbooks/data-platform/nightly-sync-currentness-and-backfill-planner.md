@@ -26,11 +26,20 @@
 - 再补 older missing business dates
 - backfill 顺序固定为 `latest_to_oldest`
 - 下一晚继续沿用同一缺口方向，不重新从最老处开始
+- 如果没有显式传 `history_start_business_date`，runtime 会尝试读取 `QINQIN_HISTORY_START_BUSINESS_DATE`
+- `navly_trigger_backfill` / operator backfill 在未显式给出 `backfill_from` / `backfill_to` 时，也会默认回落到该受控历史起点
 
 ### 3.2 档案类
 
 - 默认只做近窗口刷新
 - 不默认排进深历史补数
+
+### 3.3 抓取并发
+
+- live Qinqin endpoint sync 默认允许并发抓取多个 endpoint
+- 默认并发度由 nightly sync policy 冻结为 `3`
+- 如需在部署侧调优，可通过 `NAVLY_QINQIN_MAX_CONCURRENT_ENDPOINT_FETCHES` 覆盖
+- 并发只影响抓取阶段；historical run truth 与 raw replay 仍按 endpoint 目录顺序顺序落盘
 
 ## 4. 你应该怎么读 planner 输出
 

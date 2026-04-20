@@ -66,6 +66,12 @@
 - nightly sync cursor state
   - `contracts/nightly-sync-cursor-state-entry.contract.seed.json`
   - `sync-state/nightly_sync_cursor_state.py`
+- governed full-history bootstrap defaults
+  - scheduler / runtime / operator backfill 默认可从 `QINQIN_HISTORY_START_BUSINESS_DATE` 解析历史起点
+  - `sync_backfill` 未显式给 window 时可补到请求目标日
+- live endpoint fetch fanout
+  - `member_insight` / `finance_summary` / `staff_board` / generic Qinqin capability slice 已支持 endpoint 级并发抓取
+  - 并发度由 nightly sync policy 冻结并可通过 `NAVLY_QINQIN_MAX_CONCURRENT_ENDPOINT_FETCHES` 覆盖
 
 当前**未完成**：
 
@@ -86,6 +92,7 @@
 - readiness / serving / ingestion 若需要 capability dependency truth，应读取 `capability-dependency-registry.seed.json`
 - data-platform 不拥有 access truth
 - data-platform 当前实现仍然只是在自身 owner scope 内推进 raw truth / canonical fact truth / latest state backbone
+- runtime-config history start 与 endpoint fanout 只是 policy-resolved execution knobs，不改变 raw truth / latest state / readiness / projection 的边界划分
 
 ## C0-L3 目录映射
 

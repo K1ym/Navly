@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from backbone_support.latest_usable_state_backbone import build_state_trace_ref, utcnow_iso
+from directory.nightly_sync_policy_registry import resolve_nightly_sync_history_start_business_date
 from ingestion.nightly_sync_planner import build_nightly_sync_plan
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
@@ -76,10 +77,15 @@ def build_nightly_sync_scheduler_snapshot(
     max_backfill_dispatch_tasks: int | None = None,
     history_start_business_date: str | None = None,
 ) -> dict[str, Any]:
+    resolved_history_start_business_date = resolve_nightly_sync_history_start_business_date(
+        source_system_id,
+        explicit_history_start_business_date=history_start_business_date,
+        data_platform_root=DATA_PLATFORM_ROOT,
+    )
     resolved_expected_business_dates = resolve_expected_business_dates(
         target_business_date=target_business_date,
         expected_business_dates=expected_business_dates,
-        history_start_business_date=history_start_business_date,
+        history_start_business_date=resolved_history_start_business_date,
     )
     plan = build_nightly_sync_plan(
         source_system_id=source_system_id,
@@ -162,7 +168,7 @@ def build_nightly_sync_scheduler_snapshot(
         'target_business_date': target_business_date,
         'max_dispatch_tasks': max_dispatch_tasks,
         'max_backfill_dispatch_tasks': max_backfill_dispatch_tasks,
-        'history_start_business_date': history_start_business_date,
+        'history_start_business_date': resolved_history_start_business_date,
         'planner_output': plan,
         'cursor_states': cursor_states,
         'cursor_ledger': cursor_ledger,

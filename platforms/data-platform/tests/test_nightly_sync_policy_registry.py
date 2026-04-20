@@ -1,10 +1,18 @@
 from __future__ import annotations
 
 import json
+import sys
 import unittest
 from pathlib import Path
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
+if str(DATA_PLATFORM_ROOT) not in sys.path:
+    sys.path.insert(0, str(DATA_PLATFORM_ROOT))
+
+from directory.nightly_sync_policy_registry import (  # noqa: E402
+    resolve_nightly_sync_endpoint_fetch_concurrency,
+    resolve_nightly_sync_history_start_business_date,
+)
 
 
 def _load_json(path: Path) -> dict:
@@ -35,6 +43,17 @@ class NightlySyncPolicyRegistryTest(unittest.TestCase):
         self.assertEqual(entry['backfill_fill_direction'], 'latest_to_oldest')
         self.assertTrue(entry['carry_forward_cursor'])
         self.assertEqual(entry['default_page_size'], 200)
+        self.assertIsNone(entry['default_history_start_business_date'])
+        self.assertEqual(
+            entry['runtime_history_start_business_date_env_var'],
+            'QINQIN_HISTORY_START_BUSINESS_DATE',
+        )
+        self.assertTrue(entry['operator_backfill_defaults_to_full_history'])
+        self.assertEqual(entry['max_concurrent_endpoint_fetches'], 3)
+        self.assertEqual(
+            entry['runtime_max_concurrent_endpoint_fetches_env_var'],
+            'NAVLY_QINQIN_MAX_CONCURRENT_ENDPOINT_FETCHES',
+        )
 
         strategy_policies = entry['increment_strategy_policies']
         self.assertEqual(
@@ -51,6 +70,44 @@ class NightlySyncPolicyRegistryTest(unittest.TestCase):
         self.assertEqual(
             strategy_policies['profile_refresh_windowed']['currentness_window_business_days'],
             7,
+        )
+
+    def test_history_start_resolution_prefers_explicit_then_env(self) -> None:
+        self.assertEqual(
+            resolve_nightly_sync_history_start_business_date(
+                'qinqin.v1_1',
+                explicit_history_start_business_date='2026-03-01',
+                environ={'QINQIN_HISTORY_START_BUSINESS_DATE': '2026-02-01'},
+            ),
+            '2026-03-01',
+        )
+        self.assertEqual(
+            resolve_nightly_sync_history_start_business_date(
+                'qinqin.v1_1',
+                environ={'QINQIN_HISTORY_START_BUSINESS_DATE': '2026-02-01'},
+            ),
+            '2026-02-01',
+        )
+
+    def test_endpoint_fetch_concurrency_prefers_request_then_env_then_policy(self) -> None:
+        self.assertEqual(
+            resolve_nightly_sync_endpoint_fetch_concurrency(
+                'qinqin.v1_1',
+                requested_max_concurrent_endpoint_fetches=6,
+                environ={'NAVLY_QINQIN_MAX_CONCURRENT_ENDPOINT_FETCHES': '5'},
+            ),
+            6,
+        )
+        self.assertEqual(
+            resolve_nightly_sync_endpoint_fetch_concurrency(
+                'qinqin.v1_1',
+                environ={'NAVLY_QINQIN_MAX_CONCURRENT_ENDPOINT_FETCHES': '5'},
+            ),
+            5,
+        )
+        self.assertEqual(
+            resolve_nightly_sync_endpoint_fetch_concurrency('qinqin.v1_1', environ={}),
+            3,
         )
 
 
