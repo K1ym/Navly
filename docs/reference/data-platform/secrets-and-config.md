@@ -297,6 +297,8 @@ Qinqin 接入相关的运行时真相不得散落硬编码在实现中。
 | `QINQIN_API_RETRY_COUNT` | 否 | int | 否 | 重试次数 |
 | `QINQIN_API_RETRY_DELAY_MS` | 否 | int | 否 | 重试间隔 |
 | `QINQIN_API_REQUEST_TIMEOUT_MS` | 否 | int | 否 | 请求超时 |
+| `QINQIN_HISTORY_START_BUSINESS_DATE` | 否 | date | 否 | 未显式指定 backfill window 时的受控全历史起点 |
+| `NAVLY_QINQIN_MAX_CONCURRENT_ENDPOINT_FETCHES` | 否 | int | 否 | live endpoint 抓取并发度覆盖值 |
 | `QINQIN_API_LOOKBACK_DAYS` | 否 | int | 否 | 默认回看天数 |
 | `QINQIN_API_PAGE_SIZE` | 否 | int | 否 | 默认分页大小 |
 | `QINQIN_API_ACCESS_MODE` | 否 | string | 否 | `production` / `debug` |

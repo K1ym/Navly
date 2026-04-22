@@ -47,12 +47,12 @@ const FIELD_SCHEMAS = Object.freeze({
   backfill_from: {
     type: 'string',
     pattern: '^\\d{4}-\\d{2}-\\d{2}$',
-    description: 'Backfill start business date in YYYY-MM-DD format.',
+    description: 'Optional backfill start business date in YYYY-MM-DD format. Omit together with backfill_to to let Navly use the governed full-history start when configured.',
   },
   backfill_to: {
     type: 'string',
     pattern: '^\\d{4}-\\d{2}-\\d{2}$',
-    description: 'Backfill end business date in YYYY-MM-DD format.',
+    description: 'Optional backfill end business date in YYYY-MM-DD format. Omit together with backfill_from to let Navly use the governed full-history end at the requested business date.',
   },
 });
 

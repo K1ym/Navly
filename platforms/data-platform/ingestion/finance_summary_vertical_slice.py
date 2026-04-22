@@ -13,7 +13,9 @@ from connectors.qinqin.qinqin_substrate import (
     load_seed_backed_qinqin_registry,
     normalize_fetch_page_result,
 )
+from directory.nightly_sync_policy_registry import resolve_nightly_sync_endpoint_fetch_concurrency
 from directory.capability_dependency_registry import load_capability_dependency_entry
+from ingestion.parallel_execution import ordered_parallel_map
 from warehouse.finance_summary_canonical import (
     ACCOUNT_TRADE_ENDPOINT_ID,
     RECHARGE_ENDPOINT_ID,
@@ -221,6 +223,174 @@ def _canonical_input_by_endpoint(
     }
 
 
+def _sync_finance_endpoint(
+    *,
+    endpoint_contract_id: str,
+    org_id: str,
+    start_time: str,
+    end_time: str,
+    requested_business_date: str,
+    app_secret: str,
+    transport: Any,
+    page_size: int,
+    member_card_id: str | None,
+    trade_type: int | None,
+    data_platform_root: Path,
+    resolved_transport_kind: str,
+    registry: Any,
+) -> dict[str, Any]:
+    pages: list[dict[str, Any]] = []
+    page_index = 1
+    accumulated_records = 0
+    uses_pagination = _endpoint_uses_pagination(endpoint_contract_id, registry)
+    page_size_wire = registry.preferred_wire_name('page_size') if uses_pagination else None
+
+    while True:
+        request_envelope = build_signed_request(
+            endpoint_contract_id=endpoint_contract_id,
+            org_id=org_id,
+            start_time=start_time,
+            end_time=end_time,
+            page_index=page_index if uses_pagination else None,
+            page_size=page_size if uses_pagination else None,
+            app_secret=app_secret,
+            member_card_id=member_card_id if endpoint_contract_id == ACCOUNT_TRADE_ENDPOINT_ID else None,
+            trade_type=trade_type if endpoint_contract_id == ACCOUNT_TRADE_ENDPOINT_ID else None,
+            data_platform_root=data_platform_root,
+        )
+
+        try:
+            fetch_result = transport.fetch_page(endpoint_contract_id, request_envelope['payload'])
+        except Exception as exc:
+            fetch_result = build_exception_fetch_result(
+                exception=exc,
+                request_envelope=request_envelope,
+                default_transport_kind=resolved_transport_kind,
+            )
+
+        normalized_fetch_result = normalize_fetch_page_result(
+            fetch_result=fetch_result,
+            request_envelope=request_envelope,
+            default_transport_kind=resolved_transport_kind,
+        )
+        response_envelope = normalized_fetch_result['response_envelope']
+        transport_error = normalized_fetch_result.get('transport_error')
+
+        page_rows: list[dict[str, Any]] = []
+        response_total = 0
+        schema_error: dict[str, Any] | None = None
+        if transport_error is None and response_envelope.get('Code') == 200:
+            try:
+                normalized_page_payload = _normalized_page_payload(
+                    endpoint_contract_id=endpoint_contract_id,
+                    response_envelope=response_envelope,
+                )
+                page_rows = normalized_page_payload['rows']
+                response_total = normalized_page_payload['total']
+            except SourceSchemaError as exc:
+                schema_error = _schema_error(endpoint_contract_id, exc)
+        response_record_count = len(page_rows)
+        accumulated_records += response_record_count
+        pages.append({
+            'page_index': page_index,
+            'request_envelope': request_envelope,
+            'normalized_fetch_result': normalized_fetch_result,
+            'response_envelope': response_envelope,
+            'response_record_count': response_record_count,
+        })
+
+        if _source_empty_response(response_envelope):
+            terminal_result = _empty_terminal_result(accumulated_records)
+            return {
+                'endpoint_contract_id': endpoint_contract_id,
+                'pages': pages,
+                'endpoint_status': terminal_result['endpoint_status'],
+                'record_count': terminal_result['record_count'],
+                'terminal_outcome_category': terminal_result['terminal_outcome_category'],
+                'error_taxonomy': None,
+                'error_code': None,
+                'error_message': None,
+                'retryable': None,
+            }
+
+        if transport_error:
+            return {
+                'endpoint_contract_id': endpoint_contract_id,
+                'pages': pages,
+                'endpoint_status': 'failed',
+                'record_count': accumulated_records,
+                'terminal_outcome_category': 'transport',
+                'error_taxonomy': transport_error.get('taxonomy'),
+                'error_code': transport_error.get('code'),
+                'error_message': transport_error.get('message'),
+                'retryable': transport_error.get('retryable'),
+            }
+
+        if response_envelope.get('Code') != 200:
+            source_error = _source_error(response_envelope)
+            return {
+                'endpoint_contract_id': endpoint_contract_id,
+                'pages': pages,
+                'endpoint_status': 'failed',
+                'record_count': accumulated_records,
+                'terminal_outcome_category': source_error['terminal_outcome_category'],
+                'error_taxonomy': source_error['taxonomy'],
+                'error_code': source_error['code'],
+                'error_message': source_error['message'],
+                'retryable': source_error['retryable'],
+            }
+
+        if schema_error is not None:
+            return {
+                'endpoint_contract_id': endpoint_contract_id,
+                'pages': pages,
+                'endpoint_status': 'failed',
+                'record_count': accumulated_records,
+                'terminal_outcome_category': schema_error['terminal_outcome_category'],
+                'error_taxonomy': schema_error['taxonomy'],
+                'error_code': schema_error['code'],
+                'error_message': schema_error['message'],
+                'retryable': schema_error['retryable'],
+            }
+
+        if response_record_count == 0:
+            terminal_result = _empty_terminal_result(accumulated_records)
+            return {
+                'endpoint_contract_id': endpoint_contract_id,
+                'pages': pages,
+                'endpoint_status': terminal_result['endpoint_status'],
+                'record_count': terminal_result['record_count'],
+                'terminal_outcome_category': terminal_result['terminal_outcome_category'],
+                'error_taxonomy': None,
+                'error_code': None,
+                'error_message': None,
+                'retryable': None,
+            }
+
+        if uses_pagination:
+            current_page_size = int(
+                request_envelope['payload'].get(page_size_wire)
+                or request_envelope['payload'].get('PageSize')
+                or request_envelope['payload'].get('page_size')
+                or page_size
+            )
+            if response_total > (page_index * current_page_size):
+                page_index += 1
+                continue
+
+        return {
+            'endpoint_contract_id': endpoint_contract_id,
+            'pages': pages,
+            'endpoint_status': 'completed',
+            'record_count': accumulated_records,
+            'terminal_outcome_category': 'success',
+            'error_taxonomy': None,
+            'error_code': None,
+            'error_message': None,
+            'retryable': None,
+        }
+
+
 def run_finance_summary_vertical_slice(
     *,
     org_id: str,
@@ -254,8 +424,31 @@ def run_finance_summary_vertical_slice(
     )
     raw_pages_by_endpoint: dict[str, list[dict[str, Any]]] = {}
     completed_endpoint_runs: list[dict[str, Any]] = []
+    max_concurrent_endpoint_fetches = resolve_nightly_sync_endpoint_fetch_concurrency(
+        SOURCE_SYSTEM_ID,
+        data_platform_root=data_platform_root,
+    )
+    endpoint_results = ordered_parallel_map(
+        required_endpoint_contract_ids,
+        lambda endpoint_contract_id: _sync_finance_endpoint(
+            endpoint_contract_id=endpoint_contract_id,
+            org_id=org_id,
+            start_time=start_time,
+            end_time=end_time,
+            requested_business_date=requested_business_date,
+            app_secret=app_secret,
+            transport=transport,
+            page_size=page_size,
+            member_card_id=member_card_id,
+            trade_type=trade_type,
+            data_platform_root=data_platform_root,
+            resolved_transport_kind=resolved_transport_kind,
+            registry=registry,
+        ),
+        max_workers=max_concurrent_endpoint_fetches,
+    )
 
-    for endpoint_contract_id in required_endpoint_contract_ids:
+    for endpoint_contract_id, endpoint_result in zip(required_endpoint_contract_ids, endpoint_results):
         endpoint_run = artifact_store.start_endpoint_run(
             ingestion_run_id=ingestion_run['ingestion_run_id'],
             endpoint_contract_id=endpoint_contract_id,
@@ -264,188 +457,44 @@ def run_finance_summary_vertical_slice(
             transport_kind=resolved_transport_kind,
         )
         raw_pages_by_endpoint[endpoint_contract_id] = []
-        page_index = 1
-        accumulated_records = 0
-        uses_pagination = _endpoint_uses_pagination(endpoint_contract_id, registry)
-        page_size_wire = registry.preferred_wire_name('page_size') if uses_pagination else None
-        finalized = False
-
-        while not finalized:
-            request_envelope = build_signed_request(
-                endpoint_contract_id=endpoint_contract_id,
-                org_id=org_id,
-                start_time=start_time,
-                end_time=end_time,
-                page_index=page_index if uses_pagination else None,
-                page_size=page_size if uses_pagination else None,
-                app_secret=app_secret,
-                member_card_id=member_card_id if endpoint_contract_id == ACCOUNT_TRADE_ENDPOINT_ID else None,
-                trade_type=trade_type if endpoint_contract_id == ACCOUNT_TRADE_ENDPOINT_ID else None,
-                data_platform_root=data_platform_root,
-            )
-
-            try:
-                fetch_result = transport.fetch_page(endpoint_contract_id, request_envelope['payload'])
-            except Exception as exc:
-                fetch_result = build_exception_fetch_result(
-                    exception=exc,
-                    request_envelope=request_envelope,
-                    default_transport_kind=resolved_transport_kind,
-                )
-
-            normalized_fetch_result = normalize_fetch_page_result(
-                fetch_result=fetch_result,
-                request_envelope=request_envelope,
-                default_transport_kind=resolved_transport_kind,
-            )
+        terminal_replay_artifact_id = None
+        for page in endpoint_result['pages']:
             transport_replay_artifact = artifact_store.append_transport_replay_artifact(
                 endpoint_run_id=endpoint_run['endpoint_run_id'],
                 endpoint_contract_id=endpoint_contract_id,
                 requested_business_date=requested_business_date,
-                page_index=page_index,
-                replay_artifact=normalized_fetch_result['replay_artifact'],
+                page_index=page['page_index'],
+                replay_artifact=page['normalized_fetch_result']['replay_artifact'],
             )
-            response_envelope = normalized_fetch_result['response_envelope']
-            transport_error = normalized_fetch_result.get('transport_error')
-
-            page_rows: list[dict[str, Any]] = []
-            response_total = 0
-            schema_error: dict[str, Any] | None = None
-            if transport_error is None and response_envelope.get('Code') == 200:
-                try:
-                    normalized_page_payload = _normalized_page_payload(
-                        endpoint_contract_id=endpoint_contract_id,
-                        response_envelope=response_envelope,
-                    )
-                    page_rows = normalized_page_payload['rows']
-                    response_total = normalized_page_payload['total']
-                except SourceSchemaError as exc:
-                    schema_error = _schema_error(endpoint_contract_id, exc)
-            response_record_count = len(page_rows)
-            accumulated_records += response_record_count
-
+            terminal_replay_artifact_id = transport_replay_artifact['replay_artifact_id']
             raw_page_record = artifact_store.append_raw_response_page(
                 endpoint_run_id=endpoint_run['endpoint_run_id'],
                 endpoint_contract_id=endpoint_contract_id,
-                page_index=page_index,
+                page_index=page['page_index'],
                 transport_kind=transport_replay_artifact['transport_kind'],
                 replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
-                request_envelope=request_envelope,
-                response_envelope=response_envelope,
-                response_record_count=response_record_count,
-                source_response_code=response_envelope.get('Code'),
-                source_response_message=response_envelope.get('Msg'),
+                request_envelope=page['request_envelope'],
+                response_envelope=page['response_envelope'],
+                response_record_count=page['response_record_count'],
+                source_response_code=page['response_envelope'].get('Code'),
+                source_response_message=page['response_envelope'].get('Msg'),
             )
             raw_pages_by_endpoint[endpoint_contract_id].append(raw_page_record)
 
-            if _source_empty_response(response_envelope):
-                terminal_result = _empty_terminal_result(accumulated_records)
-                completed_endpoint_runs.append(
-                    artifact_store.finalize_endpoint_run(
-                        endpoint_run_id=endpoint_run['endpoint_run_id'],
-                        endpoint_status=terminal_result['endpoint_status'],
-                        page_count=page_index,
-                        record_count=terminal_result['record_count'],
-                        terminal_outcome_category=terminal_result['terminal_outcome_category'],
-                        terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
-                    )
-                )
-                finalized = True
-                continue
-
-            if transport_error:
-                completed_endpoint_runs.append(
-                    artifact_store.finalize_endpoint_run(
-                        endpoint_run_id=endpoint_run['endpoint_run_id'],
-                        endpoint_status='failed',
-                        page_count=page_index,
-                        record_count=accumulated_records,
-                        terminal_outcome_category='transport',
-                        error_taxonomy=transport_error.get('taxonomy'),
-                        error_code=transport_error.get('code'),
-                        error_message=transport_error.get('message'),
-                        retryable=transport_error.get('retryable'),
-                        terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
-                    )
-                )
-                finalized = True
-                continue
-
-            if response_envelope.get('Code') != 200:
-                source_error = _source_error(response_envelope)
-                completed_endpoint_runs.append(
-                    artifact_store.finalize_endpoint_run(
-                        endpoint_run_id=endpoint_run['endpoint_run_id'],
-                        endpoint_status='failed',
-                        page_count=page_index,
-                        record_count=accumulated_records,
-                        terminal_outcome_category=source_error['terminal_outcome_category'],
-                        error_taxonomy=source_error['taxonomy'],
-                        error_code=source_error['code'],
-                        error_message=source_error['message'],
-                        retryable=source_error['retryable'],
-                        terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
-                    )
-                )
-                finalized = True
-                continue
-
-            if schema_error is not None:
-                completed_endpoint_runs.append(
-                    artifact_store.finalize_endpoint_run(
-                        endpoint_run_id=endpoint_run['endpoint_run_id'],
-                        endpoint_status='failed',
-                        page_count=page_index,
-                        record_count=accumulated_records,
-                        terminal_outcome_category=schema_error['terminal_outcome_category'],
-                        error_taxonomy=schema_error['taxonomy'],
-                        error_code=schema_error['code'],
-                        error_message=schema_error['message'],
-                        retryable=schema_error['retryable'],
-                        terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
-                    )
-                )
-                finalized = True
-                continue
-
-            if response_record_count == 0:
-                terminal_result = _empty_terminal_result(accumulated_records)
-                completed_endpoint_runs.append(
-                    artifact_store.finalize_endpoint_run(
-                        endpoint_run_id=endpoint_run['endpoint_run_id'],
-                        endpoint_status=terminal_result['endpoint_status'],
-                        page_count=page_index,
-                        record_count=terminal_result['record_count'],
-                        terminal_outcome_category=terminal_result['terminal_outcome_category'],
-                        terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
-                    )
-                )
-                finalized = True
-                continue
-
-            if uses_pagination:
-                current_page_size = int(
-                    request_envelope['payload'].get(page_size_wire)
-                    or request_envelope['payload'].get('PageSize')
-                    or request_envelope['payload'].get('page_size')
-                    or page_size
-                )
-                has_more_pages = response_total > (page_index * current_page_size)
-                if has_more_pages:
-                    page_index += 1
-                    continue
-
-            completed_endpoint_runs.append(
-                artifact_store.finalize_endpoint_run(
-                    endpoint_run_id=endpoint_run['endpoint_run_id'],
-                    endpoint_status='completed',
-                    page_count=page_index,
-                    record_count=accumulated_records,
-                    terminal_outcome_category='success',
-                    terminal_replay_artifact_id=transport_replay_artifact['replay_artifact_id'],
-                )
+        completed_endpoint_runs.append(
+            artifact_store.finalize_endpoint_run(
+                endpoint_run_id=endpoint_run['endpoint_run_id'],
+                endpoint_status=endpoint_result['endpoint_status'],
+                page_count=len(endpoint_result['pages']),
+                record_count=endpoint_result['record_count'],
+                terminal_outcome_category=endpoint_result['terminal_outcome_category'],
+                error_taxonomy=endpoint_result['error_taxonomy'],
+                error_code=endpoint_result['error_code'],
+                error_message=endpoint_result['error_message'],
+                retryable=endpoint_result['retryable'],
+                terminal_replay_artifact_id=terminal_replay_artifact_id,
             )
-            finalized = True
+        )
 
     finalized_ingestion_run = artifact_store.finalize_ingestion_run(
         ingestion_run_id=ingestion_run['ingestion_run_id'],

@@ -4,6 +4,11 @@ from pathlib import Path
 from typing import Any, Iterable, Sequence
 
 from backbone_support.postgres_truth_substrate import PostgresTruthSubstrate, utcnow_iso
+from directory.nightly_sync_policy_registry import (
+    resolve_nightly_sync_history_start_business_date,
+    should_default_operator_backfill_to_full_history,
+)
+from ingestion.member_insight_vertical_slice import SOURCE_SYSTEM_ID
 from workflows.postgres_temporal_nightly_sync import (
     NightlyPlannerPolicy,
     NightlySyncPlanner,
@@ -535,6 +540,14 @@ def _execute_operator_action(
             backfill_from=backfill_from,
             backfill_to=backfill_to,
         )
+        if (
+            (requested_from is None or requested_to is None)
+            and should_default_operator_backfill_to_full_history(SOURCE_SYSTEM_ID)
+        ):
+            resolved_history_start = resolve_nightly_sync_history_start_business_date(SOURCE_SYSTEM_ID)
+            if resolved_history_start:
+                requested_from = resolved_history_start
+                requested_to = target_business_date
         if requested_from is None or requested_to is None:
             raise ValueError('backfill action requires backfill_from or backfill_to')
         temporal_plane = _build_temporal_plane(

@@ -329,9 +329,15 @@ class MemberInsightVerticalSliceTest(unittest.TestCase):
                 )
                 self.assertEqual(result['transport_kind'], 'live')
                 self.assertEqual(len(server.requests), 2)
-                self.assertEqual(server.requests[0]['path'], '/api/thirdparty/GetCustomersList')
-                self.assertEqual(server.requests[0]['payload']['OrgId'], 'demo-org-001')
-                self.assertIn('Sign', server.requests[0]['payload'])
+                self.assertEqual(
+                    {request['path'] for request in server.requests},
+                    {
+                        '/api/thirdparty/GetCustomersList',
+                        '/api/thirdparty/GetConsumeBillList',
+                    },
+                )
+                self.assertTrue(all(request['payload']['OrgId'] == 'demo-org-001' for request in server.requests))
+                self.assertTrue(all('Sign' in request['payload'] for request in server.requests))
 
                 replay_artifact = result['raw_replay']['transport_replay_artifacts'][0]
                 self.assertEqual(replay_artifact['transport_kind'], 'live')
