@@ -4,6 +4,8 @@
 
 ## 当前文件
 
+- `2026-04-12-navly-v1-phase-1-closeout-spec.md`
+  - Navly_v1 phase-1 收口规范：把当前 production drift、数据中台缺口、宿主链路缺口和 full closeout 验收门槛收敛成正式执行基线
 - `2026-04-06-navly-v1-design.md`
   - Navly_v1 正式方案：定义当前可落地架构、目标架构、双内核边界、upstream 采用策略与版本路线
 - `2026-04-06-navly-v1-modular-development-and-vibe-coding.md`
@@ -28,6 +30,10 @@
   - Navly_v1 thin runtime shell 专项方案包：模块边界、内部分层、phase-1、外部接口
 - `verification/`
   - Navly_v1 verification / e2e / docs consistency / regression baseline 方案包
+- `openclaw-host-bridge/2026-04-12-navly-v1-host-skill-tool-capability-surface.md`
+  - Navly_v1 在 OpenClaw / WeCom 宿主中的正式 skill list、tool list 与 `skill -> tool -> capability` 映射
+- `openclaw-host-bridge/2026-04-12-navly-v1-permissions-and-agent-responsibility.md`
+  - Navly_v1 权限与 OpenClaw agent 的责任分工 spec：谁负责授权真相、谁负责宿主隔离与承载
 
 ## 当前建议阅读顺序
 
@@ -36,30 +42,31 @@
 3. `2026-04-06-navly-v1-naming-conventions.md`
 4. `2026-04-06-navly-v1-shared-contracts-layer.md`
 5. `2026-04-06-navly-v1-upstream-integration-policy.md`
-6. `2026-04-06-navly-v1-implementation-kickoff.md`
-7. `shared-contracts/README.md`
-8. `shared-contracts/2026-04-06-navly-v1-shared-contracts-core-objects.md`
-9. `shared-contracts/2026-04-06-navly-v1-shared-contracts-phase-1-freeze.md`
-10. `shared-contracts/2026-04-06-navly-v1-shared-contracts-interaction.md`
-11. `data-platform/README.md`
-12. `auth-kernel/README.md`
-13. `openclaw-host-bridge/README.md`
-14. `runtime/README.md`
-15. `verification/README.md`
-16. `data-platform/2026-04-06-navly-v1-data-platform-module-boundaries.md`
-17. `data-platform/2026-04-06-navly-v1-data-platform-internal-layers.md`
-18. `data-platform/2026-04-06-navly-v1-data-platform-phase-1.md`
-19. `data-platform/2026-04-06-navly-v1-data-platform-external-interfaces.md`
-20. `auth-kernel/2026-04-06-navly-v1-auth-kernel-module-boundaries.md`
-21. `auth-kernel/2026-04-06-navly-v1-auth-kernel-internal-layers.md`
-22. `auth-kernel/2026-04-06-navly-v1-auth-kernel-phase-1.md`
-23. `auth-kernel/2026-04-06-navly-v1-auth-kernel-external-interfaces.md`
-24. `openclaw-host-bridge/2026-04-06-navly-v1-openclaw-host-bridge-boundaries.md`
-25. `runtime/2026-04-06-navly-v1-thin-runtime-boundaries.md`
-26. `verification/2026-04-06-navly-v1-phase-1-verification-checklist.md`
-27. `../../architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
-28. `../../api/qinqin/README.md`
-29. `../../audits/qinqin/README.md`
+6. `2026-04-12-navly-v1-phase-1-closeout-spec.md`
+7. `2026-04-06-navly-v1-implementation-kickoff.md`
+8. `shared-contracts/README.md`
+9. `shared-contracts/2026-04-06-navly-v1-shared-contracts-core-objects.md`
+10. `shared-contracts/2026-04-06-navly-v1-shared-contracts-phase-1-freeze.md`
+11. `shared-contracts/2026-04-06-navly-v1-shared-contracts-interaction.md`
+12. `data-platform/README.md`
+13. `auth-kernel/README.md`
+14. `openclaw-host-bridge/README.md`
+15. `runtime/README.md`
+16. `verification/README.md`
+17. `data-platform/2026-04-06-navly-v1-data-platform-module-boundaries.md`
+18. `data-platform/2026-04-06-navly-v1-data-platform-internal-layers.md`
+19. `data-platform/2026-04-06-navly-v1-data-platform-phase-1.md`
+20. `data-platform/2026-04-06-navly-v1-data-platform-external-interfaces.md`
+21. `auth-kernel/2026-04-06-navly-v1-auth-kernel-module-boundaries.md`
+22. `auth-kernel/2026-04-06-navly-v1-auth-kernel-internal-layers.md`
+23. `auth-kernel/2026-04-06-navly-v1-auth-kernel-phase-1.md`
+24. `auth-kernel/2026-04-06-navly-v1-auth-kernel-external-interfaces.md`
+25. `openclaw-host-bridge/2026-04-06-navly-v1-openclaw-host-bridge-boundaries.md`
+26. `runtime/2026-04-06-navly-v1-thin-runtime-boundaries.md`
+27. `verification/2026-04-06-navly-v1-phase-1-verification-checklist.md`
+28. `../../architecture/navly-v1/2026-04-06-navly-v1-architecture.md`
+29. `../../api/qinqin/README.md`
+30. `../../audits/qinqin/README.md`
 
 ## 文档包目标
 

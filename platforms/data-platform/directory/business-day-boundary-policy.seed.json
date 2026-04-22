@@ -1,28 +1,62 @@
 {
   "registry_name": "business_day_boundary_policy_registry",
-  "status": "phase_1_contract_frozen",
-  "governance_scope": "data-platform-only",
-  "resolution_hierarchy": [
+  "status": "phase_1_policy_frozen",
+  "override_resolution_order": [
     "store_ref",
     "org_ref",
     "global_default"
   ],
-  "boundary_interpretation": "business_date = local_calendar_date when local_time >= business_day_boundary_local_time; otherwise previous_local_calendar_date",
+  "selection_rules": [
+    "prefer_most_specific_scope",
+    "within_same_scope_use_latest_effective_from",
+    "effective_to_is_exclusive_when_present"
+  ],
+  "supported_metric_domains": [
+    "store_operating_day",
+    "store_daily_overview",
+    "store_finance_summary",
+    "store_staff_board"
+  ],
   "entries": [
     {
-      "policy_id": "navly.business_day_boundary.global_default",
-      "selector_kind": "global_default",
-      "org_ref": null,
-      "store_ref": null,
+      "policy_id": "navly.business_day.global_default.store_operating_day",
+      "metric_domain": "store_operating_day",
+      "scope_kind": "global_default",
+      "scope_ref": "navly:scope:global:default",
       "timezone": "Asia/Shanghai",
-      "business_day_boundary_local_time": "03:00:00",
+      "business_day_start_local_time": "04:00",
+      "business_day_end_exclusive_local_time": "04:00",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
       "policy_status": "policy_frozen",
-      "truth_source_docs": [
-        "docs/api/qinqin/auth-and-signing.md",
-        "docs/api/qinqin/endpoint-manifest.md"
-      ],
-      "notes": "Phase-1 default business-day boundary policy. The 03:00 boundary is an explicit data-platform governance decision inferred from the formal Qinqin access window opening at 03:00 and the documented 03:10 daily sync start."
+      "notes": "Global default for cross-store operating-day attribution."
+    },
+    {
+      "policy_id": "navly.business_day.org.sample-retail.store_operating_day",
+      "metric_domain": "store_operating_day",
+      "scope_kind": "org_ref",
+      "scope_ref": "navly:scope:org:sample-retail",
+      "timezone": "Asia/Shanghai",
+      "business_day_start_local_time": "04:00",
+      "business_day_end_exclusive_local_time": "04:00",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
+      "policy_status": "policy_frozen",
+      "notes": "Org-level override placeholder proving this policy is governed in data-platform C0, not runtime config."
+    },
+    {
+      "policy_id": "navly.business_day.store.sample-store-001.store_operating_day",
+      "metric_domain": "store_operating_day",
+      "scope_kind": "store_ref",
+      "scope_ref": "navly:scope:store:sample-store-001",
+      "timezone": "Asia/Shanghai",
+      "business_day_start_local_time": "03:00",
+      "business_day_end_exclusive_local_time": "03:00",
+      "effective_from": "2026-02-01",
+      "effective_to": null,
+      "policy_status": "policy_frozen",
+      "notes": "Store-specific override example showing narrower scopes can define a different business-day boundary."
     }
   ],
-  "notes": "This registry is a governed data-platform object, not runtime config. Future org_ref or store_ref overrides must be added here and follow the declared resolution_hierarchy."
+  "notes": "Governed business-day boundary policy registry owned by data-platform C0. Downstream consumers are expected to adopt this object in later tasks."
 }

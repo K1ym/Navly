@@ -46,6 +46,10 @@
   - `bridges/openclaw-host-bridge/` 的目标目录骨架与 bridge local / shared interaction 边界
 - `2026-04-06-navly-v1-openclaw-host-bridge-implementation-plan.md`
   - `openclaw-host-bridge` phase-1 的可执行 implementation plan、里程碑与 gate
+- `2026-04-12-navly-v1-host-skill-tool-capability-surface.md`
+  - Navly_v1 在 OpenClaw 宿主中的正式 `skill -> tool -> capability` 调用面，以及面向店长的业务能力披露层
+- `2026-04-12-navly-v1-permissions-and-agent-responsibility.md`
+  - Navly_v1 中权限真相与 OpenClaw agent 的责任边界，明确 agent 只做承载/隔离，不做最终授权
 
 ---
 
