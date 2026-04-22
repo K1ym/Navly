@@ -32,10 +32,10 @@
       "notes": "Global default for cross-store operating-day attribution."
     },
     {
-      "policy_id": "navly.business_day.org.sample-retail.store_operating_day",
+      "policy_id": "navly.business_day.org.demo-org-001.store_operating_day",
       "metric_domain": "store_operating_day",
       "scope_kind": "org_ref",
-      "scope_ref": "navly:scope:org:sample-retail",
+      "scope_ref": "navly:scope:org:demo-org-001",
       "timezone": "Asia/Shanghai",
       "business_day_start_local_time": "04:00",
       "business_day_end_exclusive_local_time": "04:00",
@@ -45,10 +45,10 @@
       "notes": "Org-level override placeholder proving this policy is governed in data-platform C0, not runtime config."
     },
     {
-      "policy_id": "navly.business_day.store.sample-store-001.store_operating_day",
+      "policy_id": "navly.business_day.store.demo-org-001.store_operating_day",
       "metric_domain": "store_operating_day",
       "scope_kind": "store_ref",
-      "scope_ref": "navly:scope:store:sample-store-001",
+      "scope_ref": "navly:scope:store:demo-org-001",
       "timezone": "Asia/Shanghai",
       "business_day_start_local_time": "03:00",
       "business_day_end_exclusive_local_time": "03:00",

@@ -6,10 +6,12 @@ from pathlib import Path
 from typing import Any
 
 from backbone_support.latest_usable_state_backbone import build_state_trace_ref, utcnow_iso
+from directory.business_day_boundary_policy_registry import (
+    resolve_business_day_boundary_policy as resolve_directory_business_day_boundary_policy,
+)
 
 DATA_PLATFORM_ROOT = Path(__file__).resolve().parents[1]
 COMMISSION_SETTING_ENDPOINT_ID = 'qinqin.staff.get_tech_commission_set_list.v1_8'
-NON_RESOLVABLE_POLICY_STATUSES = {'policy_draft', 'policy_deprecated'}
 USABLE_AVAILABILITY_STATUSES = {'available', 'source_empty'}
 
 
@@ -22,44 +24,17 @@ def _load_business_day_policy_registry(data_platform_root: Path = DATA_PLATFORM_
     return _load_json(data_platform_root / 'directory' / 'business-day-boundary-policy.seed.json')
 
 
-def _is_resolvable_policy(entry: dict[str, Any]) -> bool:
-    return entry['policy_status'] not in NON_RESOLVABLE_POLICY_STATUSES
-
-
 def resolve_business_day_boundary_policy(
     *,
     org_ref: str | None = None,
     store_ref: str | None = None,
     data_platform_root: Path = DATA_PLATFORM_ROOT,
 ) -> dict[str, Any]:
-    registry = _load_business_day_policy_registry(data_platform_root=data_platform_root)
-    matches_by_selector: dict[str, list[dict[str, Any]]] = {
-        selector_kind: []
-        for selector_kind in registry['resolution_hierarchy']
-    }
-
-    for entry in registry['entries']:
-        if not _is_resolvable_policy(entry):
-            continue
-        selector_kind = entry['selector_kind']
-        if selector_kind not in matches_by_selector:
-            continue
-        if selector_kind == 'store_ref' and store_ref and entry['store_ref'] == store_ref:
-            matches_by_selector[selector_kind].append(entry)
-        elif selector_kind == 'org_ref' and org_ref and entry['org_ref'] == org_ref:
-            matches_by_selector[selector_kind].append(entry)
-        elif selector_kind == 'global_default':
-            matches_by_selector[selector_kind].append(entry)
-
-    for selector_kind in registry['resolution_hierarchy']:
-        matches = matches_by_selector[selector_kind]
-        if not matches:
-            continue
-        if len(matches) != 1:
-            raise ValueError(f'Expected exactly one business-day policy for {selector_kind}, got {matches}')
-        return matches[0]
-
-    raise ValueError('Expected at least one matching business-day boundary policy.')
+    return resolve_directory_business_day_boundary_policy(
+        org_ref=org_ref,
+        store_ref=store_ref,
+        data_platform_root=data_platform_root,
+    )
 
 
 def _availability_status(endpoint_run: dict[str, Any]) -> str:

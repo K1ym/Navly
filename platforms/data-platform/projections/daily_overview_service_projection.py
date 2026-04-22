@@ -30,8 +30,13 @@ def build_daily_overview_service_object(
         'latest_usable_business_date': latest_usable_business_date,
         'business_day_boundary_policy': {
             'policy_id': business_day_policy['policy_id'],
+            'metric_domain': business_day_policy.get('metric_domain'),
+            'scope_kind': business_day_policy.get('scope_kind'),
+            'scope_ref': business_day_policy.get('scope_ref'),
             'selector_kind': business_day_policy['selector_kind'],
             'timezone': business_day_policy['timezone'],
+            'business_day_start_local_time': business_day_policy.get('business_day_start_local_time'),
+            'business_day_end_exclusive_local_time': business_day_policy.get('business_day_end_exclusive_local_time'),
             'business_day_boundary_local_time': business_day_policy['business_day_boundary_local_time'],
         },
         'published_service_object_ids': published_service_object_ids,
